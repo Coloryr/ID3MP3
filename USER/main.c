@@ -16,7 +16,7 @@
 #include "mp3id3.h" 
 
 int main(void)
-{		    		    	  
+{
 	delay_init();	    	 //延时函数初始化	  
 	NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
 	KEY_Init();
@@ -32,16 +32,16 @@ int main(void)
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_2);//设置为18M时钟,高速模式		
 	VS1053_Init();
 	LCD_Clear(BLACK);
-	POINT_COLOR=RED;
-	BACK_COLOR=BLACK;		
-	if(font_init()==1)
-	  update_font(0,0,16,0);
+	POINT_COLOR = RED;
+	BACK_COLOR = BLACK;
+	if (font_init() == 1)
+		update_font(0, 0, 16, 0);
 	while (1)
 	{
-		POINT_COLOR=RED;       			
+		POINT_COLOR = RED;
 		LCD_Clear(BLACK);
 		//VS_Sine_Test();
-		mp3_play();  
+		mp3_play();
 	}
 }
 

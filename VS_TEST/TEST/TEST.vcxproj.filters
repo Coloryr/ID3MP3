@@ -195,6 +195,9 @@
     <ClInclude Include="..\..\USER\system_stm32f10x.h">
       <Filter>USER</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\APP\mp3id3.h">
+      <Filter>APP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\APP\fontupd.c">
@@ -340,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="..\..\USER\system_stm32f10x.c">
       <Filter>USER</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\mp3id3.c">
+      <Filter>APP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

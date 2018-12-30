@@ -4,7 +4,7 @@
 #include "exfuns.h"
 #include "ff.h"
  	 	 
-u8 mp3id3_is(const TCHAR* path);
+u16 mp3id3_is(const TCHAR* path);
 
 #endif
 

@@ -112,81 +112,79 @@ const u16 VS_NEW_BANDS_FREQ_TBL[14]={80,300,800,1270,2016,3200,4500,6000,7500,90
 //显示曲目索引
 //index:当前索引
 //total:总文件数
-void mp3_index_show(u16 index,u16 total)
+void mp3_index_show(u16 index, u16 total)
 {
 	//显示当前曲目的索引,及总曲目数
-	if(lcd_bit<10)
-		{
-	LCD_ShowxNum(30+0,50,index,3,16,0X80);		//索引
-	LCD_ShowChar(30+24,50,'/',16,0);
-	LCD_ShowxNum(30+32,50,total,3,16,0X80); 	//总曲目	
-		}			
+	if (lcd_bit < 10)
+	{
+		LCD_ShowxNum(30 + 0, 50, index, 3, 16, 0X80);		//索引
+		LCD_ShowChar(30 + 24, 50, '/', 16, 0);
+		LCD_ShowxNum(30 + 32, 50, total, 3, 16, 0X80); 	//总曲目	
+	}
 }
 //显示当前音量
 void mp3_vol_show(u8 vol)
-{			    
-	if(lcd_bit<10)
-		{
-	LCD_ShowString(30+110,50,200,16,16,"VOL:");	  	  
-	LCD_ShowxNum(30+142,50,vol,2,16,0X80); 	//显示音量	 
-		}
+{
+	if (lcd_bit < 10)
+	{
+		LCD_ShowString(30 + 110, 50, 200, 16, 16, "VOL:");
+		LCD_ShowxNum(30 + 142, 50, vol, 2, 16, 0X80); 	//显示音量	 
+	}
 }
 u16 f_kbps=0;//歌曲文件位率	
 //显示播放时间,比特率 信息 
 //lenth:歌曲总长度
 void mp3_msg_show(u32 lenth)
-{	
-	static u16 playtime=0;//播放时间标记
-  u16 specbuf[15];	
- 	u16 time=0;// 时间变量
-	u16 temp=0;	  
-	u16 res;
-	if(f_kbps==0xffff)//未更新过
+{
+	static u16 playtime = 0;//播放时间标记
+	u16 time = 0;// 时间变量
+	u16 temp = 0;
+	if (f_kbps == 0xffff)//未更新过
 	{
-		playtime=0;
-		f_kbps=VS_Get_HeadInfo();//获得比特率
-	}	 	 
-	time=VS_Get_DecodeTime(); //得到解码时间
+		playtime = 0;
+		f_kbps = VS_Get_HeadInfo();//获得比特率
+	}
+	time = VS_Get_DecodeTime(); //得到解码时间
 
-	if(playtime==0)playtime=time;
-	else if((time!=playtime)&&(time!=0))//1s时间到,更新显示数据
+	if (playtime == 0)playtime = time;
+	else if ((time != playtime) && (time != 0))//1s时间到,更新显示数据
 	{
- 		playtime=time;//更新时间 	 			
-		if(lcd_bit<10)
+		playtime = time;//更新时间 	 			
+		if (lcd_bit < 10)
 		{
-		lcd_bit++;
-	
- 		temp=VS_Get_HeadInfo(); //获得比特率	   				 
-		if(temp!=f_kbps)
-		{
-			f_kbps=temp;//更新KBPS	  				     
-		}			 
-		//显示播放时间			 
-		LCD_ShowxNum(30,20,time/60,2,16,0X80);		//分钟
-		LCD_ShowChar(30+16,20,':',16,0);
-		LCD_ShowxNum(30+24,20,time%60,2,16,0X80);	//秒钟		
- 		LCD_ShowChar(30+40,20,'/',16,0); 	    	 
-		//显示总时间
-		if(f_kbps)time=(lenth/f_kbps)/125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
-		else time=0;//非法位率	  
- 		LCD_ShowxNum(30+48,20,time/60,2,16,0X80);	//分钟
-		LCD_ShowChar(30+64,20,':',16,0);
-		LCD_ShowxNum(30+72,20,time%60,2,16,0X80);	//秒钟	  		    
-		//显示位率			   
-   		LCD_ShowxNum(30+110,20,f_kbps,3,16,0X80); 	//显示位率	 
-		LCD_ShowString(30+134,20,200,16,16,"Kbps");	  
+			lcd_bit++;
+
+			temp = VS_Get_HeadInfo(); //获得比特率	   				 
+			if (temp != f_kbps)
+			{
+				f_kbps = temp;//更新KBPS	  				     
+			}
+			//显示播放时间			 
+			LCD_ShowxNum(30, 20, time / 60, 2, 16, 0X80);		//分钟
+			LCD_ShowChar(30 + 16, 20, ':', 16, 0);
+			LCD_ShowxNum(30 + 24, 20, time % 60, 2, 16, 0X80);	//秒钟		
+			LCD_ShowChar(30 + 40, 20, '/', 16, 0);
+			//显示总时间
+			if (f_kbps)time = (lenth / f_kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
+			else time = 0;//非法位率	  
+			LCD_ShowxNum(30 + 48, 20, time / 60, 2, 16, 0X80);	//分钟
+			LCD_ShowChar(30 + 64, 20, ':', 16, 0);
+			LCD_ShowxNum(30 + 72, 20, time % 60, 2, 16, 0X80);	//秒钟	  		    
+			//显示位率			   
+			LCD_ShowxNum(30 + 110, 20, f_kbps, 3, 16, 0X80); 	//显示位率	 
+			LCD_ShowString(30 + 134, 20, 200, 16, 16, "Kbps");
 		}
 		else
 		{
-		LCD_LED = 0;
-		}	 
-	}   		
-	if(lcd_bit<10)
-		{
-		 VS_Get_Spec(FFTbuf); //提取频谱数据
-		FFT_post(FFTbuf);	  //进行频谱效果显示
+			LCD_LED = 0;
 		}
-}	
+	}
+	if (lcd_bit < 10)
+	{
+		VS_Get_Spec(FFTbuf); //提取频谱数据
+		FFT_post(FFTbuf);	  //进行频谱效果显示
+	}
+}
 //得到path路径下,目标文件的总个数
 //path:路径		    
 //返回值:总有效文件数
@@ -220,118 +218,120 @@ u16 mp3_get_tnum(u8 *path)
 //初始化频谱管理数据
 void init_fft(void)
 {
-  u8 i;
-  for(i=0;i<FFT_BANDS;i++)	//初始化频谱管理数据
-  {
-   fftdev.fft_cur[i]=0;
-   fftdev.fft_top[i]=60;
-   fftdev.fft_time[i]=1;
-  }
+	u8 i;
+	for (i = 0; i < FFT_BANDS; i++)	//初始化频谱管理数据
+	{
+		fftdev.fft_cur[i] = 0;
+		fftdev.fft_top[i] = 60;
+		fftdev.fft_time[i] = 1;
+	}
 }
 //播放音乐
 void mp3_play(void)
 {
 	u8 res;
- 	DIR mp3dir;	 		//目录
+	DIR mp3dir;	 		//目录
 	FILINFO mp3fileinfo;//文件信息
 	u8 *fn;   			//长文件名
 	u8 *pname;			//带路径的文件名
 	u16 totmp3num; 		//音乐文件总数
 	u16 curindex;		//图片当前索引
 	u8 key;					//键值		  
- 	u16 temp;
+	u16 temp;
 	u16 *mp3indextbl;	//音乐索引表 
 	init_fft();
- 	while(f_opendir(&mp3dir,"0:/MUSIC"))//打开图片文件夹
- 	{	    
-		Show_Str(30,20,240,16,"MUSIC文件夹错误!",16,0);
-		delay_ms(200);				  
-		LCD_Fill(30,20,240,226,BLACK);//清除显示	     
-		delay_ms(200);				  
-	} 									  
-	totmp3num=mp3_get_tnum("0:/MUSIC"); //得到总有效文件数
-  	while(totmp3num==NULL)//音乐文件总数为0		
- 	{	    
-		Show_Str(30,20,240,16,"没有音乐文件!",16,0);
-		delay_ms(200);				  
-		LCD_Fill(30,20,240,226,BLACK);//清除显示	     
-		delay_ms(200);				  
-	}										   
-  	mp3fileinfo.lfsize=_MAX_LFN*2+1;				//长文件名最大长度
-	mp3fileinfo.lfname=mymalloc(mp3fileinfo.lfsize);//为长文件缓存区分配内存
- 	pname=mymalloc(mp3fileinfo.lfsize);				//为带路径的文件名分配内存
- 	mp3indextbl=mymalloc(2*totmp3num);				//申请2*totmp3num个字节的内存,用于存放音乐文件索引
- 	while(mp3fileinfo.lfname==NULL||pname==NULL||mp3indextbl==NULL)//内存分配出错
- 	{	    
-		Show_Str(30,20,240,16,"内存分配失败!",16,0);
-		delay_ms(200);				  
-		LCD_Fill(30,20,240,226,BLACK);//清除显示	     
-		delay_ms(200);				  
-	}  	
+	while (f_opendir(&mp3dir, "0:/MUSIC"))//打开图片文件夹
+	{
+		Show_Str(30, 20, 240, 16, "MUSIC文件夹错误!", 16, 0);
+		delay_ms(200);
+		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
+		delay_ms(200);
+	}
+	totmp3num = mp3_get_tnum("0:/MUSIC"); //得到总有效文件数
+	while (totmp3num == NULL)//音乐文件总数为0		
+	{
+		Show_Str(30, 20, 240, 16, "没有音乐文件!", 16, 0);
+		delay_ms(200);
+		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
+		delay_ms(200);
+	}
+	mp3fileinfo.lfsize = _MAX_LFN * 2 + 1;				//长文件名最大长度
+	mp3fileinfo.lfname = mymalloc(mp3fileinfo.lfsize);//为长文件缓存区分配内存
+	pname = mymalloc(mp3fileinfo.lfsize);				//为带路径的文件名分配内存
+	mp3indextbl = mymalloc(2 * totmp3num);				//申请2*totmp3num个字节的内存,用于存放音乐文件索引
+	while (mp3fileinfo.lfname == NULL || pname == NULL || mp3indextbl == NULL)//内存分配出错
+	{
+		Show_Str(30, 20, 240, 16, "内存分配失败!", 16, 0);
+		delay_ms(200);
+		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
+		delay_ms(200);
+	}
 	VS_HD_Reset();
 	VS_Soft_Reset();
-	mp3_vol_show((vsset.mvol-100)/5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
+	mp3_vol_show((vsset.mvol - 100) / 5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
 	//记录索引
-    res=f_opendir(&mp3dir,"0:/MUSIC"); //打开目录
-	if(res==FR_OK)
+	res = f_opendir(&mp3dir, "0:/MUSIC"); //打开目录
+	if (res == FR_OK)
 	{
-		curindex=0;//当前索引为0
-		while(1)//全部查询一遍
+		curindex = 0;//当前索引为0
+		while (1)//全部查询一遍
 		{
-			temp=mp3dir.index;								//记录当前index
-	        res=f_readdir(&mp3dir,&mp3fileinfo);       		//读取目录下的一个文件
-	        if(res!=FR_OK||mp3fileinfo.fname[0]==0)break;	//错误了/到末尾了,退出		  
-     		fn=(u8*)(*mp3fileinfo.lfname?mp3fileinfo.lfname:mp3fileinfo.fname);			 
-			res=f_typetell(fn);	
-			if((res&0XF0)==0X40)//取高四位,看看是不是音乐文件	
+			temp = mp3dir.index;								//记录当前index
+			res = f_readdir(&mp3dir, &mp3fileinfo);       		//读取目录下的一个文件
+			if (res != FR_OK || mp3fileinfo.fname[0] == 0)break;	//错误了/到末尾了,退出		  
+			fn = (u8*)(*mp3fileinfo.lfname ? mp3fileinfo.lfname : mp3fileinfo.fname);
+			res = f_typetell(fn);
+			if ((res & 0XF0) == 0X40)//取高四位,看看是不是音乐文件	
 			{
-				mp3indextbl[curindex]=temp;//记录索引
+				mp3indextbl[curindex] = temp;//记录索引
 				curindex++;
-			}	    
-		} 
-	}   
-			curindex=STMFLASH_ReadHalfWord(0X08050000);
-		if(curindex>totmp3num||curindex<=0)
-		{
-			curindex=0;
-		Test_Write(0X08050000,curindex);
+			}
 		}
-		
-		vsset.mvol=STMFLASH_ReadHalfWord(0X08050002);
-		if(vsset.mvol>240||vsset.mvol<=100)
-		{
-			vsset.mvol=160;
-		Test_Write(0X08050002,vsset.mvol);
-		}
-		mp3_vol_show((vsset.mvol-100)/5);	
-   	res=f_opendir(&mp3dir,(const TCHAR*)"0:/MUSIC"); 	//打开目录
-	while(res==FR_OK)//打开成功
-	{	
-		dir_sdi(&mp3dir,mp3indextbl[curindex]);			//改变当前目录索引	   
-        res=f_readdir(&mp3dir,&mp3fileinfo);       		//读取目录下的一个文件
-        if(res!=FR_OK||mp3fileinfo.fname[0]==0)break;	//错误了/到末尾了,退出
-     	fn=(u8*)(*mp3fileinfo.lfname?mp3fileinfo.lfname:mp3fileinfo.fname);			 
-		strcpy((char*)pname,"0:/MUSIC/");				//复制路径(目录)
-		strcat((char*)pname,(const char*)fn);  			//将文件名接在后面
- 		LCD_Fill(30,70,240,210+16,BLACK);				//清除之前的显示
-		Show_Str(30,70,240,16,fn,16,0);				//显示歌曲名字 
-		LCD_DrawLine(20+2,120,20+2+15*14,120);
+	}
+	curindex = STMFLASH_ReadHalfWord(0X08050000);
+	if (curindex > totmp3num || curindex <= 0)
+	{
+		curindex = 0;
+		Test_Write(0X08050000, curindex);
+	}
+
+	vsset.mvol = STMFLASH_ReadHalfWord(0X08050002);
+	if (vsset.mvol > 240 || vsset.mvol <= 100)
+	{
+		vsset.mvol = 160;
+		Test_Write(0X08050002, vsset.mvol);
+	}
+	//mp3_vol_show((vsset.mvol-100)/5);	
+	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
+	while (res == FR_OK)//打开成功
+	{
+		dir_sdi(&mp3dir, mp3indextbl[curindex]);			//改变当前目录索引	   
+		res = f_readdir(&mp3dir, &mp3fileinfo);       		//读取目录下的一个文件
+		if (res != FR_OK || mp3fileinfo.fname[0] == 0)break;	//错误了/到末尾了,退出
+		fn = (u8*)(*mp3fileinfo.lfname ? mp3fileinfo.lfname : mp3fileinfo.fname);
+		strcpy((char*)pname, "0:/MUSIC/");				//复制路径(目录)
+		strcat((char*)pname, (const char*)fn);  			//将文件名接在后面
+		LCD_Fill(30, 70, 240, 210 + 16, BLACK);				//清除之前的显示
+		Show_Str(30, 70, 240, 16, fn, 16, 0);				//显示歌曲名字 
+		LCD_DrawLine(20 + 2, 120, 20 + 2 + 15 * 14, 120);
 		//gui_fill_rectangle(30,70,240,14,MP3_MAIN_BKCOLOR);//上下各多清空一点,清空之前的显示 
 		//gui_show_ptstrwhiterim(30,70,239-5,319,0,0X0000,0XFFFF,12,mp3fileinfo.fname);	//显示新的名字
 		mp3_index_show(curindex+1,totmp3num);
-		key=mp3_play_song(pname); 				 		//播放这个MP3    
-		if(key==KEY1_PRES)		//上一曲
+		key = mp3_play_song(pname); 				 		//播放这个MP3    
+		if (key == KEY1_PRES)		//上一曲
 		{
-			if(curindex)curindex--;
-			else curindex=totmp3num-1;
-			Test_Write(0X08050000,curindex);
- 		}else if(key==KEY0_PRES)//下一曲
+			if (curindex)curindex--;
+			else curindex = totmp3num - 1;
+			Test_Write(0X08050000, curindex);
+		}
+		else if (key == KEY0_PRES)//下一曲
 		{
-			curindex++;		   	
-			if(curindex>=totmp3num)curindex=0;//到末尾的时候,自动从头开始
-			Test_Write(0X08050000,curindex);
- 		}else break;	//产生了错误 	 
-	} 											  
+			curindex++;
+			if (curindex >= totmp3num)curindex = 0;//到末尾的时候,自动从头开始
+			Test_Write(0X08050000, curindex);
+		}
+		else break;	//产生了错误 	 
+	}
 	myfree(mp3fileinfo.lfname);	//释放内存			    
 	myfree(pname);				//释放内存			    
 	myfree(mp3indextbl);			//释放内存	 
@@ -344,97 +344,101 @@ void mp3_play(void)
 //       2,上一曲
 //       0XFF,出现错误了
 u8 mp3_play_song(u8 *pname)
-{	 
- 	FIL* fmp3;
+{
+	FIL* fmp3;
 	u16 br;
-	u8 res,rval;	  
-	u8 *databuf;	   		   
-	u16 i=0; 
-	u8 key;  	    
-	static u8 pause=0;		//暂停标志 
-	rval=0;	    
-	fmp3=(FIL*)mymalloc(sizeof(FIL));	//申请内存
-	databuf=(u8*)mymalloc(4096);		//开辟4096字节的内存区域
-	if(databuf==NULL||fmp3==NULL)rval=0XFF ;//内存申请失败.
-	if(rval==0)
-	{	  
-	  	VS_Restart_Play();  					//重启播放 
+	u8 res, rval;
+	u8 *databuf;
+	u16 i = 0;
+	u8 key;
+	u16 id3head;
+	static u8 pause = 0;		//暂停标志 
+	rval = 0;
+	fmp3 = (FIL*)mymalloc(sizeof(FIL));	//申请内存
+	databuf = (u8*)mymalloc(4096);		//开辟4096字节的内存区域
+	if (databuf == NULL || fmp3 == NULL)rval = 0XFF;//内存申请失败.
+	if (rval == 0)
+	{
+		VS_Restart_Play();  					//重启播放 
 		VS_Set_All();        					//设置音量等信息 			 
 		VS_Reset_DecodeTime();					//复位解码时间 	  
-		VS_Load_Patch((u16*)VS1053_PATCH,1000); 	  //加载频谱分析补丁
-    VS_Set_Bands((u16*)VS_NEW_BANDS_FREQ_TBL,FFT_BANDS);//重设频谱频率
-		res=f_typetell(pname);	 	 			//得到文件后缀	 			
-    		
-		if(res==0x4c)//如果是flac,加载patch
-		{	
-			VS_Load_Patch((u16*)vs1053b_patch,VS1053B_PATCHLEN);
-		}  		
-		mp3id3_is((const TCHAR*)pname)	;	
-		res=f_open(fmp3,(const TCHAR*)pname,FA_READ);//打开文件
+		VS_Load_Patch((u16*)VS1053_PATCH, 1000); 	  //加载频谱分析补丁
+		VS_Set_Bands((u16*)VS_NEW_BANDS_FREQ_TBL, FFT_BANDS);//重设频谱频率
+		res = f_typetell(pname);	 	 			//得到文件后缀	 			
+
+		if (res == 0x4c)//如果是flac,加载patch
+		{
+			VS_Load_Patch((u16*)vs1053b_patch, VS1053B_PATCHLEN);
+		}
+		id3head = mp3id3_is((const TCHAR*)pname);
+		res = f_open(fmp3, (const TCHAR*)pname, FA_READ);//打开文件
+		f_lseek(fmp3,id3head);
 		//printf("sram :%d",mem_perused(0));
-		if(res==0)//打开成功.
-		{ 
+		if (res == 0)//打开成功.
+		{
 			VS_SPI_SpeedHigh();	//高速						   
-			while(rval==0)
+			while (rval == 0)
 			{
-				res=f_read(fmp3,databuf,4096,(UINT*)&br);//读出4096个字节  
-				i=0;
+				res = f_read(fmp3, databuf, 4096, (UINT*)&br);//读出4096个字节  
+				i = 0;
 				do//主播放循环
-			    {  	
-					if((VS_Send_MusicData(databuf+i)==0)&&(pause==0))//给VS10XX发送音频数据
+				{
+					if ((VS_Send_MusicData(databuf + i) == 0) && (pause == 0))//给VS10XX发送音频数据
 					{
-						i+=32;
-					}else   
+						i += 32;
+					}
+					else
 					{
-						key=KEY_Scan(0);
-						switch(key)
+						key = KEY_Scan(0);
+						switch (key)
 						{
-							case KEY0_PRES:
-								rval=KEY0_PRES;		//下一曲
+						case KEY0_PRES:
+							rval = KEY0_PRES;		//下一曲
 							LCD_LED = 1;
-							lcd_bit=0;
-								break;
-							case KEY1_PRES:
-								rval=KEY1_PRES;		//上一曲
+							lcd_bit = 0;
+							break;
+						case KEY1_PRES:
+							rval = KEY1_PRES;		//上一曲
 							LCD_LED = 1;
-							lcd_bit=0;
-								break;
-							case KEY2_PRES:
-								vsset.mvol=vsset.mvol+10;
-							if(vsset.mvol==240)
+							lcd_bit = 0;
+							break;
+						case KEY2_PRES:
+							vsset.mvol = vsset.mvol + 10;
+							if (vsset.mvol == 240)
 							{
-							vsset.mvol=100;
+								vsset.mvol = 100;
 							}
-								mp3_vol_show((vsset.mvol-100)/5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
-								VS_Set_Vol(vsset.mvol);		//上一曲
+							mp3_vol_show((vsset.mvol - 100) / 5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
+							VS_Set_Vol(vsset.mvol);		//上一曲
 							LCD_LED = 1;
-							lcd_bit=0;
-							Test_Write(0X08050002,vsset.mvol);
-							mp3_vol_show((vsset.mvol-100)/5);	
-								break;
-							case KEY3_PRES:	   //暂停/播放
-								pause=!pause;	
+							lcd_bit = 0;
+							Test_Write(0X08050002, vsset.mvol);
+							mp3_vol_show((vsset.mvol - 100) / 5);
+							break;
+						case KEY3_PRES:	   //暂停/播放
+							pause = !pause;
 							LCD_LED = 1;
-							lcd_bit=0;
-								break; 
-							default:
-								break;
+							lcd_bit = 0;
+							break;
+						default:
+							break;
 						}
 						mp3_msg_show(fmp3->fsize);//显示信息	    
-					}	    	    
-				}while(i<4096);//循环发送4096个字节 
-				if(br!=4096||res!=0)
+					}
+				} while (i < 4096);//循环发送4096个字节 
+				if (br != 4096 || res != 0)
 				{
-					rval=KEY0_PRES;
+					rval = KEY0_PRES;
 					break;//读完了.	
-				} 							 
+				}
 			}
 			f_close(fmp3);
-		}else rval=0XFF;//出现错误	   	  
-	}						     	 
-	myfree(databuf);	  	 		  	    
+		}
+		else rval = 0XFF;//出现错误	   	  
+	}
+	myfree(databuf);
 	myfree(fmp3);
-	return rval;	  	 		  	    
+	return rval;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -442,51 +446,51 @@ u8 mp3_play_song(u8 *pname)
 //x,y,width,height:位置和尺寸
 //curval:当值
 //topval:最大值
-void fft_show_oneband(u16 x,u16 y,u16 width,u16 height,u16 curval,u16 topval)
-{  
-	gui_fill_rectangle(x,y,width,height-curval,MP3_MAIN_BKCOLOR);					//填充背景色
-	gui_fill_rectangle(x,y+height-curval,width,curval,FFT_BANDS_COLOR);	//填充柱状色
-	gui_draw_hline(x,y+height-topval-1,width,FFT_TOP_COLOR);	
+void fft_show_oneband(u16 x, u16 y, u16 width, u16 height, u16 curval, u16 topval)
+{
+	gui_fill_rectangle(x, y, width, height - curval, MP3_MAIN_BKCOLOR);					//填充背景色
+	gui_fill_rectangle(x, y + height - curval, width, curval, FFT_BANDS_COLOR);	//填充柱状色
+	gui_draw_hline(x, y + height - topval - 1, width, FFT_TOP_COLOR);
 }
 //显示FFT_BANDS根柱子
 //mp3devx:MP3结构体
 //pdt:频谱数据
 void FFT_post(u16 *pbuf)
 {
-	u8 i=0;
-	u8 temp;								   
- for(i=0;i<FFT_BANDS;i++)	//显示各个频谱	   循环显示14个段
-  {
+	u8 i = 0;
+	u8 temp;
+	for (i = 0; i < FFT_BANDS; i++)	//显示各个频谱	   循环显示14个段
+	{
 		//fftdev.fft_cur[i]=(pbuf[i]&0X3F)*2;
-		
-   temp=(pbuf[i]&0X3F)*3; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
 
-   if(fftdev.fft_cur[i]<temp) 	  //当前值小于temp
-     fftdev.fft_cur[i]=temp;
-   else							  //当前值大于等于temp	 开始往下降 一次降2
-    {
-	  if(fftdev.fft_cur[i]>1)fftdev.fft_cur[i]-=1;
-	  else fftdev.fft_cur[i]=0;	
+		temp = (pbuf[i] & 0X3F) * 3; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
+
+		if (fftdev.fft_cur[i] < temp) 	  //当前值小于temp
+			fftdev.fft_cur[i] = temp;
+		else							  //当前值大于等于temp	 开始往下降 一次降2
+		{
+			if (fftdev.fft_cur[i] > 1)fftdev.fft_cur[i] -= 1;
+			else fftdev.fft_cur[i] = 0;
+		}
+
+		if (fftdev.fft_cur[i] > fftdev.fft_top[i])//当前值大于峰值时 更新峰值
+		{
+			fftdev.fft_top[i] = fftdev.fft_cur[i];
+			fftdev.fft_time[i] = 1;               //重设峰值停顿时间
+		}
+
+		if (fftdev.fft_time[i])fftdev.fft_time[i]--;   //如果停顿时间大于1 即未减完
+		else 										   //停顿时间已减没
+		{
+			if (fftdev.fft_top[i]) fftdev.fft_top[i]--;   //峰值下降1
+		}
+
+
+		if (fftdev.fft_cur[i] > 63)fftdev.fft_cur[i] = 63;	  //保证在范围内 因为前面有增倍效果
+		if (fftdev.fft_top[i] > 63)fftdev.fft_top[i] = 63;
+
+		fft_show_oneband(20 + 2 + i * 14, 120, 12, 63, fftdev.fft_cur[i], fftdev.fft_top[i]);//显示柱子	   
 	}
-
-   if(fftdev.fft_cur[i]>fftdev.fft_top[i])//当前值大于峰值时 更新峰值
-    {
-	  fftdev.fft_top[i]=fftdev.fft_cur[i];
-	  fftdev.fft_time[i]=1;               //重设峰值停顿时间
-	}
-
-   if(fftdev.fft_time[i])fftdev.fft_time[i]--;   //如果停顿时间大于1 即未减完
-   else 										   //停顿时间已减没
-   {
-   	if(fftdev.fft_top[i]) fftdev.fft_top[i]--;   //峰值下降1
-   }
-
-   
-   if(fftdev.fft_cur[i]>63)fftdev.fft_cur[i]=63;	  //保证在范围内 因为前面有增倍效果
-   if(fftdev.fft_top[i]>63)fftdev.fft_top[i]=63;
-	 
-		fft_show_oneband(20+2+i*14,120,12,63,fftdev.fft_cur[i],fftdev.fft_top[i]);//显示柱子	   
-	}   	
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

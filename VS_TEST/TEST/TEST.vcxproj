@@ -22,6 +22,7 @@
     <ClInclude Include="..\..\APP\bit.h" />
     <ClInclude Include="..\..\APP\fontupd.h" />
     <ClInclude Include="..\..\APP\lunar.h" />
+    <ClInclude Include="..\..\APP\mp3id3.h" />
     <ClInclude Include="..\..\APP\mp3player.h" />
     <ClInclude Include="..\..\APP\show.h" />
     <ClInclude Include="..\..\APP\text.h" />
@@ -80,6 +81,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\APP\fontupd.c" />
     <ClCompile Include="..\..\APP\LUNAR.c" />
+    <ClCompile Include="..\..\APP\mp3id3.c" />
     <ClCompile Include="..\..\APP\mp3player.c" />
     <ClCompile Include="..\..\APP\SHOW.c" />
     <ClCompile Include="..\..\APP\text.c" />
