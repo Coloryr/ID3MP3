@@ -331,53 +331,18 @@ void LCD_Display_Dir(u8 dir)
 		lcddev.dir = 0;//竖屏
 		lcddev.width = 240;
 		lcddev.height = 320;
-		if (lcddev.id == 0X9341 || lcddev.id == 0X6804)
-		{
-			lcddev.wramcmd = 0X2C;
-			lcddev.setxcmd = 0X2A;
-			lcddev.setycmd = 0X2B;
-			if (lcddev.id == 0X6804)
-			{
-				lcddev.width = 320;
-				lcddev.height = 480;
-			}
-		}
-		else if (lcddev.id == 0X8989)
-		{
-			lcddev.wramcmd = R34;
-			lcddev.setxcmd = 0X4E;
-			lcddev.setycmd = 0X4F;
-		}
-		else
-		{
-			lcddev.wramcmd = R34;
-			lcddev.setxcmd = R32;
-			lcddev.setycmd = R33;
-		}
+		lcddev.wramcmd = R34;
+		lcddev.setxcmd = R32;
+		lcddev.setycmd = R33;
 	}
-	else if (lcddev.id != 0X6804)//6804不支持横屏显示	
+	else
 	{
 		lcddev.dir = 1;//横屏
 		lcddev.width = 320;
 		lcddev.height = 240;
-		if (lcddev.id == 0X9341)
-		{
-			lcddev.wramcmd = 0X2C;
-			lcddev.setxcmd = 0X2A;
-			lcddev.setycmd = 0X2B;
-		}
-		else if (lcddev.id == 0X8989)
-		{
-			lcddev.wramcmd = R34;
-			lcddev.setxcmd = 0X4F;
-			lcddev.setycmd = 0X4E;
-		}
-		else
-		{
-			lcddev.wramcmd = R34;
-			lcddev.setxcmd = R33;
-			lcddev.setycmd = R32;
-		}
+		lcddev.wramcmd = R34;
+		lcddev.setxcmd = R33;
+		lcddev.setycmd = R32;
 	}
 	LCD_Scan_Dir(DFT_SCAN_DIR);	//默认扫描方向
 }
@@ -706,7 +671,8 @@ void LCD_ShowChar(u16 x, u16 y, u8 num, u8 size, u8 mode)
 				LCD_DrawPoint(x, y);
 				temp <<= 1;
 				y++;
-				if (x >= lcddev.height) { POINT_COLOR = colortemp; return; }//超区域了
+				if (x >= lcddev.height && lcddev.dir==0) { POINT_COLOR = colortemp; return; }//超区域了
+				else if (x >= lcddev.width && lcddev.dir==1) { POINT_COLOR = colortemp; return; }//超区域了
 				if ((y - y0) == size)
 				{
 					y = y0;
@@ -728,7 +694,8 @@ void LCD_ShowChar(u16 x, u16 y, u8 num, u8 size, u8 mode)
 				if (temp & 0x80)LCD_DrawPoint(x, y);
 				temp <<= 1;
 				y++;
-				if (x >= lcddev.height) { POINT_COLOR = colortemp; return; }//超区域了
+				if (x >= lcddev.height && lcddev.dir==0) { POINT_COLOR = colortemp; return; }//超区域了
+				else if (x >= lcddev.width && lcddev.dir==1) { POINT_COLOR = colortemp; return; }//超区域了
 				if ((y - y0) == size)
 				{
 					y = y0;

@@ -11,6 +11,7 @@
 #include "ff.h"   
 #include "flac.h"	
 #include "stmflash.h"
+#include "mp3id3.h"
 
 _f_fftdev fftdev;	//定义fft变量管理结构体
 
@@ -362,11 +363,13 @@ u8 mp3_play_song(u8 *pname)
 		VS_Reset_DecodeTime();					//复位解码时间 	  
 		VS_Load_Patch((u16*)VS1053_PATCH,1000); 	  //加载频谱分析补丁
     VS_Set_Bands((u16*)VS_NEW_BANDS_FREQ_TBL,FFT_BANDS);//重设频谱频率
-		res=f_typetell(pname);	 	 			//得到文件后缀	 			  	 						 
+		res=f_typetell(pname);	 	 			//得到文件后缀	 			
+    		
 		if(res==0x4c)//如果是flac,加载patch
 		{	
 			VS_Load_Patch((u16*)vs1053b_patch,VS1053B_PATCHLEN);
-		}  				 		   		 						  
+		}  		
+		mp3id3_is((const TCHAR*)pname)	;	
 		res=f_open(fmp3,(const TCHAR*)pname,FA_READ);//打开文件
 		//printf("sram :%d",mem_perused(0));
 		if(res==0)//打开成功.

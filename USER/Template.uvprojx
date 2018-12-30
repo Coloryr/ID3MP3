@@ -520,6 +520,11 @@
               <FileType>1</FileType>
               <FilePath>..\APP\gui.c</FilePath>
             </File>
+            <File>
+              <FileName>mp3id3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\mp3id3.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

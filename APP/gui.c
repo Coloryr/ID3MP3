@@ -6,32 +6,6 @@
 extern const unsigned char asc2_1206[95][12];
 extern const unsigned char asc2_1608[95][16];
 
-////////////////////////////GUI通用字符串集//////////////////////////////
-//确认
-const u8* GUI_OK_CAPTION_TBL[GUI_LANGUAGE_NUM]=
-{
-	"确定","確定","OK",
-};
-//选项
-const u8* GUI_OPTION_CAPTION_TBL[GUI_LANGUAGE_NUM]=
-{
-	"选项","選項","MENU",
-};
-//返回
-const u8* GUI_BACK_CAPTION_TBL[GUI_LANGUAGE_NUM]=
-{
-	"返回","返回","BACK",
-};
-//取消 
-const u8* GUI_CANCEL_CAPTION_TBL[GUI_LANGUAGE_NUM]=
-{
-	"取消","取消","CANCEL",
-};
-//退出
-const u8* GUI_QUIT_CAPTION_TBL[GUI_LANGUAGE_NUM]=
-{
-	"退出","退出","QUIT",		    
-};
 ///////////////////////////////////////////////////////////////////////////
 
 //输入接口
