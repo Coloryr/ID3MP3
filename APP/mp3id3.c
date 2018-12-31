@@ -7,7 +7,8 @@
 #include "delay.h"
 
 u16 size;
-
+	u8 pic[];
+	
 u8 mp3id3_head(u8 *a)
 {
 	if (a[0] == 0x49 && a[1] == 0x44 && a[2] == 0x33)
@@ -28,7 +29,7 @@ u16 mp3id3_is(const TCHAR* path)
 	u16 br;
 	u8 res;
 	u8 *databuf;
-	u8 *pic;
+
 	u16 frmSize = 0;
 	u8 buffer[10];
 	u8 img = 1;
@@ -112,7 +113,6 @@ u16 mp3id3_is(const TCHAR* path)
 			i += 14 + 8;
 			frmSize -= 14;
 			frmSize1 = frmSize;
-			pic = (u8*)mymalloc(frmSize1);
 			while (frmSize)
 			{
 				a = 0;
@@ -153,7 +153,6 @@ u16 mp3id3_is(const TCHAR* path)
 			}
 			f_close(fmp3);
 			f_close(f_test);
-			myfree(pic);
 			myfree(f_test);
 			myfree(fmp3);	//释放内存			    
 			myfree(databuf);				//释放内存			    
@@ -161,7 +160,6 @@ u16 mp3id3_is(const TCHAR* path)
 		}
 		else
 		{
-			myfree(pic);
 			myfree(f_test);
 			myfree(fmp3);	//释放内存			    
 			myfree(databuf);				//释放内存			    
@@ -170,13 +168,11 @@ u16 mp3id3_is(const TCHAR* path)
 	}
 	else
 	{
-		myfree(pic);
 		myfree(f_test);
 		myfree(fmp3);	//释放内存			    
 		myfree(databuf);				//释放内存			    
 		return 1;
 	}
-	myfree(pic);
 	myfree(f_test);
 	myfree(fmp3);	//释放内存			    
 	myfree(databuf);				//释放内存			     
