@@ -70,11 +70,11 @@ u16 mp3id3_is(const TCHAR* path)
 			{	//找到位置
 				if (databuf[i + 24] == 0xff && databuf[i + 25] == 0xd8 && databuf[i + 26] == 0xff && databuf[i + 27] == 0xe0)
 				{
-					type = 0;
+					type = 0; //JPG
 				}
 				if (databuf[i + 24] == 0x89 && databuf[i + 25] == 0x50 && databuf[i + 26] == 0x4e && databuf[i + 27] == 0x47)
 				{
-					type = 1;
+					type = 1; //PNG
 				}
 				img = 0;
 			}
@@ -95,6 +95,7 @@ u16 mp3id3_is(const TCHAR* path)
 			img_path = (u8*)PIC_local_jpg;
 		if (type == 1)
 			img_path = (u8*)PIC_local_png;
+		res = f_unlink((const TCHAR*)img_path);
 		res = f_open(f_test, (const TCHAR*)img_path, FA_READ | FA_WRITE);//尝试打开之前的文件
 		if (res == 0x04)res = f_open(f_test, (const TCHAR*)img_path, FA_CREATE_NEW | FA_WRITE);//创建文件
 		if (res != FR_OK)						//创建失败
@@ -110,9 +111,17 @@ u16 mp3id3_is(const TCHAR* path)
 		while (res == 0)						//读出图片文件
 		{
 			res = f_read(fmp3, fbuf, WRITE_buff_size, (UINT*)&br);
-			if (res || br == 0)break;
+			if (res || br == 0)
+			{
+				type = 2;
+				break;
+			}
 			res = f_write(f_test, fbuf, (UINT)br, (UINT*)&bw);
-			if (res || bw < br)break;
+			if (res || bw < br)
+			{
+				type = 2;
+				break;
+			}
 			img++;
 			if (img > out_size)
 			{
@@ -126,6 +135,7 @@ u16 mp3id3_is(const TCHAR* path)
 		myfree(databuf);				//释放内存			    
 		return size;
 	}
+	type = 2;
 	f_close(fmp3);
 	myfree(f_test);
 	myfree(fmp3);

@@ -11,7 +11,7 @@
 #define W25Q16 	0XEF14
 #define W25Q32 	0XEF15
 #define W25Q64 	0XEF16
-#define W25Q6128 	0XEF17
+#define W25Q128 	0XEF17
 
 extern u16 SPI_FLASH_TYPE;		//定义我们使用的flash芯片型号		   
 #define	SPI_FLASH_CS PCout(13)  	//选中FLASH	

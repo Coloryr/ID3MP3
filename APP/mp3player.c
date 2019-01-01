@@ -143,21 +143,19 @@ void mp3_msg_show(u32 lenth)
 	static u16 playtime = 0;//播放时间标记
 	u16 time = 0;// 时间变量
 	u16 temp = 0;
-	if (f_kbps == 0xffff)//未更新过
+	if(lcd_bit == 0)
 	{
-		playtime = 0;
-		f_kbps = VS_Get_HeadInfo();//获得比特率
-	}
-	time = VS_Get_DecodeTime(); //得到解码时间
-
-	if (playtime == 0)playtime = time;
-	else if ((time != playtime) && (time != 0))//1s时间到,更新显示数据
-	{
-		playtime = time;//更新时间 	 			
-		if (lcd_bit == 0)
+		if (f_kbps == 0xffff)//未更新过
 		{
-			lcd_bit++;
+			playtime = 0;
+			f_kbps = VS_Get_HeadInfo();//获得比特率
+		}
+		time = VS_Get_DecodeTime(); //得到解码时间
 
+		if (playtime == 0)playtime = time;
+		else if ((time != playtime) && (time != 0))//1s时间到,更新显示数据
+		{
+			playtime = time;//更新时间 	 			
 			temp = VS_Get_HeadInfo(); //获得比特率	   				 
 			if (temp != f_kbps)
 			{
@@ -178,16 +176,8 @@ void mp3_msg_show(u32 lenth)
 			LCD_ShowxNum(224, 80, f_kbps, 3, 16, 0X80); 	//显示位率	 
 			LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
 		}
-	}
-	if (lcd_bit == 0)
-	{
-		LCD_LED = 1;
 		VS_Get_Spec(FFTbuf); //提取频谱数据
 		FFT_post(FFTbuf);	  //进行频谱效果显示
-	}
-	else if (lcd_bit == 1)
-	{
-		LCD_LED = 0;
 	}
 }
 //得到path路径下,目标文件的总个数
@@ -320,7 +310,7 @@ void mp3_play(void)
 		strcat((char*)pname, (const char*)fn);  			//将文件名接在后面	
 
 		id3head = mp3id3_is((const TCHAR*)pname);
-		if (id3head != 0 && lcd_bit < 10)
+		if (id3head != 0 && lcd_bit < 10 && type == 0)
 		{
 			LCD_Clear(BLACK);
 			show = (u8*)PIC_local_show;
@@ -425,7 +415,7 @@ u8 mp3_play_song(u8 *pname, u16 id3head)
 								vsset.mvol = 100;
 							}
 							mp3_vol_show((vsset.mvol - 100) / 5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
-							VS_Set_Vol(vsset.mvol);		//上一曲
+							VS_Set_Vol(vsset.mvol);		
 							LCD_LED = 1;
 							lcd_bit = 0;
 							Test_Write(0X08050002, vsset.mvol);
@@ -435,9 +425,15 @@ u8 mp3_play_song(u8 *pname, u16 id3head)
 							//pause = !pause;
 							//LCD_LED = 1;
 						if(lcd_bit==0)
+						{
 							lcd_bit = 1;
-						if(lcd_bit==1)
+							LCD_LED=0;
+						}
+						else if(lcd_bit==1)
+						{
 							lcd_bit = 0;
+							LCD_LED=1;
+						}
 							break;
 						default:
 							break;
@@ -507,7 +503,7 @@ void FFT_post(u16 *pbuf)
 		if (fftdev.fft_cur[i] > 63)fftdev.fft_cur[i] = 63;	  //保证在范围内 因为前面有增倍效果
 		if (fftdev.fft_top[i] > 63)fftdev.fft_top[i] = 63;
 
-		fft_show_oneband(224 + i * 5, 130, 5, 80, fftdev.fft_cur[i], fftdev.fft_top[i]);//显示柱子	   
+		fft_show_oneband(224 + i * 6, 130, 6, 80, fftdev.fft_cur[i], fftdev.fft_top[i]);//显示柱子	   
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

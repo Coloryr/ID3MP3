@@ -10,6 +10,7 @@
 
 u16 mp3id3_is(const TCHAR* path);
 
+extern u8 type;
 
 #endif
 

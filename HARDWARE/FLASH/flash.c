@@ -3,7 +3,7 @@
 #include "delay.h"
 #include "malloc.h"
 
-u16 SPI_FLASH_TYPE=W25Q64;//默认就是25Q64
+u16 SPI_FLASH_TYPE=W25Q128;//默认就是25Q64
 
 //4Kbytes为一个Sector
 //16个扇区为1个Block
