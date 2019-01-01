@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\APP;..\FATFS;..\HARDWARE\FLASH;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\LED;..\HARDWARE\RTC;..\HARDWARE\SD;..\HARDWARE\SPI;..\HARDWARE\VS10XX;..\HARDWARE\IMAGE2LCD;..\HARDWARE\MALLOC;..\HARDWARE\LCD;..\HARDWARE\STMFLASH</IncludePath>
+              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\APP;..\FATFS;..\HARDWARE\FLASH;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\LED;..\HARDWARE\RTC;..\HARDWARE\SD;..\HARDWARE\SPI;..\HARDWARE\VS10XX;..\HARDWARE\IMAGE2LCD;..\HARDWARE\MALLOC;..\HARDWARE\LCD;..\HARDWARE\STMFLASH;..\libpng</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -524,6 +524,16 @@
               <FileName>mp3id3.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\mp3id3.c</FilePath>
+            </File>
+            <File>
+              <FileName>piclib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\piclib.c</FilePath>
+            </File>
+            <File>
+              <FileName>tjpgd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\tjpgd.c</FilePath>
             </File>
           </Files>
         </Group>

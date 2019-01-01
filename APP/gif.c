@@ -4,13 +4,20 @@
 #include "delay.h"	    
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK战舰STM32开发板
-//GIF解码 驱动代码	   
+//ALIENTEK STM32开发板
+//图片解码 驱动代码-gif解码部分
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-//修改日期:2012/9/19
-//版本：V1.0			   								  
+//修改日期:2014/3/14
+//版本：V1.0
+//版权所有，盗版必究。
+//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
+//All rights reserved
+//********************************************************************************
+//升级说明 
+//无
 //////////////////////////////////////////////////////////////////////////////////
+					    
 
 const u16 _aMaskTbl[16] =
 {
@@ -491,11 +498,11 @@ u8 gif_decode(const u8 *filename,u16 x,u16 y,u16 width,u16 height)
 	gif89a *mygif89a;
 	FIL *gfile;
 #if GIF_USE_MALLOC==1 	//定义是否使用malloc,这里我们选择使用malloc
-	gfile=(FIL*)mymalloc(SRAMIN,sizeof(FIL));
+	gfile=(FIL*)mymalloc(sizeof(FIL));
 	if(gfile==NULL)res=PIC_MEM_ERR;//申请内存失败 
-	mygif89a=(gif89a*)mymalloc(SRAMIN,sizeof(gif89a));
+	mygif89a=(gif89a*)mymalloc(sizeof(gif89a));
 	if(mygif89a==NULL)res=PIC_MEM_ERR;//申请内存失败    
-	mygif89a->lzw=(LZW_INFO*)mymalloc(SRAMIN,sizeof(LZW_INFO));
+	mygif89a->lzw=(LZW_INFO*)mymalloc(sizeof(LZW_INFO));
 	if(mygif89a->lzw==NULL)res=PIC_MEM_ERR;//申请内存失败 
 #else
 	gfile=&f_gfile;
@@ -534,9 +541,9 @@ u8 gif_decode(const u8 *filename,u16 x,u16 y,u16 width,u16 height)
 		f_close(gfile);
 	}   
 #if GIF_USE_MALLOC==1 	//定义是否使用malloc,这里我们选择使用malloc
-	myfree(SRAMIN,gfile);
-	myfree(SRAMIN,mygif89a->lzw);
-	myfree(SRAMIN,mygif89a); 
+	myfree(gfile);
+	myfree(mygif89a->lzw);
+	myfree(mygif89a); 
 #endif 
 	return res;
 }

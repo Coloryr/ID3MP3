@@ -25,6 +25,7 @@ extern u8 *fatbuf;//SD卡数据缓存区
 #define T_JPG		0X51	//jpg文件
 #define T_JPEG		0X52	//jpeg文件		 
 #define T_GIF		0X53	//gif文件  
+#define T_PNG		0X54	//gif文件  
 
  
 u8 exfuns_init(void);							//申请内存

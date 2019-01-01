@@ -1,20 +1,36 @@
+#include "piclib.h"
 #include "bmp.h"
 #include "string.h"
+//////////////////////////////////////////////////////////////////////////////////	 
+//本程序只供学习使用，未经作者许可，不得用于其它任何用途
+//ALIENTEK STM32开发板
+//图片解码 驱动代码-bmp解码部分	   
+//正点原子@ALIENTEK
+//技术论坛:www.openedv.com
+//修改日期:2014/3/14
+//版本：V1.0
+//版权所有，盗版必究。
+//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
+//All rights reserved
+//********************************************************************************
+//升级说明 
+//无
+//////////////////////////////////////////////////////////////////////////////////
 
 //不使用内存分配
 #if BMP_USE_MALLOC == 0	
 FIL f_bfile;
-u8 bmpreadbuf[2048];
+u8 bmpreadbuf[BMP_DBUF_SIZE];
 #endif 				    
 
 //标准的bmp解码,解码filename这个BMP文件	
 //速度比较慢.主要	
-//filename:包含路径的文件名	 	      	  			  
+//filename:包含路径的文件名	       	  			  
 //返回值:0,成功;
 //		 其他,错误码.
-u8 stdbmp_decode(const u8 *file) 
+u8 stdbmp_decode(const u8 *filename) 
 {
-	//FIL* f_bmp;
+	FIL* f_bmp;
     u16 br;
 
     u16 count;		    	   
@@ -30,7 +46,7 @@ u8 stdbmp_decode(const u8 *file)
 
 
 	u8 *databuf;    		//数据读取存放地址
- 	u16 readlen=1*1024;		//一次从SD卡读取的字节数长度
+ 	u16 readlen=BMP_DBUF_SIZE;//一次从SD卡读取的字节数长度
 
 	u8 *bmpbuf;			  	//数据解码地址
 	u8 biCompression=0;		//记录压缩方式
@@ -44,7 +60,8 @@ u8 stdbmp_decode(const u8 *file)
 	f_bmp=(FIL *)mymalloc(sizeof(FIL));	//开辟FIL字节的内存区域 
 	if(f_bmp==NULL)							//内存申请失败.
 	{		 
-		myfree(databuf);	
+		myfree(databuf);
+		return PIC_MEM_ERR;				
 	} 	 
 #else				 	//不使用malloc
 	databuf=bmpreadbuf;
@@ -59,11 +76,11 @@ u8 stdbmp_decode(const u8 *file)
 		color_byte=pbmp->bmiHeader.biBitCount/8;	//彩色位 16/24/32  
 		biCompression=pbmp->bmiHeader.biCompression;//压缩方式
 		picinfo.ImgHeight=pbmp->bmiHeader.biHeight;	//得到图片高度
-		picinfo.ImgWidth=pbmp->bmiHeader.biWidth;  	//得到图片宽度   
+		picinfo.ImgWidth=pbmp->bmiHeader.biWidth;  	//得到图片宽度 
+		ai_draw_init();//初始化智能画图			
 		//水平像素必须是4的倍数!!
 		if((picinfo.ImgWidth*color_byte)%4)rowlen=((picinfo.ImgWidth*color_byte)/4+1)*4;
 		else rowlen=picinfo.ImgWidth*color_byte;
-		ai_draw_init();//初始化智能画图	    
 		//开始解码BMP   
 		color=0;//颜色清空	 													 
 		x=0 ;
@@ -143,7 +160,7 @@ u8 stdbmp_decode(const u8 *file)
 						realx=(x*picinfo.Div_Fac)>>13;//x轴实际值
 						if(is_element_ok(realx,realy,1)&&yok)//符合条件
 						{						 				 	  	       
-							pic_phy.draw_point(realx+picinfo.S_XOFF,realy+picinfo.S_YOFF,color);//显示图片	
+							pic_phy.draw_point(realx+picinfo.S_XOFF,realy+picinfo.S_YOFF-1,color);//显示图片	
 							//POINT_COLOR=color;		 
 							//LCD_DrawPoint(realx+picinfo.S_XOFF,realy+picinfo.S_YOFF); 
 							//SRAMLCD.Draw_Point(realx+picinfo.S_XOFF,realy+picinfo.S_YOFF,color);
@@ -176,8 +193,8 @@ u8 stdbmp_decode(const u8 *file)
 		f_close(f_bmp);//关闭文件
 	}  	
 #if BMP_USE_MALLOC == 1	//使用malloc	
-	myfree(SRAMIN,databuf);	 
-	myfree(SRAMIN,f_bmp);		 
+	myfree(databuf);	 
+	myfree(f_bmp);		 
 #endif	
 	return res;		//BMP显示结束.    					   
 }		 
@@ -202,8 +219,8 @@ u8 minibmp_decode(u8 *filename,u16 x,u16 y,u16 width,u16 height,u16 acolor,u8 mo
 	//tx,ty的实际坐标	
 	u8 res;
 	u16 i,j;
-	u8 *databuf;    		//数据读取存放地址
- 	u16 readlen=1024;	    //一次从SD卡读取的字节数长度,不能小于240*3!!!
+	u8 *databuf;    		//数据读取存                                                                       放地址
+ 	u16 readlen=BMP_DBUF_SIZE;//一次从SD卡读取的字节数长度,不能小于LCD宽度*3!!!
 
 	u8 *bmpbuf;			  	//数据解码地址
 	u8 biCompression=0;		//记录压缩方式
@@ -223,12 +240,12 @@ u8 minibmp_decode(u8 *filename,u16 x,u16 y,u16 width,u16 height,u16 acolor,u8 mo
 	picinfo.S_Width=width;
 		
 #if BMP_USE_MALLOC == 1	//使用malloc	
-	databuf=(u8*)mymalloc(SRAMIN,readlen);		//开辟readlen字节的内存区域
+	databuf=(u8*)mymalloc(readlen);		//开辟readlen字节的内存区域
 	if(databuf==NULL)return PIC_MEM_ERR;		//内存申请失败.
-	f_bmp=(FIL *)mymalloc(SRAMIN,sizeof(FIL));	//开辟FIL字节的内存区域 
+	f_bmp=(FIL *)mymalloc(sizeof(FIL));	//开辟FIL字节的内存区域 
 	if(f_bmp==NULL)								//内存申请失败.
 	{		 
-		myfree(SRAMIN,databuf);
+		myfree(databuf);
 		return PIC_MEM_ERR;				
 	} 	 
 #else
@@ -341,11 +358,11 @@ u8 minibmp_decode(u8 *filename,u16 x,u16 y,u16 width,u16 height,u16 acolor,u8 mo
 		f_close(f_bmp);//关闭文件      
 	}else res=PIC_SIZE_ERR;//图片尺寸错误	
 #if BMP_USE_MALLOC == 1	//使用malloc	
-	myfree(SRAMIN,databuf);	 
-	myfree(SRAMIN,f_bmp);		 
+	myfree(databuf);	 
+	myfree(f_bmp);		 
 #endif	
 	return res;
-}
+}            
 //BMP编码函数
 //将当前LCD屏幕的指定区域截图,存为16位格式的BMP文件 RGB565格式.
 //保存为rgb565则需要掩码,需要利用原来的调色板位置增加掩码.这里我们已经增加了掩码.
@@ -369,12 +386,12 @@ u8 bmp_encode(u8 *filename,u16 x,u16 y,u16 width,u16 height,u8 mode)
 	if((y+height-1)>lcddev.height)return PIC_WINDOW_ERR;	//区域错误 
  	 
 #if BMP_USE_MALLOC == 1	//使用malloc	
-	databuf=(u16*)mymalloc(SRAMIN,1024);		//开辟至少bi4width大小的字节的内存区域 ,对240宽的屏,480个字节就够了.
+	databuf=(u16*)mymalloc(1024);		//开辟至少bi4width大小的字节的内存区域 ,对240宽的屏,480个字节就够了.
 	if(databuf==NULL)return PIC_MEM_ERR;		//内存申请失败.
-	f_bmp=(FIL *)mymalloc(SRAMIN,sizeof(FIL));	//开辟FIL字节的内存区域 
+	f_bmp=(FIL *)mymalloc(sizeof(FIL));	//开辟FIL字节的内存区域 
 	if(f_bmp==NULL)								//内存申请失败.
 	{		 
-		myfree(SRAMIN,databuf);
+		myfree(databuf);
 		return PIC_MEM_ERR;				
 	} 	 
 #else
@@ -424,11 +441,18 @@ u8 bmp_encode(u8 *filename,u16 x,u16 y,u16 width,u16 height,u8 mode)
 		f_close(f_bmp);
 	}	    
 #if BMP_USE_MALLOC == 1	//使用malloc	
-	myfree(SRAMIN,databuf);	 
-	myfree(SRAMIN,f_bmp);		 
+	myfree(databuf);	 
+	myfree(f_bmp);		 
 #endif	
 	return res;
 }
+
+
+
+
+
+
+
 
 
 

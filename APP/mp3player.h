@@ -30,7 +30,7 @@ void FFT_post(u16 *pbuf);
 void fft_show_oneband(u16 x,u16 y,u16 width,u16 height,u16 curval,u16 topval);
 void mp3_play(void);
 u16 mp3_get_tnum(u8 *path);
-u8 mp3_play_song(u8 *pname);
+u8 mp3_play_song(u8 *pname, u16 id3head);
 void mp3_index_show(u16 index,u16 total);
 void mp3_msg_show(u32 lenth);
 #endif
