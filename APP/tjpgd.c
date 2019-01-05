@@ -964,42 +964,7 @@ JRESULT jd_decomp (
 
 	return rc;
 }	    
-						
-//下面根据是否使用malloc来决定变量的分配方法.
-#if JPEG_USE_MALLOC == 1 //使用malloc	 
-
-FIL *f_jpeg;			//JPEG文件指针
-JDEC *jpeg_dev;   		//待解码对象结构体指针  
-u8  *jpg_buffer;    	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
-
-//给占内存大的数组/结构体申请内存
-u8 jpeg_mallocall(void)
-{
-	f_jpeg=(FIL*)mymalloc(sizeof(FIL));
-	if(f_jpeg==NULL)return PIC_MEM_ERR;			//申请内存失败.	  
-	jpeg_dev=(JDEC*)mymalloc(sizeof(JDEC));
-	if(jpeg_dev==NULL)return PIC_MEM_ERR;		//申请内存失败.
-	jpg_buffer=(u8*)mymalloc(JPEG_WBUF_SIZE);
-	if(jpg_buffer==NULL)return PIC_MEM_ERR;		//申请内存失败. 
-	return 0;
-}
-//释放内存
-void jpeg_freeall(void)
-{
-	myfree(f_jpeg);			//释放f_jpeg申请到的内存
-	myfree(jpeg_dev);		//释放jpeg_dev申请到的内存
-	myfree(jpg_buffer);		//释放jpg_buffer申请到的内存
-}
-
-#else 	//不使用malloc   
-
-FIL  tf_jpeg; 
-JDEC tjpeg_dev;   		  
-FIL  *f_jpeg=&tf_jpeg;						//JPEG文件指针
-JDEC *jpeg_dev=&tjpeg_dev;   				//待解码对象结构体指针   
-__align(4) u8 jpg_buffer[JPEG_WBUF_SIZE];	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
-	
-#endif
+					
 
 //jpeg数据输入回调函数
 //jd:储存待解码的对象信息的结构体
@@ -1065,6 +1030,7 @@ u32 jpeg_out_func_point(JDEC* jd,void* rgbbuf,JRECT* rect)
 	}
     return 0;    //返回0,使得解码工作继续执行 
 } 
+/*
 //解码jpeg/jpg文件s
 //filename:jpeg/jpg路径+文件名
 //fast:使能小图片(图片尺寸小于等于液晶分辨率)快速解码,0,不使能;1,使能.
@@ -1116,7 +1082,7 @@ u8 jpg_decode(const u8 *filename,u8 fast)
 #endif
 	return res;	 
 }
-
+*/
 
 
 

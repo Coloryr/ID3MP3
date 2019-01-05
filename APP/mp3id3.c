@@ -2,45 +2,66 @@
 #include "exfuns.h"
 #include "ff.h"
 #include "malloc.h" 
-#include "lcd.h"	
+#include "piclib.h"
+#include "lcd.h"
+#include "tjpgd.h"
 #include "text.h"
 #include "delay.h"
 
 u16 size;
-u8 type;
 
-//图片缓存路径
-const u8 *PIC_local_jpg="0:/temp.jpg";
-const u8 *PIC_local_png="0:/temp.png";
-	
-u8 mp3id3_head(u8 *a)
+//下面根据是否使用malloc来决定变量的分配方法.
+#if JPEG_USE_MALLOC == 1 //使用malloc	 
+
+FIL *f_jpeg;			//JPEG文件指针
+JDEC *jpeg_dev;   		//待解码对象结构体指针  
+u8  *jpg_buffer;    	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
+
+//给占内存大的数组/结构体申请内存
+u8 jpeg_mallocall(void)
 {
-	if (a[0] == 0x49 && a[1] == 0x44 && a[2] == 0x33)
-	{
-		//计算大小
-		size = a[6] & 0x7f | ((a[7] & 0x7f) << 7) | ((a[8] & 0x7f) << 14) | ((a[9] & 0x7f) << 21);
-		return 0;
-	}
-	else return 1;
+	f_jpeg=(FIL*)mymalloc(sizeof(FIL));
+	if(f_jpeg==NULL)return PIC_MEM_ERR;			//申请内存失败.	  
+	jpeg_dev=(JDEC*)mymalloc(sizeof(JDEC));
+	if(jpeg_dev==NULL)return PIC_MEM_ERR;		//申请内存失败.
+	jpg_buffer=(u8*)mymalloc(JPEG_WBUF_SIZE);
+	if(jpg_buffer==NULL)return PIC_MEM_ERR;		//申请内存失败. 
+	return 0;
+}
+//释放内存
+void jpeg_freeall(void)
+{
+	myfree(f_jpeg);			//释放f_jpeg申请到的内存
+	myfree(jpeg_dev);		//释放jpeg_dev申请到的内存
+	myfree(jpg_buffer);		//释放jpg_buffer申请到的内存
 }
 
-u16 mp3id3_is(const TCHAR* path)
+#else 	//不使用malloc   
+
+FIL  tf_jpeg; 
+JDEC tjpeg_dev;   		  
+FIL  *f_jpeg=&tf_jpeg;						//JPEG文件指针
+JDEC *jpeg_dev=&tjpeg_dev;   				//待解码对象结构体指针   
+__align(4) u8 jpg_buffer[JPEG_WBUF_SIZE];	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
+	
+#endif
+
+u16 mp3id3_is(const TCHAR* path, u8 pic_show)
 {
 	FIL* fmp3 = 0;
-	FIL* f_test = 0;
 	u16 i = 0;
 	u16 br = 0;
 	u8 res = 0;
 	u8 *databuf = 0;
-	u8 *fbuf = 0;
-	u16 img = 1;
-	u8 *img_path = 0;
-
-	fmp3 = (FIL*)mymalloc(sizeof(FIL));	//申请内存
+	u8 img = 1;
+	u8 type;
+	u8 scale;	//图像输出比例 0,1/2,1/4,1/8  
+	UINT (*outfun)(JDEC*, void*, JRECT*);
+	
 	databuf = (u8*)mymalloc(READ_buff_size);
-	f_test = (FIL*)mymalloc(sizeof(FIL));
-	fbuf = (u8*)mymalloc(WRITE_buff_size);
-	if (databuf == NULL || fmp3 == NULL || fbuf == NULL || f_test == NULL)//内存申请失败.
+	fmp3 = (FIL*)mymalloc(sizeof(FIL));
+	
+	if (databuf == NULL || fmp3 == NULL)//内存申请失败.
 		while (1)
 		{
 			Show_Str(30, 20, 160, 16, "MP3ID3：内存申请失败", 16, 0);
@@ -48,20 +69,19 @@ u16 mp3id3_is(const TCHAR* path)
 			LCD_Fill(30, 20, 160, 16, BLACK);//清除显示	     
 			delay_ms(200);
 		}
-	res = f_open(fmp3, path, FA_READ | FA_OPEN_EXISTING);//打开文件
-	if (res != 0)
+	while (f_open(fmp3, path, FA_READ | FA_OPEN_EXISTING))
 	{
-		while (1)
-		{
-			Show_Str(30, 20, 160, 16, "MP3ID3：文件读取错误", 16, 0);
-			delay_ms(200);
-			LCD_Fill(30, 20, 160, 16, BLACK);//清除显示	     
-			delay_ms(200);
-		}
+		Show_Str(30, 20, 160, 16, "MP3ID3：文件读取错误", 16, 0);
+		delay_ms(200);
+		LCD_Fill(30, 20, 160, 16, BLACK);//清除显示	     
+		delay_ms(200);
 	}
 	res = f_read(fmp3, databuf, 10, (UINT*)&br);//读出mp3id3头
-	if (mp3id3_head(databuf) == 0)
+	if (databuf[0] == 0x49 && databuf[1] == 0x44 && databuf[2] == 0x33)
 	{
+		//计算大小
+		size = databuf[6] & 0x7f | ((databuf[7] & 0x7f) << 7) 
+			| ((databuf[8] & 0x7f) << 14) | ((databuf[9] & 0x7f) << 21);
 		res = f_read(fmp3, databuf, READ_buff_size, (UINT*)&br);
 		i = 0;
 		while (img)
@@ -83,61 +103,78 @@ u16 mp3id3_is(const TCHAR* path)
 			if (i >= 4096)								//找不到位置
 			{
 				f_close(fmp3);
-				myfree(f_test);
 				myfree(fmp3);
 				myfree(databuf);				//释放内存			    
 				return size;
 			}
 		}
-		i += 14 + 20;								//跳过头
-		f_lseek(fmp3, i);
-		if (type == 0)
-			img_path = (u8*)PIC_local_jpg;
-		if (type == 1)
-			img_path = (u8*)PIC_local_png;
-		res = f_unlink((const TCHAR*)img_path);
-		res = f_open(f_test, (const TCHAR*)img_path, FA_READ | FA_WRITE);//尝试打开之前的文件
-		if (res == 0x04)res = f_open(f_test, (const TCHAR*)img_path, FA_CREATE_NEW | FA_WRITE);//创建文件
-		if (res != FR_OK)						//创建失败
+		if(pic_show == 1 && type == 0)
 		{
-			f_close(fmp3);
-			f_close(f_test);
-			myfree(f_test);
-			myfree(fmp3);
-			myfree(databuf);				//释放内存			    
-			return size;
+			if((pic_show_x+pic_show_size)>picinfo.lcdwidth)return PIC_WINDOW_ERR;		//x坐标超范围了.
+			if((pic_show_y+pic_show_size)>picinfo.lcdheight)return PIC_WINDOW_ERR;		//y坐标超范围了.  
+			//得到显示方框大小	  	 
+			picinfo.S_Height=pic_show_size;
+			picinfo.S_Width=pic_show_size;
+			//显示区域无效
+			if(picinfo.S_Height==0||picinfo.S_Width==0)
+			{
+				picinfo.S_Height=lcddev.height;
+				picinfo.S_Width=lcddev.width;
+				return FALSE;   
+			}
+			//显示的开始坐标点
+			picinfo.S_YOFF=pic_show_y;
+			picinfo.S_XOFF=pic_show_x;
+	
+			#if JPEG_USE_MALLOC == 1	//使用malloc
+				res=jpeg_mallocall(); 
+			#endif
+			if(res==0)
+			{
+				i += 14 + 20;								
+				f_lseek(fmp3, i);				//跳过头
+				
+				//得到JPEG/JPG图片的开始信息		 
+				
+				if(res==FR_OK)//打开文件成功
+				{ 
+					res=jd_prepare(jpeg_dev,jpeg_in_func,jpg_buffer,JPEG_WBUF_SIZE,fmp3);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
+					outfun=jpeg_out_func_point;//默认采用画点的方式显示
+					if(res==JDR_OK)//准备解码成功 
+					{ 	
+						for(scale=0;scale<4;scale++)//确定输出图像的比例因子
+						{ 
+							if((jpeg_dev->width>>scale)<=picinfo.S_Width&&(jpeg_dev->height>>scale)<=picinfo.S_Height)//在目标区域内
+							{	
+								if(((jpeg_dev->width>>scale)!=picinfo.S_Width)&&((jpeg_dev->height>>scale)!=picinfo.S_Height&&scale))scale=0;//不能贴边,则不缩放
+								else outfun=jpeg_out_func_fill;	//在显示尺寸以内,可以采用填充的方式显示 
+								break; 							
+							} 
+						} 
+					if(scale==4)scale=0;//错误
+					picinfo.ImgHeight=jpeg_dev->height>>scale;	//缩放后的图片尺寸
+					picinfo.ImgWidth=jpeg_dev->width>>scale;	//缩放后的图片尺寸 
+					ai_draw_init();								//初始化智能画图 
+					//执行解码工作，调用TjpgDec模块的jd_decomp函数
+					res=jd_decomp(jpeg_dev,outfun,scale); 
+				}
+			}
 		}
-		img = 0;
-		while (res == 0)						//读出图片文件
+		#if JPEG_USE_MALLOC == 1//使用malloc
+			jpeg_freeall();		//释放内存
+		#endif
+		}
+		else if(type==2 && pic_show ==1)
 		{
-			res = f_read(fmp3, fbuf, WRITE_buff_size, (UINT*)&br);
-			if (res || br == 0)
-			{
-				type = 2;
-				break;
-			}
-			res = f_write(f_test, fbuf, (UINT)br, (UINT*)&bw);
-			if (res || bw < br)
-			{
-				type = 2;
-				break;
-			}
-			img++;
-			if (img > out_size)
-			{
-				break;
-			}
+			LCD_Fill(pic_show_x,pic_show_x,pic_show_x+pic_show_size,
+				pic_show_x+pic_show_size,BACK_COLOR);
 		}
 		f_close(fmp3);
-		f_close(f_test);
-		myfree(f_test);
 		myfree(fmp3);
 		myfree(databuf);				//释放内存			    
 		return size;
 	}
-	type = 2;
 	f_close(fmp3);
-	myfree(f_test);
 	myfree(fmp3);
 	myfree(databuf);						//释放内存			     
 	return 0;

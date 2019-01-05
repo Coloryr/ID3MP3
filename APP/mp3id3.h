@@ -5,12 +5,12 @@
 #include "ff.h"
  	 	 
 #define READ_buff_size   4096			//读文件的缓存大小
-#define WRITE_buff_size  1024		  //写图片的缓存大小（测试大于1024会出问题）
-#define out_size         300			//写1024*300字节，对于256x256更大的图片可能需要改大一点
 
-u16 mp3id3_is(const TCHAR* path);
+#define pic_show_x   0						//图片显示的位置_x
+#define pic_show_y   16						//图片显示的位置_y
+#define pic_show_size   224				//图片显示的大小
 
-extern u8 type;
+u16 mp3id3_is(const TCHAR* path, u8 pic_show);
 
 #endif
 

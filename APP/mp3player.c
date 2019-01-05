@@ -14,9 +14,6 @@
 #include "mp3id3.h"
 #include "piclib.h"
 
-//图片缓存路径，要与mp3id3.c的一致
-const u8 *PIC_local_show="0:/temp.jpg";
-
 _f_fftdev fftdev;	//定义fft变量管理结构体
 
 u8 lcd_bit=0;
@@ -235,7 +232,6 @@ void mp3_play(void)
 	u16 temp;
 	u16 *mp3indextbl;	//音乐索引表 
 	u16 id3head;
-	u8 *show;
 
 	init_fft();
 	while (f_opendir(&mp3dir, "0:/MUSIC"))//打开图片文件夹
@@ -309,17 +305,8 @@ void mp3_play(void)
 		strcpy((char*)pname, "0:/MUSIC/");				//复制路径(目录)
 		strcat((char*)pname, (const char*)fn);  			//将文件名接在后面	
 
-		id3head = mp3id3_is((const TCHAR*)pname);
-		if (id3head != 0 && lcd_bit < 10 && type == 0)
-		{
-			LCD_Clear(BLACK);
-			show = (u8*)PIC_local_show;
-			ai_load_picfile((const TCHAR*)show, 0, 16, 224, 224, 1);
-		}
-		else if(lcd_bit < 10)
-		{
-			LCD_Clear(BLACK);
-		}
+		id3head = mp3id3_is((const TCHAR*)pname, 1);
+
 		LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
 		Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
 		mp3_vol_show((vsset.mvol - 100) / 5);

@@ -26,7 +26,6 @@ extern "C" {
 
 #include "integer.h"
 #include "sys.h"
-
 	
 	
 /* Error code */
@@ -82,6 +81,10 @@ struct JDEC {
 JRESULT jd_prepare (JDEC*, UINT(*)(JDEC*,BYTE*,UINT), void*, UINT, void*);
 JRESULT jd_decomp (JDEC*, UINT(*)(JDEC*,void*,JRECT*), BYTE);
 u8 jpg_decode(const u8 *filename,u8 fast);
+
+u32 jpeg_in_func(JDEC* jd,u8* buf,u32 num) ;
+u32 jpeg_out_func_fill(JDEC* jd,void* rgbbuf,JRECT* rect) ;
+u32 jpeg_out_func_point(JDEC* jd,void* rgbbuf,JRECT* rect) ;
 
 #ifdef __cplusplus
 }

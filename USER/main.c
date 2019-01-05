@@ -26,7 +26,7 @@ int main(void)
 	exfuns_init();						//为fatfs相关变量申请内存 
 	SD_Init();								//SD卡初始化
 	gui_init();								//LCD-gui初始化
-	RTC_Init();								//RTC初始化
+	//RTC_Init();								//RTC初始化
 	piclib_init();						//PIC初始化
 	f_mount(fs[0], "0:", 1); 	//挂载SD卡 
 	f_mount(fs[1], "1:", 1); 	//挂载FLASH.

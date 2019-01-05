@@ -94,6 +94,7 @@ u8 is_element_ok(u16 x,u16 y,u8 chg)
 		return 1;
 	}else return 0;
 }
+/*
 //智能画图
 //FileName:要显示的图片文件  BMP/JPG/JPEG/GIF
 //x,y,width,height:坐标及显示区域尺寸
@@ -129,7 +130,7 @@ u8 ai_load_picfile(const u8 *filename,u16 x,u16 y,u16 width,u16 height,u8 fast)
 		//	break;
 		case T_JPG:
 		case T_JPEG:
-			res=jpg_decode(filename,fast);				//解码JPG/JPEG	  	  
+			//res=jpg_decode(filename,fast);				//解码JPG/JPEG	  	  
 			break;
 		//case T_GIF:
 		//	res=gif_decode(filename,x,y,width,height);	//解码gif  	  
@@ -141,7 +142,7 @@ u8 ai_load_picfile(const u8 *filename,u16 x,u16 y,u16 width,u16 height,u8 fast)
 	return res;
 }
 
-
+*/
 
 
 

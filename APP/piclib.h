@@ -5,9 +5,7 @@
 #include "malloc.h"
 #include "ff.h"
 #include "exfuns.h"
-#include "bmp.h"
 #include "tjpgd.h"
-#include "gif.h"
 
 #define PIC_FORMAT_ERR		0x27	//∏Ò Ω¥ÌŒÛ
 #define PIC_SIZE_ERR		0x28	//Õº∆¨≥ﬂ¥Á¥ÌŒÛ
