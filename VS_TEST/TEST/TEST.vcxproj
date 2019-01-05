@@ -21,11 +21,16 @@
   <ItemGroup>
     <ClInclude Include="..\..\APP\bit.h" />
     <ClInclude Include="..\..\APP\fontupd.h" />
+    <ClInclude Include="..\..\APP\gui.h" />
+    <ClInclude Include="..\..\APP\guix.h" />
+    <ClInclude Include="..\..\APP\integer.h" />
     <ClInclude Include="..\..\APP\lunar.h" />
     <ClInclude Include="..\..\APP\mp3id3.h" />
     <ClInclude Include="..\..\APP\mp3player.h" />
+    <ClInclude Include="..\..\APP\piclib.h" />
     <ClInclude Include="..\..\APP\show.h" />
     <ClInclude Include="..\..\APP\text.h" />
+    <ClInclude Include="..\..\APP\tjpgd.h" />
     <ClInclude Include="..\..\CORE\core_cm3.h" />
     <ClInclude Include="..\..\FATFS\diskio.h" />
     <ClInclude Include="..\..\FATFS\exfuns.h" />
@@ -80,11 +85,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\APP\fontupd.c" />
+    <ClCompile Include="..\..\APP\gui.c" />
     <ClCompile Include="..\..\APP\LUNAR.c" />
     <ClCompile Include="..\..\APP\mp3id3.c" />
     <ClCompile Include="..\..\APP\mp3player.c" />
+    <ClCompile Include="..\..\APP\piclib.c" />
+    <ClCompile Include="..\..\APP\png2tga.c" />
     <ClCompile Include="..\..\APP\SHOW.c" />
     <ClCompile Include="..\..\APP\text.c" />
+    <ClCompile Include="..\..\APP\tjpgd.c" />
     <ClCompile Include="..\..\CORE\core_cm3.c" />
     <ClCompile Include="..\..\FATFS\cc936.c" />
     <ClCompile Include="..\..\FATFS\diskio.c" />

@@ -198,6 +198,21 @@
     <ClInclude Include="..\..\APP\mp3id3.h">
       <Filter>APP</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\APP\gui.h">
+      <Filter>APP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\APP\guix.h">
+      <Filter>APP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\APP\integer.h">
+      <Filter>APP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\APP\piclib.h">
+      <Filter>APP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\APP\tjpgd.h">
+      <Filter>APP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\APP\fontupd.c">
@@ -345,6 +360,18 @@
       <Filter>USER</Filter>
     </ClCompile>
     <ClCompile Include="..\..\APP\mp3id3.c">
+      <Filter>APP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\gui.c">
+      <Filter>APP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\piclib.c">
+      <Filter>APP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\png2tga.c">
+      <Filter>APP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\tjpgd.c">
       <Filter>APP</Filter>
     </ClCompile>
   </ItemGroup>

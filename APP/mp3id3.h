@@ -11,6 +11,7 @@
 #define pic_show_size   224				//图片显示的大小
 
 u16 mp3id3_is(const TCHAR* path, u8 pic_show);
-
+extern u8 *TIT2;
+extern u8 *TPE1;
 #endif
 

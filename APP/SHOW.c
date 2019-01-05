@@ -274,7 +274,7 @@ void mp3_msg_show(u32 lenth)
 	static u16 playtime = 0;//播放时间标记
 	u16 time = 0;// 时间变量
 	u16 temp = 0;
-	if(lcd_bit == 1)
+	if (lcd_bit == 1)
 	{
 		if (f_kbps == 0xffff)//未更新过
 		{

@@ -146,7 +146,7 @@ void init_fft(void)
 	{
 		fftdev.fft_cur[i] = 0;
 		fftdev.fft_top[i] = 60;
-		fftdev.fft_time[i] = 1;
+		fftdev.fft_time[i] = 15;
 	}
 }
 //显示FFT_BANDS根柱子
@@ -159,7 +159,7 @@ void FFT_post(u16 *pbuf)
 	for (i = 0; i < FFT_BANDS; i++)	//显示各个频谱	   循环显示14个段
 	{
 
-		temp = (pbuf[i] & 0X3F) * 3; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
+		temp = (pbuf[i] & 0X3F) * 4; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
 
 		if (fftdev.fft_cur[i] < temp) 	  //当前值小于temp
 			fftdev.fft_cur[i] = temp;
@@ -172,7 +172,7 @@ void FFT_post(u16 *pbuf)
 		if (fftdev.fft_cur[i] > fftdev.fft_top[i])//当前值大于峰值时 更新峰值
 		{
 			fftdev.fft_top[i] = fftdev.fft_cur[i];
-			fftdev.fft_time[i] = 1;               //重设峰值停顿时间
+			fftdev.fft_time[i] = 25;               //重设峰值停顿时间
 		}
 
 		if (fftdev.fft_time[i])fftdev.fft_time[i]--;   //如果停顿时间大于1 即未减完
@@ -182,14 +182,22 @@ void FFT_post(u16 *pbuf)
 		}
 
 
-		if (fftdev.fft_cur[i] > 63)fftdev.fft_cur[i] = 63;	  //保证在范围内 因为前面有增倍效果
-		if (fftdev.fft_top[i] > 63)fftdev.fft_top[i] = 63;
+		if (fftdev.fft_cur[i] > 79)fftdev.fft_cur[i] = 79;	  //保证在范围内 因为前面有增倍效果
+		if (fftdev.fft_top[i] > 79)fftdev.fft_top[i] = 79;
 
 		fft_show_oneband(224 + i * 6, 130, 6, 80, fftdev.fft_cur[i], fftdev.fft_top[i]);//显示柱子	   
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void join2(u8 *a, u8 *b) {
+    while (*a != '\0') {
+        a++;
+    }
+    while ((*a++ = *b++) != '\0') {
+        ;
+    }
+}
 
 //播放音乐
 void mp3_play(void)
@@ -205,8 +213,8 @@ void mp3_play(void)
 	u16 temp;
 	u16 *mp3indextbl;	//音乐索引表 
 
-	lcd_bit=1;
-	
+	lcd_bit = 1;
+
 	init_fft();
 	while (f_opendir(&mp3dir, "0:/MUSIC"))//打开图片文件夹
 	{
@@ -255,7 +263,7 @@ void mp3_play(void)
 			}
 		}
 	}
-
+	curindex = 0;
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
 	while (res == FR_OK)//打开成功
 	{
@@ -265,13 +273,28 @@ void mp3_play(void)
 		fn = (u8*)(*mp3fileinfo.lfname ? mp3fileinfo.lfname : mp3fileinfo.fname);
 		strcpy((char*)pname, "0:/MUSIC/");				//复制路径(目录)
 		strcat((char*)pname, (const char*)fn);  			//将文件名接在后面	
-		
-		LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
-		Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+
+		temp = mp3id3_is((const TCHAR*)pname, lcd_bit);
+		if (temp != 0)
+		{
+			join2(TIT2, " - ");
+			join2(TIT2, TPE1);
+			LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
+			Show_Str(0, 0, 320, 16, TIT2, 16, 0);				//显示歌曲名字 
+		}
+		else
+		{
+			LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
+			Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+		}
+		if (TPE1 != NULL)
+			myfree(TPE1);
+		if (TIT2 != NULL)
+			myfree(TIT2);
 		mp3_vol_show((vsset.mvol - 100) / 5);
 		mp3_index_show(curindex + 1, totmp3num);
-		
-		key = mp3_play_song(pname, mp3id3_is((const TCHAR*)pname, lcd_bit)); 				 		//播放这个MP3    
+
+		key = mp3_play_song(pname, temp); 				 		//播放这个MP3    
 		if (key == KEY1_PRES)		//上一曲
 		{
 			if (curindex)curindex--;
@@ -355,22 +378,22 @@ u8 mp3_play_song(u8 *pname, u16 id3head)
 								vsset.mvol = 100;
 							}
 							mp3_vol_show((vsset.mvol - 100) / 5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
-							VS_Set_Vol(vsset.mvol);		
+							VS_Set_Vol(vsset.mvol);
 							LCD_LED = 1;
 							lcd_bit = 0;
 							mp3_vol_show((vsset.mvol - 100) / 5);
 							break;
 						case KEY3_PRES:	   //暂停/播放
-						if(lcd_bit==0)
-						{
-							lcd_bit = 1;
-							LCD_LED=1;
-						}
-						else if(lcd_bit==1)
-						{
-							lcd_bit = 0;
-							LCD_LED=0;
-						}
+							if (lcd_bit == 0)
+							{
+								lcd_bit = 1;
+								LCD_LED = 1;
+							}
+							else if (lcd_bit == 1)
+							{
+								lcd_bit = 0;
+								LCD_LED = 0;
+							}
 							break;
 						default:
 							break;

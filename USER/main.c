@@ -42,8 +42,6 @@ int main(void)
 	{
 		POINT_COLOR = RED;
 		LCD_Clear(BLACK);
-		VS_HD_Reset();
-		VS_Set_Vol(100);
 		VS_Sine_Test();
 				
 		mp3_play();

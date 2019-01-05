@@ -4,11 +4,11 @@
 //VS10XX默认设置参数
 _vs10xx_obj vsset=
 {
-	180,	//音量:220
+	140,	//音量:220
 	15,		//低音上线 100Hz
 	15,		//低音提升 15dB	
 	10,		//高音下限 10Khz	
-	15,		//高音提升 10.5dB
+	10,		//高音提升 10.5dB
 	0,		//空间效果	
 };
 
@@ -113,7 +113,7 @@ u8 VS_HD_Reset(void)
 void VS_Sine_Test(void)
 {
 	VS_HD_Reset();
-	VS_WR_Cmd(0x0b, 0X2020);	  //设置音量	 
+	VS_Set_Vol(100);
 	VS_WR_Cmd(SPI_MODE, 0x0820);//进入VS10XX的测试模式     
 	while (VS_DQ == 0);     //等待DREQ为高
 	//printf("mode sin:%x\n",VS_RD_Reg(SPI_MODE));
