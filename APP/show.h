@@ -4,16 +4,13 @@
 #include "stdlib.h"
 
 void time_go(void);
-void game(void);
-
-#define Sound2 2500          //??2
-#define Sound1 1500 
-#define Sound3 2000 
- 
-#define key1  GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_11)//读取按键0
-#define key3  GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_12)//读取按键1
-#define key2  GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_10)//读取按键1
-
+void fft_show_oneband(u16 x, u16 y, u16 width, u16 height, u16 curval, u16 topval);
+void FFT_post(u16 *pbuf);
+void mp3_index_show(u16 index, u16 total);
+void mp3_vol_show(u8 vol);
+void mp3_msg_show(u32 lenth);
+	
 extern u8 time_k;
+extern u8 lcd_bit;
 
 #endif

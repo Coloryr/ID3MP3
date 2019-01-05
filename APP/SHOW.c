@@ -7,6 +7,10 @@
 #include "rtc.h"
 #include "delay.h"
 #include "key.h"
+#include "vs10xx.h"
+#include "mp3player.h"
+
+u8 lcd_bit=0;
 
 _lunar_obj moon;
 /*显示生肖-----------------------------------------------------*/
@@ -228,8 +232,85 @@ void time_go(void)
 	displaysx();
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//显示一根柱子
+//x,y,width,height:位置和尺寸
+//curval:当值
+//topval:最大值
+void fft_show_oneband(u16 x, u16 y, u16 width, u16 height, u16 curval, u16 topval)
+{
+	gui_fill_rectangle(x, y, width, height - curval, MP3_MAIN_BKCOLOR);					//填充背景色
+	gui_fill_rectangle(x, y + height - curval, width, curval, FFT_BANDS_COLOR);	//填充柱状色
+	gui_draw_hline(x, y + height - topval - 1, width, FFT_TOP_COLOR);
+}
 
+//显示曲目索引
+//index:当前索引
+//total:总文件数
+void mp3_index_show(u16 index, u16 total)
+{
+	//显示当前曲目的索引,及总曲目数
+	if (lcd_bit ==1)
+	{
+		LCD_ShowxNum(224 + 0, 20, index, 3, 16, 0X80);		//索引
+		LCD_ShowChar(224 + 24, 20, '/', 16, 0);
+		LCD_ShowxNum(224 + 32, 20, total, 3, 16, 0X80); 	//总曲目	
+	}
+}
+//显示当前音量
+void mp3_vol_show(u8 vol)
+{
+	if (lcd_bit ==1 )
+	{
+		LCD_ShowString(224, 40, 32, 16, 16, "VOL:");
+		LCD_ShowxNum(224 + 32, 40, vol, 2, 16, 0X80); 	//显示音量	 
+	}
+}
+u16 f_kbps=0;//歌曲文件位率	
+//显示播放时间,比特率 信息 
+//lenth:歌曲总长度
+void mp3_msg_show(u32 lenth)
+{
+	static u16 playtime = 0;//播放时间标记
+	u16 time = 0;// 时间变量
+	u16 temp = 0;
+	if(lcd_bit == 1)
+	{
+		if (f_kbps == 0xffff)//未更新过
+		{
+			playtime = 0;
+			f_kbps = VS_Get_HeadInfo();//获得比特率
+		}
+		time = VS_Get_DecodeTime(); //得到解码时间
 
+		if (playtime == 0)playtime = time;
+		else if ((time != playtime) && (time != 0))//1s时间到,更新显示数据
+		{
+			playtime = time;//更新时间 	 			
+			temp = VS_Get_HeadInfo(); //获得比特率	   				 
+			if (temp != f_kbps)
+			{
+				f_kbps = temp;//更新KBPS	  				     
+			}
+			//显示播放时间			 
+			LCD_ShowxNum(224, 60, time / 60, 2, 16, 0X80);		//分钟
+			LCD_ShowChar(224 + 16, 60, ':', 16, 0);
+			LCD_ShowxNum(224 + 24, 60, time % 60, 2, 16, 0X80);	//秒钟		
+			LCD_ShowChar(224 + 40, 60, '/', 16, 0);
+			//显示总时间
+			if (f_kbps)time = (lenth / f_kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
+			else time = 0;//非法位率	  
+			LCD_ShowxNum(224 + 48, 60, time / 60, 2, 16, 0X80);	//分钟
+			LCD_ShowChar(224 + 64, 60, ':', 16, 0);
+			LCD_ShowxNum(224 + 72, 60, time % 60, 2, 16, 0X80);	//秒钟	  		    
+			//显示位率			   
+			LCD_ShowxNum(224, 80, f_kbps, 3, 16, 0X80); 	//显示位率	 
+			LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
+		}
+		VS_Get_Spec(FFTbuf); //提取频谱数据
+		FFT_post(FFTbuf);	  //进行频谱效果显示
+	}
+}
 
 
 

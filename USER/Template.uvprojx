@@ -585,11 +585,6 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\LCD\ILI93xx.c</FilePath>
             </File>
-            <File>
-              <FileName>stmflash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\STMFLASH\stmflash.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
