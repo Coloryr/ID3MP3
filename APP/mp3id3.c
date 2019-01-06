@@ -101,7 +101,10 @@ void mp3id3_is(void *pdata)
 	OS_CPU_SR cpu_sr=0;
 	while(1)
 	{
-		while(song_next=0);
+		while(song_next=0)
+		{
+			delay_ms(500);
+		}
 		size=1;
 		song_next=0;
 	 
