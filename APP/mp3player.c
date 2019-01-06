@@ -16,17 +16,6 @@
 #include "flash.h"
 #include "includes.h" 
 
-//图片显示任务
-//设置任务优先级
-#define PIC_SHOW_TASK_PRIO       		3
-//设置任务堆栈大小
-#define PIC_SHOW_STK_SIZE  		    1024
-//任务堆栈，8字节对齐	
-__align(8) static OS_STK PIC_SHOW_TASK_STK[PIC_SHOW_STK_SIZE];
-//任务函数
-void mp3id3_is(void *pdata);
-
-
 u8 *pname;			//带路径的文件名
 
 u8 save_bit[5]={0,0,0,0,0};
@@ -238,7 +227,7 @@ void mp3_play(void *pdata)
 
 	OS_CPU_SR cpu_sr=0;
 		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)     
-	
+	song_next=0;
 	lcd_bit = 1;
 
 	init_fft();
@@ -311,6 +300,7 @@ void mp3_play(void *pdata)
 		strcpy((char*)pname, "0:/MUSIC/");				//复制路径(目录)
 		strcat((char*)pname, (const char*)fn);  			//将文件名接在后面	
 		size=1;
+		song_next=1;
 		OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
 		while(size=1);
 		if (temp != 0)

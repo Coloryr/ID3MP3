@@ -12,6 +12,7 @@
 #include "show.h"
 #include "includes.h" 
 
+u8 song_next;
 u16 size;
 
 u8 *TIT2;						//歌名
@@ -97,7 +98,13 @@ void mp3id3_is(void *pdata)
 	u16 a = 0;
 	u8 temp1, temp2;
 	UINT(*outfun)(JDEC*, void*, JRECT*);
-	 OS_CPU_SR cpu_sr=0;
+	OS_CPU_SR cpu_sr=0;
+	while(1)
+	{
+		while(song_next=0);
+		size=1;
+		song_next=0;
+	 
 		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
 	databuf = (u8*)mymalloc(READ_buff_size);
 	fmp3 = (FIL*)mymalloc(sizeof(FIL));
@@ -477,7 +484,8 @@ x:
 	}
 	f_close(fmp3);
 	myfree(fmp3);
-	myfree(databuf);						//释放内存			     
+	myfree(databuf);						//释放内存	
+}	
 }
 
 

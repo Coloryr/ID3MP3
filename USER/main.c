@@ -38,6 +38,16 @@ OS_STK MUSIC_PLAY_TASK_STK[MUSIC_PLAY_STK_SIZE];
 //任务函数
 void mp3_play(void *pdata);
 
+//图片显示任务
+//设置任务优先级
+#define PIC_SHOW_TASK_PRIO       		3
+//设置任务堆栈大小
+#define PIC_SHOW_STK_SIZE  		    1024
+//任务堆栈，8字节对齐	
+__align(8) static OS_STK PIC_SHOW_TASK_STK[PIC_SHOW_STK_SIZE];
+//任务函数
+void mp3id3_is(void *pdata);
+
 ////////////////////////////////伪随机数产生办法////////////////////////////////
 u32 random_seed=1;
 void app_srand(u32 seed)
@@ -63,7 +73,8 @@ void start_task(void *pdata)
 	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)    	   
 	OSStatInit();		//初始化统计任务.这里会延时1秒钟左右	
  	app_srand(OSTime);
-  OSTaskCreate(mp3_play,(void *)0,(OS_STK*)&MUSIC_PLAY_TASK_STK[MUSIC_PLAY_STK_SIZE-1],MUSIC_PLAY_TASK_PRIO); 					   
+  OSTaskCreate(mp3_play,(void *)0,(OS_STK*)&MUSIC_PLAY_TASK_STK[MUSIC_PLAY_STK_SIZE-1],MUSIC_PLAY_TASK_PRIO); 		
+	OSTaskCreate(mp3id3_is,(void *)0,(OS_STK*)&PIC_SHOW_TASK_STK[PIC_SHOW_STK_SIZE-1],PIC_SHOW_TASK_PRIO); 				   
 	OSTaskSuspend(START_TASK_PRIO);	//挂起起始任务.
 	OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
 }

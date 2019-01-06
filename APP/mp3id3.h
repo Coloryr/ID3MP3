@@ -14,5 +14,6 @@ void mp3id3_is(void *pdata);
 extern u8 *TIT2;
 extern u8 *TPE1;
 extern u16 size;
+extern u8 song_next;
 #endif
 
