@@ -145,6 +145,7 @@ u8 update_font(u16 x, u16 y, u8 size, u8 src)
 	}
 	res = 0XFF;
 	ftinfo.fontok = 0XFF;
+	SPI_Flash_Erase_Chip();
 	SPI_Flash_Write((u8*)&ftinfo, FONTINFOADDR, sizeof(ftinfo));	//清除之前字库成功的标志.防止更新到一半重启,导致的字库部分数据丢失.
 	SPI_Flash_Read((u8*)&ftinfo, FONTINFOADDR, sizeof(ftinfo));	//重新读出ftinfo结构体数据
 	LCD_ShowString(x, y, 240, 320, size, "Updating UNIGBK.BIN");

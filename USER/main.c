@@ -36,8 +36,15 @@ int main(void)
 	LCD_Clear(BLACK);
 	POINT_COLOR = RED;
 	BACK_COLOR = BLACK;
-	if (font_init() == 1)
+	if (font_init() == 1 || KEY_Scan(0) ==1)
+	{
+		a:
 		update_font(0, 0, 16, 0);
+		if(font_init() != 0)
+		{
+			goto a;
+		}
+	}
 	while (1)
 	{
 		POINT_COLOR = RED;

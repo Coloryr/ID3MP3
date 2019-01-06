@@ -13,6 +13,10 @@
 #include "show.h"
 #include "mp3id3.h"
 #include "piclib.h"
+#include "flash.h"
+
+u8 save_bit[5]={0,0,0,0,0};
+u32 save_bit_local=(1024*15)*1024;//默认是15M的地址
 
 _f_fftdev fftdev;	//定义fft变量管理结构体
 
@@ -191,12 +195,18 @@ void FFT_post(u16 *pbuf)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void join2(u8 *a, u8 *b) {
-    while (*a != '\0') {
-        a++;
-    }
-    while ((*a++ = *b++) != '\0') {
-        ;
-    }
+	if (*a != 0)
+	{
+		while (*a != '\0') {
+			a++;
+		}
+		if (*b != 0)
+		{
+			while ((*a++ = *b++) != '\0') {
+				;
+			}
+		}
+	}
 }
 
 //播放音乐
@@ -216,6 +226,7 @@ void mp3_play(void)
 	lcd_bit = 1;
 
 	init_fft();
+	Show_Str(30, 20, 240, 16, "正在读取文件", 16, 0);
 	while (f_opendir(&mp3dir, "0:/MUSIC"))//打开图片文件夹
 	{
 		Show_Str(30, 20, 240, 16, "MUSIC文件夹错误!", 16, 0);
@@ -263,7 +274,18 @@ void mp3_play(void)
 			}
 		}
 	}
-	curindex = 0;
+	SPI_Flash_Read(save_bit, save_bit_local, 5);
+	curindex = (save_bit[0] << 8) | save_bit[1];
+	if (curindex > totmp3num || vsset.mvol > 200)
+	{
+		curindex = 0;
+		save_bit[0] = (curindex >> 8) & 0xff;
+		save_bit[1] = curindex & 0xff;
+		save_bit[2] = vsset.mvol;
+		SPI_Flash_Write(save_bit, save_bit_local, 5);
+	}
+	vsset.mvol = save_bit[2];
+	VS_Set_Vol(vsset.mvol);
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
 	while (res == FR_OK)//打开成功
 	{
@@ -277,20 +299,25 @@ void mp3_play(void)
 		temp = mp3id3_is((const TCHAR*)pname, lcd_bit);
 		if (temp != 0)
 		{
-			join2(TIT2, " - ");
-			join2(TIT2, TPE1);
 			LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
-			Show_Str(0, 0, 320, 16, TIT2, 16, 0);				//显示歌曲名字 
+			if (TIT2 != NULL && TPE1 != NULL && TIT2[0] != 0x00)
+			{
+				join2(TIT2, "-");
+				join2(TIT2, TPE1);
+				Show_Str(0, 0, 320, 16, TIT2, 16, 0);				//显示歌曲名字 
+			}
+			else if (TIT2 != NULL && TIT2[0] != 0x00)
+			{
+				Show_Str(0, 0, 320, 16, TIT2, 16, 0);				//显示歌曲名字 
+			}
+			else
+				Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
 		}
 		else
 		{
 			LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
 			Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
 		}
-		if (TPE1 != NULL)
-			myfree(TPE1);
-		if (TIT2 != NULL)
-			myfree(TIT2);
 		mp3_vol_show((vsset.mvol - 100) / 5);
 		mp3_index_show(curindex + 1, totmp3num);
 
@@ -299,11 +326,17 @@ void mp3_play(void)
 		{
 			if (curindex)curindex--;
 			else curindex = totmp3num - 1;
+			save_bit[0] = (curindex >> 8) & 0xff;
+			save_bit[1] = curindex & 0xff;
+			SPI_Flash_Write(save_bit, save_bit_local, 5);
 		}
 		else if (key == KEY0_PRES)//下一曲
 		{
 			curindex++;
 			if (curindex >= totmp3num)curindex = 0;//到末尾的时候,自动从头开始
+			save_bit[0] = (curindex >> 8) & 0xff;
+			save_bit[1] = curindex & 0xff;
+			SPI_Flash_Write(save_bit, save_bit_local, 5);
 		}
 		else break;	//产生了错误 	 
 	}
@@ -373,15 +406,15 @@ u8 mp3_play_song(u8 *pname, u16 id3head)
 							break;
 						case KEY2_PRES:
 							vsset.mvol = vsset.mvol + 10;
-							if (vsset.mvol == 200)
+							if (vsset.mvol >= 200)
 							{
 								vsset.mvol = 100;
 							}
 							mp3_vol_show((vsset.mvol - 100) / 5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
 							VS_Set_Vol(vsset.mvol);
-							LCD_LED = 1;
-							lcd_bit = 0;
 							mp3_vol_show((vsset.mvol - 100) / 5);
+							save_bit[2] = vsset.mvol;
+							SPI_Flash_Write_Page(save_bit, save_bit_local, 5);
 							break;
 						case KEY3_PRES:	   //暂停/播放
 							if (lcd_bit == 0)
