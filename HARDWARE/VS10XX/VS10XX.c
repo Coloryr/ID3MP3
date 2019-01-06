@@ -1,5 +1,6 @@
 #include "vs10xx.h"	
 #include "spi.h"
+#include "includes.h" 
 
 //VS10XX默认设置参数
 _vs10xx_obj vsset=
@@ -113,6 +114,7 @@ u8 VS_HD_Reset(void)
 void VS_Sine_Test(void)
 {
 	VS_HD_Reset();
+	VS_Soft_Reset();
 	VS_Set_Vol(100);
 	VS_WR_Cmd(SPI_MODE, 0x0820);//进入VS10XX的测试模式     
 	while (VS_DQ == 0);     //等待DREQ为高
@@ -242,11 +244,11 @@ u16 VS_RD_Reg(u8 address)
 u16 VS_WRAM_Read(u16 addr)
 {
 	u16 res;
-	//    OS_CPU_SR cpu_sr=0;
-	//	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
+	    OS_CPU_SR cpu_sr=0;
+		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
 	VS_WR_Cmd(SPI_WRAMADDR, addr);
 	res = VS_RD_Reg(SPI_WRAM);
-	//	OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
+		OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
 	return res;
 
 }
@@ -274,11 +276,11 @@ u16 VS_Get_HeadInfo(void)
 {
 	unsigned int HEAD0;
 	unsigned int HEAD1;
-	//    OS_CPU_SR cpu_sr=0;
-	//	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
+	    OS_CPU_SR cpu_sr=0;
+		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
 	HEAD0 = VS_RD_Reg(SPI_HDAT0);
 	HEAD1 = VS_RD_Reg(SPI_HDAT1);
-	//	OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
+		OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
 		//printf("(H0,H1):%x,%x\n",HEAD0,HEAD1);
 	switch (HEAD1)
 	{
@@ -388,10 +390,10 @@ void VS_Reset_DecodeTime(void)
 u16 VS_Get_DecodeTime(void)
 {
 	u16 dt = 0;
-	//    OS_CPU_SR cpu_sr=0;
-	//	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
+	    OS_CPU_SR cpu_sr=0;
+		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
 	dt = VS_RD_Reg(SPI_DECODE_TIME);
-	//	OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)    
+		OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)    
 	return dt;
 }
 //vs10xx装载patch.
@@ -431,8 +433,8 @@ u8 VS_Get_Spec(u16 *p)
 {
 	u8 bands;
 	u8 i;
-	//    OS_CPU_SR cpu_sr=0;
-	//	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
+	    OS_CPU_SR cpu_sr=0;
+		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
 	VS_WR_Cmd(SPI_WRAMADDR, SPEC_DATA_BASE + 2);
 	bands = VS_RD_Reg(SPI_WRAM);					//获取频段数                                                                                          
 	VS_WR_Cmd(SPI_WRAMADDR, SPEC_DATA_BASE + 4);
@@ -443,7 +445,7 @@ u8 VS_Get_Spec(u16 *p)
 		//[11:6]:峰值                                  
 		*p++ = VS_RD_Reg(SPI_WRAM);				//读取当前值和峰值 
 	}
-	//	OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
+		OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
 	return bands;
 }
 
@@ -453,8 +455,8 @@ u8 VS_Get_Spec(u16 *p)
 void VS_Set_Bands(u16 *buf, u8 bands)
 {
 	u8 i;
-	//    OS_CPU_SR cpu_sr=0;
-	//	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
+	    OS_CPU_SR cpu_sr=0;
+		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)             
 	VS_WR_Cmd(SPI_WRAMADDR, SPEC_DATA_BASE + 0X58);//地址总是1868,对VS1053,SPEC_DATA_BASE是0X1810.所以加上0X58  
 	for (i = 0; i < bands; i++)
 	{
@@ -463,7 +465,7 @@ void VS_Set_Bands(u16 *buf, u8 bands)
 	if (i < 15)VS_WR_Cmd(SPI_WRAM, 25000);//对VS1053这个最大值为15,填充25000,表示频谱表结束
 	VS_WR_Cmd(SPI_WRAMADDR, SPEC_DATA_BASE + 1);//地址SPEC_DATA_BASE+1,为Samples Rates的起始地址
 	VS_WR_Cmd(SPI_WRAM, 0);	//开始新频率
-//	OS_EXIT_CRITICAL();		//退出临界区(可以被中断打断)
+	OS_EXIT_CRITICAL();		//退出临界区(可以被中断打断)
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////// 	  	  
 //设定VS10XX播放的音量和高低音
@@ -471,13 +473,13 @@ void VS_Set_Bands(u16 *buf, u8 bands)
 void VS_Set_Vol(u8 volx)
 {
 	u16 volt = 0; 			//暂存音量值
-//	OS_CPU_SR cpu_sr=0;
+	OS_CPU_SR cpu_sr=0;
 	volt = 254 - volx;			//取反一下,得到最大值,表示最大的表示 
 	volt <<= 8;
 	volt += 254 - volx;			//得到音量设置后大小
-// 	OS_ENTER_CRITICAL();	//进入临界区(无法被中断打断)             
+ 	OS_ENTER_CRITICAL();	//进入临界区(无法被中断打断)             
 	VS_WR_Cmd(SPI_VOL, volt);//设音量 
-//	OS_EXIT_CRITICAL();		//退出临界区(可以被中断打断)
+	OS_EXIT_CRITICAL();		//退出临界区(可以被中断打断)
 }
 //设定高低音控制
 //bfreq:低频上限频率	2~15(单位:10Hz)
@@ -488,7 +490,7 @@ void VS_Set_Bass(u8 bfreq, u8 bass, u8 tfreq, u8 treble)
 {
 	u16 bass_set = 0; //暂存音调寄存器值
 	signed char temp = 0;
-	//  	OS_CPU_SR cpu_sr=0;
+	  	OS_CPU_SR cpu_sr=0;
 	if (treble == 0)temp = 0;	   		//变换
 	else if (treble > 8)temp = treble - 8;
 	else temp = treble - 9;
@@ -499,24 +501,24 @@ void VS_Set_Bass(u8 bfreq, u8 bass, u8 tfreq, u8 treble)
 	bass_set += bass & 0xf;				//低音设定
 	bass_set <<= 4;
 	bass_set += bfreq & 0xf;			//低音上限    
-// 	OS_ENTER_CRITICAL();			//进入临界区(无法被中断打断)             
+ 	OS_ENTER_CRITICAL();			//进入临界区(无法被中断打断)             
 	VS_WR_Cmd(SPI_BASS, bass_set);	//BASS 
-//	OS_EXIT_CRITICAL();				//退出临界区(可以被中断打断)
+	OS_EXIT_CRITICAL();				//退出临界区(可以被中断打断)
 }
 //设定音效
 //eft:0,关闭;1,最小;2,中等;3,最大.
 void VS_Set_Effect(u8 eft)
 {
 	u16 temp;
-	//   	OS_CPU_SR cpu_sr=0;
-	//	OS_ENTER_CRITICAL();		//进入临界区(无法被中断打断)             
+	   	OS_CPU_SR cpu_sr=0;
+		OS_ENTER_CRITICAL();		//进入临界区(无法被中断打断)             
 	temp = VS_RD_Reg(SPI_MODE);	//读取SPI_MODE的内容
 	if (eft & 0X01)temp |= 1 << 4;		//设定LO
 	else temp &= ~(1 << 5);			//取消LO
 	if (eft & 0X02)temp |= 1 << 7;		//设定HO
 	else temp &= ~(1 << 7);			//取消HO						   
 	VS_WR_Cmd(SPI_MODE, temp);	//设定模式    
-//	OS_EXIT_CRITICAL();			//退出临界区(可以被中断打断)
+	OS_EXIT_CRITICAL();			//退出临界区(可以被中断打断)
 }
 ///////////////////////////////////////////////////////////////////////////////
 //设置音量,音效等.

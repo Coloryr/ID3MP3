@@ -8,6 +8,9 @@
 #include "text.h"
 #include "delay.h"
 #include "flash.h"
+#include "mp3player.h"
+#include "show.h"
+#include "includes.h" 
 
 u16 size;
 
@@ -80,7 +83,7 @@ __align(4) u8 jpg_buffer[JPEG_WBUF_SIZE];	//¶¨Òåjpeg½âÂë¹¤×÷Çø´óÐ¡(×îÉÙÐèÒª3092×
 	
 #endif
 
-u16 mp3id3_is(const TCHAR* path, u8 pic_show)
+void mp3id3_is(void *pdata)
 {
 	FIL* fmp3 = 0;
 	u16 i = 0;
@@ -94,7 +97,8 @@ u16 mp3id3_is(const TCHAR* path, u8 pic_show)
 	u16 a = 0;
 	u8 temp1, temp2;
 	UINT(*outfun)(JDEC*, void*, JRECT*);
-
+	 OS_CPU_SR cpu_sr=0;
+		OS_ENTER_CRITICAL();//½øÈëÁÙ½çÇø(ÎÞ·¨±»ÖÐ¶Ï´ò¶Ï)             
 	databuf = (u8*)mymalloc(READ_buff_size);
 	fmp3 = (FIL*)mymalloc(sizeof(FIL));
 	if (TIT2 == NULL)
@@ -114,7 +118,7 @@ u16 mp3id3_is(const TCHAR* path, u8 pic_show)
 			LCD_Fill(30, 20, 160, 16, BLACK);//Çå³ýÏÔÊ¾	     
 			delay_ms(200);
 		}
-	while (f_open(fmp3, path, FA_READ | FA_OPEN_EXISTING))
+	while (f_open(fmp3, (const TCHAR*)pname, FA_READ | FA_OPEN_EXISTING))
 	{
 		Show_Str(30, 20, 160, 16, "MP3ID3£ºÎÄ¼þ¶ÁÈ¡´íÎó", 16, 0);
 		delay_ms(200);
@@ -398,10 +402,12 @@ u16 mp3id3_is(const TCHAR* path, u8 pic_show)
 				img = 0;
 			}
 		}
-		if (pic_show == 1 && code_type == 0)
+				OS_EXIT_CRITICAL();	//ÍË³öÁÙ½çÇø(¿ÉÒÔ±»ÖÐ¶Ï´ò¶Ï)
+		if (lcd_bit == 1 && code_type == 0)
 		{
-			if ((pic_show_x + pic_show_size) > picinfo.lcdwidth)return PIC_WINDOW_ERR;		//x×ø±ê³¬·¶Î§ÁË.
-			if ((pic_show_y + pic_show_size) > picinfo.lcdheight)return PIC_WINDOW_ERR;		//y×ø±ê³¬·¶Î§ÁË.  
+			
+			if ((pic_show_x + pic_show_size) > picinfo.lcdwidth)goto x;		//x×ø±ê³¬·¶Î§ÁË.
+			if ((pic_show_y + pic_show_size) > picinfo.lcdheight)goto x;		//y×ø±ê³¬·¶Î§ÁË.  
 			//µÃµ½ÏÔÊ¾·½¿ò´óÐ¡	  	 
 			picinfo.S_Height = pic_show_size;
 			picinfo.S_Width = pic_show_size;
@@ -410,7 +416,7 @@ u16 mp3id3_is(const TCHAR* path, u8 pic_show)
 			{
 				picinfo.S_Height = lcddev.height;
 				picinfo.S_Width = lcddev.width;
-				return FALSE;
+				goto x;
 			}
 			//ÏÔÊ¾µÄ¿ªÊ¼×ø±êµã
 			picinfo.S_YOFF = pic_show_y;
@@ -454,25 +460,24 @@ u16 mp3id3_is(const TCHAR* path, u8 pic_show)
 			jpeg_freeall();		//ÊÍ·ÅÄÚ´æ
 #endif
 		}
-		else if (code_type == 1 && pic_show == 1)
+		else if (code_type == 1 && lcd_bit == 1)
 		{
 			i += 14 + 20;
 			f_lseek(fmp3, i);				//Ìø¹ýÍ·
 		}
-		else if (code_type == 2 && pic_show == 1)
+		else if (code_type == 2 && lcd_bit == 1)
 		{
 			LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size,
 				pic_show_y + pic_show_size, BACK_COLOR);
 		}
+x:		
 		f_close(fmp3);
 		myfree(fmp3);
 		myfree(databuf);				//ÊÍ·ÅÄÚ´æ			    
-		return size;
 	}
 	f_close(fmp3);
 	myfree(fmp3);
 	myfree(databuf);						//ÊÍ·ÅÄÚ´æ			     
-	return 0;
 }
 
 

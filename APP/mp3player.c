@@ -14,6 +14,20 @@
 #include "mp3id3.h"
 #include "piclib.h"
 #include "flash.h"
+#include "includes.h" 
+
+//图片显示任务
+//设置任务优先级
+#define PIC_SHOW_TASK_PRIO       		3
+//设置任务堆栈大小
+#define PIC_SHOW_STK_SIZE  		    1024
+//任务堆栈，8字节对齐	
+__align(8) static OS_STK PIC_SHOW_TASK_STK[PIC_SHOW_STK_SIZE];
+//任务函数
+void mp3id3_is(void *pdata);
+
+
+u8 *pname;			//带路径的文件名
 
 u8 save_bit[5]={0,0,0,0,0};
 u32 save_bit_local=(1024*15)*1024;//默认是15M的地址
@@ -149,8 +163,8 @@ void init_fft(void)
 	for (i = 0; i < FFT_BANDS; i++)	//初始化频谱管理数据
 	{
 		fftdev.fft_cur[i] = 0;
-		fftdev.fft_top[i] = 60;
-		fftdev.fft_time[i] = 15;
+		fftdev.fft_top[i] = 80;
+		fftdev.fft_time[i] = 30;
 	}
 }
 //显示FFT_BANDS根柱子
@@ -163,11 +177,11 @@ void FFT_post(u16 *pbuf)
 	for (i = 0; i < FFT_BANDS; i++)	//显示各个频谱	   循环显示14个段
 	{
 
-		temp = (pbuf[i] & 0X3F) * 4; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
+		temp = (pbuf[i] & 0X3F) * 3; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
 
 		if (fftdev.fft_cur[i] < temp) 	  //当前值小于temp
 			fftdev.fft_cur[i] = temp;
-		else							  //当前值大于等于temp	 开始往下降 一次降2
+		else							  //当前值大于等于temp	 开始往下降 一次降1
 		{
 			if (fftdev.fft_cur[i] > 1)fftdev.fft_cur[i] -= 1;
 			else fftdev.fft_cur[i] = 0;
@@ -176,7 +190,7 @@ void FFT_post(u16 *pbuf)
 		if (fftdev.fft_cur[i] > fftdev.fft_top[i])//当前值大于峰值时 更新峰值
 		{
 			fftdev.fft_top[i] = fftdev.fft_cur[i];
-			fftdev.fft_time[i] = 25;               //重设峰值停顿时间
+			fftdev.fft_time[i] = 30;               //重设峰值停顿时间
 		}
 
 		if (fftdev.fft_time[i])fftdev.fft_time[i]--;   //如果停顿时间大于1 即未减完
@@ -210,19 +224,21 @@ void join2(u8 *a, u8 *b) {
 }
 
 //播放音乐
-void mp3_play(void)
+void mp3_play(void *pdata)
 {
 	u8 res;
 	DIR mp3dir;	 		//目录
 	FILINFO mp3fileinfo;//文件信息
 	u8 *fn;   			//长文件名
-	u8 *pname;			//带路径的文件名
 	u16 totmp3num; 		//音乐文件总数
 	u16 curindex;		//图片当前索引
 	u8 key;					//键值		  
 	u16 temp;
 	u16 *mp3indextbl;	//音乐索引表 
 
+	OS_CPU_SR cpu_sr=0;
+		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)     
+	
 	lcd_bit = 1;
 
 	init_fft();
@@ -253,8 +269,6 @@ void mp3_play(void)
 		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
-	VS_HD_Reset();
-	VS_Soft_Reset();
 	//记录索引
 	res = f_opendir(&mp3dir, "0:/MUSIC"); //打开目录
 	if (res == FR_OK)
@@ -276,9 +290,10 @@ void mp3_play(void)
 	}
 	SPI_Flash_Read(save_bit, save_bit_local, 5);
 	curindex = (save_bit[0] << 8) | save_bit[1];
-	if (curindex > totmp3num || vsset.mvol > 200)
+	if (curindex > totmp3num || save_bit[2] > 200 || save_bit[2] == 0x00)
 	{
 		curindex = 0;
+		vsset.mvol = 160;
 		save_bit[0] = (curindex >> 8) & 0xff;
 		save_bit[1] = curindex & 0xff;
 		save_bit[2] = vsset.mvol;
@@ -295,8 +310,9 @@ void mp3_play(void)
 		fn = (u8*)(*mp3fileinfo.lfname ? mp3fileinfo.lfname : mp3fileinfo.fname);
 		strcpy((char*)pname, "0:/MUSIC/");				//复制路径(目录)
 		strcat((char*)pname, (const char*)fn);  			//将文件名接在后面	
-
-		temp = mp3id3_is((const TCHAR*)pname, lcd_bit);
+		size=1;
+		OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
+		while(size=1);
 		if (temp != 0)
 		{
 			LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
@@ -320,7 +336,6 @@ void mp3_play(void)
 		}
 		mp3_vol_show((vsset.mvol - 100) / 5);
 		mp3_index_show(curindex + 1, totmp3num);
-
 		key = mp3_play_song(pname, temp); 				 		//播放这个MP3    
 		if (key == KEY1_PRES)		//上一曲
 		{
@@ -385,6 +400,8 @@ u8 mp3_play_song(u8 *pname, u16 id3head)
 			VS_SPI_SpeedHigh();	//高速						   
 			while (rval == 0)
 			{
+				OS_CPU_SR cpu_sr=0;
+				OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)           
 				res = f_read(fmp3, databuf, 4096, (UINT*)&br);//读出4096个字节  
 				i = 0;
 				do//主播放循环
@@ -439,6 +456,7 @@ u8 mp3_play_song(u8 *pname, u16 id3head)
 					rval = KEY0_PRES;
 					break;//读完了.	
 				}
+				OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
 			}
 			f_close(fmp3);
 		}

@@ -10,8 +10,9 @@
 #define pic_show_y   16						//图片显示的位置_y
 #define pic_show_size   224				//图片显示的大小
 
-u16 mp3id3_is(const TCHAR* path, u8 pic_show);
+void mp3id3_is(void *pdata);
 extern u8 *TIT2;
 extern u8 *TPE1;
+extern u16 size;
 #endif
 
