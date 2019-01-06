@@ -293,6 +293,7 @@ void mp3_play(void *pdata)
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
 	while (res == FR_OK)//打开成功
 	{
+		OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)    
 		dir_sdi(&mp3dir, mp3indextbl[curindex]);			//改变当前目录索引	   
 		res = f_readdir(&mp3dir, &mp3fileinfo);       		//读取目录下的一个文件
 		if (res != FR_OK || mp3fileinfo.fname[0] == 0)break;	//错误了/到末尾了,退出
@@ -334,6 +335,8 @@ void mp3_play(void *pdata)
 			save_bit[0] = (curindex >> 8) & 0xff;
 			save_bit[1] = curindex & 0xff;
 			SPI_Flash_Write(save_bit, save_bit_local, 5);
+			size=1;
+		song_next=1;
 		}
 		else if (key == KEY0_PRES)//下一曲
 		{
@@ -342,6 +345,8 @@ void mp3_play(void *pdata)
 			save_bit[0] = (curindex >> 8) & 0xff;
 			save_bit[1] = curindex & 0xff;
 			SPI_Flash_Write(save_bit, save_bit_local, 5);
+			size=1;
+		song_next=1;
 		}
 		else break;	//产生了错误 	 
 	}
