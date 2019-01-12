@@ -22,7 +22,7 @@
 */
 
 #ifndef  OS_MASTER_FILE
-#include "includes.h"
+#include <ucos_ii.h>
 #endif
 
 #if (OS_MEM_EN > 0u) && (OS_MAX_MEM_PART > 0u)

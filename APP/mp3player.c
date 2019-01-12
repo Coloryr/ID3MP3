@@ -102,21 +102,6 @@ void FFT_post(u16 *pbuf)
 	}
 }
 
-void join2(u8 *a, u8 *b) {
-	if (*a != 0)
-	{
-		while (*a != '\0') {
-			a++;
-		}
-		if (*b != 0)
-		{
-			while ((*a++ = *b++) != '\0') {
-				;
-			}
-		}
-	}
-}
-
 void mp3_play_ready()
 {
 	u8 res;
@@ -125,6 +110,12 @@ void mp3_play_ready()
 	u16 temp;
   
 	VS_Sine_Test();	
+	VS_Restart_Play();  					//重启播放 
+	VS_Set_All();        					//设置音量等信息 			 
+	VS_Reset_DecodeTime();					//复位解码时间 	  
+	VS_Load_Patch((u16*)VS1053_PATCH, 1000); 	  //加载频谱分析补丁
+	VS_Set_Bands((u16*)VS_NEW_BANDS_FREQ_TBL, FFT_BANDS);//重设频谱频率
+	
 	lcd_bit = 1;
 
 	init_fft();
@@ -148,7 +139,9 @@ void mp3_play_ready()
 	info.mp3fileinfo.lfname = mymalloc(info.mp3fileinfo.lfsize);//为长文件缓存区分配内存
 	info.pname = mymalloc(info.mp3fileinfo.lfsize);				//为带路径的文件名分配内存
 	info.mp3indextbl = mymalloc(2 * info.totmp3num);				//申请2*totmp3num个字节的内存,用于存放音乐文件索引
-	while (info.mp3fileinfo.lfname == NULL || info.pname == NULL || info.mp3indextbl == NULL)//内存分配出错
+	info.fmp3 = (FIL*)mymalloc(sizeof(FIL));	//申请内存
+	while (info.mp3fileinfo.lfname == NULL || info.pname == NULL || 
+			info.mp3indextbl == NULL || info.fmp3 == NULL)//内存分配出错
 	{
 		Show_Str(30, 20, 240, 16, "内存分配失败!", 16, 0);
 		delay_ms(200);
@@ -198,6 +191,15 @@ void mp3_play(void *pdata)
 		strcpy((char*)info.pname, "0:/MUSIC/");				//复制路径(目录)
 		strcat((char*)info.pname, (const char*)fn);  			//将文件名接在后面	
 		info.size=1;
+		res = f_open(info.fmp3, (const TCHAR*)info.pname, FA_READ);
+		if(res != FR_OK)
+			while (1)
+			{
+			Show_Str(30, 20, 240, 16, "MUSIC文件夹错误!", 16, 0);
+			delay_ms(200);
+			LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
+			delay_ms(200);
+			}
 		//mp3id3();
 		if (info.size != 0)
 		{
@@ -222,6 +224,7 @@ void mp3_play(void *pdata)
 		}
 		mp3_vol_show((vsset.mvol - 100) / 5);
 		mp3_index_show(info.curindex + 1, info.totmp3num);
+		f_lseek(info.fmp3, info.size);
 		key = mp3_play_song(); 				 		//播放这个MP3    
 		if (key == KEY1_PRES)		//上一曲
 		{
@@ -259,40 +262,25 @@ u8 mp3_play_song(void)
 	u8 *databuf;
 	u16 i = 0;
 	u8 key;
-	FIL* fmp3 = 0;					//MP3文件
-
+	OS_CPU_SR cpu_sr=0;
+		
 	static u8 pause = 0;		//暂停标志 
+	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)        
 	rval = 0;
-	fmp3 = (FIL*)mymalloc(sizeof(FIL));	//申请内存
 	databuf = (u8*)mymalloc(4096);		//开辟4096字节的内存区域
-	if (databuf == NULL || fmp3 == NULL)rval = 0XFF;//内存申请失败.
+	if (databuf == NULL)rval = 0XFF;//内存申请失败.
 	if (rval == 0)
 	{
-		VS_Restart_Play();  					//重启播放 
-		VS_Set_All();        					//设置音量等信息 			 
-		VS_Reset_DecodeTime();					//复位解码时间 	  
-		VS_Load_Patch((u16*)VS1053_PATCH, 1000); 	  //加载频谱分析补丁
-		VS_Set_Bands((u16*)VS_NEW_BANDS_FREQ_TBL, FFT_BANDS);//重设频谱频率
-		res = f_typetell(info.pname);	 	 			//得到文件后缀	 			
-
-		if (res == 0x4c)//如果是flac,加载patch
-		{
-			VS_Load_Patch((u16*)vs1053b_patch, VS1053B_PATCHLEN);
-		}
-		res = f_open(fmp3, (const TCHAR*)info.pname, FA_READ);//打开文件
-		f_lseek(fmp3, info.size);
-		if (res == 0)//打开成功.
-		{
 			VS_SPI_SpeedHigh();	//高速						   
 			while (rval == 0)
 			{    
-				res = f_read(fmp3, databuf, 4096, (UINT*)&br);//读出4096个字节 			
+				res = f_read(info.fmp3, databuf, 4096, (UINT*)&br);//读出4096个字节 			
 				i = 0;
 				do//主播放循环
 				{
 					if ((VS_Send_MusicData(databuf + i) == 0) && (pause == 0))//给VS10XX发送音频数据
 					{
-						i += 32;
+						i += 32;     
 					}
 					else
 					{
@@ -332,7 +320,7 @@ u8 mp3_play_song(void)
 						default:
 							break;
 						}
-						mp3_msg_show(fmp3->fsize);//显示信息	    
+						mp3_msg_show(info.fmp3->fsize);//显示信息	    
 					}
 				} while (i < 4096);//循环发送4096个字节 
 				if (br != 4096 || res != 0)
@@ -341,12 +329,9 @@ u8 mp3_play_song(void)
 					break;//读完了.	
 				}
 			}
-			f_close(fmp3);
-		}
-		else rval = 0XFF;//出现错误	   	  
+			f_close(info.fmp3);	  
 	}
 	myfree(databuf);
-	myfree(fmp3);
 	return rval;
 }
 

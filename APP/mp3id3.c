@@ -41,9 +41,8 @@ u16 UNICODEtoGBK(u16 unicode)  //???????
 	return c;
 }
 
-void mp3id3()
+void mp3id3(void)
 {
-	FIL* fmp3 = 0;
 	u16 i = 0;
 	u8 res = 0;
 	u8 *databuf = 0;
@@ -55,7 +54,6 @@ void mp3id3()
 	u8 temp1, temp2;
 	
 	databuf = (u8*)mymalloc(READ_buff_size);
-	fmp3 = (FIL*)mymalloc(sizeof(FIL));
 	
 	if (info.TIT2 == NULL)
 		info.TIT2 = (u8*)mymalloc(40);
@@ -66,7 +64,7 @@ void mp3id3()
 		info.TIT2[temp] = 0;
 		info.TPE1[temp] = 0;
 	}
-	if (databuf == NULL || fmp3 == NULL)//内存申请失败.
+	if (databuf == NULL)//内存申请失败.
 		while (1)
 		{
 			Show_Str(30, 20, 160, 16, "MP3ID3：内存申请失败", 16, 0);
@@ -74,14 +72,7 @@ void mp3id3()
 			LCD_Fill(30, 20, 160, 16, BLACK);//清除显示	     
 			delay_ms(200);
 		}
-	while (f_open(fmp3, (const TCHAR*)info.pname, FA_READ | FA_OPEN_EXISTING))
-	{
-		Show_Str(30, 20, 160, 16, "MP3ID3：文件读取错误", 16, 0);
-		delay_ms(200);
-		LCD_Fill(30, 20, 160, 16, BLACK);//清除显示	     
-		delay_ms(200);
-	}
-	res = f_read(fmp3, databuf, 10, (UINT*)&br);//读出mp3id3头
+	res = f_read(info.fmp3, databuf, 10, (UINT*)&br);//读出mp3id3头
 	if(res!=FR_OK)
 		return;
 	if (databuf[0] == 0x49 && databuf[1] == 0x44 && databuf[2] == 0x33)
@@ -89,7 +80,7 @@ void mp3id3()
 		//计算大小
 		info.size = databuf[6] & 0x7f | ((databuf[7] & 0x7f) << 7)
 			| ((databuf[8] & 0x7f) << 14) | ((databuf[9] & 0x7f) << 21);
-		res = f_read(fmp3, databuf, READ_buff_size, (UINT*)&br);
+		res = f_read(info.fmp3, databuf, READ_buff_size, (UINT*)&br);
 		if(res!=FR_OK)
 			return;
 		i = 0;
@@ -215,7 +206,6 @@ void mp3id3()
 		i = 0;
 		while (img)							//查找作者
 		{
-			myfree(info.TPE1);
 			if (databuf[i] == 0x54 && databuf[i + 1] == 0x50 && databuf[i + 2] == 0x45 && databuf[i + 3] == 0x31)
 			{	//找到位置
 				tag_size = databuf[i + 4] << 24
@@ -246,7 +236,6 @@ void mp3id3()
 					i += 11;
 					tag_size -= 1;
 				}
-				info.TPE1 = (u8*)mymalloc(tag_size);
 
 				if (code_type == 3)			//UTF-8
 				{
@@ -362,12 +351,11 @@ void mp3id3()
 				img = 0;
 			}
 		}
-		
 		if (lcd_bit == 1 && code_type == 0)
 		{
 			i += 14 + 20;
 			info.pic_local = i;
-			APP_pic_start();
+			//APP_pic_start();
 		}
 		else if (code_type == 1 && lcd_bit == 1)
 		{
@@ -380,8 +368,6 @@ void mp3id3()
 				pic_show_y + pic_show_size, BACK_COLOR);
 		}		    
 	}
-	f_close(fmp3);
-	myfree(fmp3);
 	myfree(databuf);						//释放内存	
 }
 

@@ -17,6 +17,7 @@ typedef struct
 	FILINFO mp3fileinfo;//文件信息
 	u16 *mp3indextbl;		//音乐索引表 
 	u16 size;						//MP3ID3大小
+	FIL* fmp3;					//MP3文件
 	
 	u16 pic_local;			//PIC位置
 

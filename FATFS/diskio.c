@@ -221,7 +221,7 @@ void ff_enter(void)
 }
 void ff_leave(void)
 {
- 	OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
+ 	//OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
 }
 //动态分配内存
 void *ff_memalloc (UINT size)			

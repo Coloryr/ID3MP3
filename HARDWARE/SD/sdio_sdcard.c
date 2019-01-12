@@ -498,7 +498,7 @@ SD_Error SD_Init(void)
 
 	SDIO_GPIOInit();	//初始化SDIO端口模式
 
-	MY_NVIC_Init(0, 0, SDIO_IRQn, NVIC_PriorityGroup_2);	//SDIO中断配置
+	MY_NVIC_Init(2, 2, SDIO_IRQn, NVIC_PriorityGroup_2);	//SDIO中断配置
 
 	//复位SDIO寄存器值
 	SDIO->POWER = 0x00000000;

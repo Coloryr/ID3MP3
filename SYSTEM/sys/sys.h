@@ -2,9 +2,9 @@
 #define __SYS_H	  
 #include <stm32f10x.h>   
 
-//0,不支持ucos
-//1,支持ucos
-#define SYSTEM_SUPPORT_UCOS		1		//定义系统文件夹是否支持UCOS
+//0,不支持OS
+//1,支持OS
+#define SYSTEM_SUPPORT_OS		1		//定义系统文件夹是否支持OS
 																	    
 	 
 //位带操作,实现51类似的GPIO控制功能
@@ -53,24 +53,38 @@
 #define PGout(n)   BIT_ADDR(GPIOG_ODR_Addr,n)  //输出 
 #define PGin(n)    BIT_ADDR(GPIOG_IDR_Addr,n)  //输入
 /////////////////////////////////////////////////////////////////
- 
- 
- 
-void NVIC_Configuration(void);
+//Ex_NVIC_Config专用定义
+#define GPIO_A 0
+#define GPIO_B 1
+#define GPIO_C 2
+#define GPIO_D 3
+#define GPIO_E 4
+#define GPIO_F 5
+#define GPIO_G 6 
+#define FTIR   1  //下降沿触发
+#define RTIR   2  //上升沿触发
+								   
 
+//JTAG模式设置定义
+#define JTAG_SWD_DISABLE   0X02
+#define SWD_ENABLE         0X01
+#define JTAG_SWD_ENABLE    0X00	
 
+/////////////////////////////////////////////////////////////////  
+void Stm32_Clock_Init(u8 PLL);  //时钟初始化  
+void Sys_Soft_Reset(void);      //系统软复位
+void Sys_Standby(void);         //待机模式 	
+void MY_NVIC_SetVectorTable(u32 NVIC_VectTab, u32 Offset);//设置偏移地址
+//void MY_NVIC_PriorityGroupConfig(u8 NVIC_Group);//设置NVIC分组
+//void MY_NVIC_Init(u8 NVIC_PreemptionPriority,u8 NVIC_SubPriority,u8 NVIC_Channel,u8 NVIC_Group);//设置中断
+void Ex_NVIC_Config(u8 GPIOx,u8 BITx,u8 TRIM);//外部中断配置函数(只对GPIOA~G)
+void JTAG_Set(u8 mode);
 //////////////////////////////////////////////////////////////////////////////
 //以下为汇编函数
 void WFI_SET(void);		//执行WFI指令
 void INTX_DISABLE(void);//关闭所有中断
 void INTX_ENABLE(void);	//开启所有中断
 void MSR_MSP(u32 addr);	//设置堆栈地址
-
-typedef enum
-{
-  FALSE = 0, TRUE  = !FALSE
-}
-bool;
 
 #endif
 

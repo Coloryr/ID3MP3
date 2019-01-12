@@ -21,8 +21,8 @@
 
 int main(void)
 {
-	delay_init();	    			 	//延时函数初始化	  
-	NVIC_Configuration(); 		//设置NVIC中断分组2:2位抢占优先级，2位响应优先级
+	Stm32_Clock_Init(16);
+	delay_init(72);	    			 	//延时函数初始化	  
 	KEY_Init();								//按键初始化
 	LCD_Init();								//LCD初始化
 	mem_init();								//初始化内存池	    
