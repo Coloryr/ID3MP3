@@ -1,5 +1,4 @@
-#include "piclib.h"
-#include "lcd.h"
+#include "includes.h" 
 
 _pic_info picinfo;	 	//图片信息
 _pic_phy pic_phy;		//图片显示物理接口	

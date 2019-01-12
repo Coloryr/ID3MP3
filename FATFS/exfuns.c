@@ -1,6 +1,4 @@
-#include "string.h"
-#include "exfuns.h"
-#include "malloc.h"
+#include "includes.h" 
 
  //文件类型列表
 const u8 *FILE_TYPE_TBL[6][13]=

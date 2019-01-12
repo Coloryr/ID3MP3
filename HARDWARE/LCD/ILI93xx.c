@@ -1,7 +1,5 @@
-#include "lcd.h"
-#include "stdlib.h"
-#include "font.h"  
-#include "delay.h"	   
+#include "includes.h" 
+#include "font.h"
 			 
 //LCD的画笔颜色和背景色	   
 u16 POINT_COLOR=0x0000;	//画笔颜色

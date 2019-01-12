@@ -7,12 +7,7 @@
 /* storage control module to the FatFs module with a defined API.        */
 /*-----------------------------------------------------------------------*/
 
-#include "diskio.h"		/* FatFs lower layer API */
-#include "sdio_sdcard.h"
-#include "flash.h"
-#include "malloc.h"		
-#include "rtc.h"
-#include "ucos_ii.h"
+#include "includes.h" 		/* FatFs lower layer API */
 
 #define SD_CARD	 0  //SD卡,卷标为0
 #define EX_FLASH 1	//外部flash,卷标为1
@@ -214,15 +209,6 @@ DWORD get_fattime (void)
  	date|=calendar.min>>1;  	//得到秒钟	   			    
     return date;   
 }			 
-OS_CPU_SR cpu_sr=0;
-void ff_enter(void)
-{
- 	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)    
-}
-void ff_leave(void)
-{
- 	//OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
-}
 //动态分配内存
 void *ff_memalloc (UINT size)			
 {

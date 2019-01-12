@@ -1,8 +1,4 @@
-#include "sys.h"
-#include "lunar.h"
-#include "show.h"
-	
-#include "bit.h"
+#include "includes.h" 
 
 extern _lunar_obj moon;	//日历结构体
 u8 _cror_(u8 temp, u8 i)

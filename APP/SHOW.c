@@ -1,19 +1,8 @@
-#include "show.h"
-#include "lunar.h"
-#include "image2lcd.h"
+#include "includes.h" 
 #include "image1.h"
-#include "lcd.h"
-#include "text.h"
-#include "rtc.h"
-#include "delay.h"
-#include "key.h"
-#include "vs10xx.h"
-#include "mp3player.h"
-#include "tjpgd.h"
-#include "piclib.h"
-#include "guix.h"
 
 u8 lcd_bit=0;
+FIL* fmp3 = 0;
 
 _lunar_obj moon;
 
@@ -270,50 +259,62 @@ void mp3_vol_show(u8 vol)
 		LCD_ShowxNum(224 + 32, 40, vol, 2, 16, 0X80); 	//ÏÔÊ¾ÒôÁ¿	 
 	}
 }
-u16 f_kbps=0;//¸èÇúÎÄ¼þÎ»ÂÊ	
 //ÏÔÊ¾²¥·ÅÊ±¼ä,±ÈÌØÂÊ ÐÅÏ¢ 
 //lenth:¸èÇú×Ü³¤¶È
-void mp3_msg_show(u32 lenth)
+void mp3_msg_show(void)
 {
-	static u16 playtime = 0;//²¥·ÅÊ±¼ä±ê¼Ç
-	u16 time = 0;// Ê±¼ä±äÁ¿
 	u16 temp = 0;
-	if (lcd_bit == 1)
+	if (lcd_bit == 1 && info.pic_show==0)
 	{
-		if (f_kbps == 0xffff)//Î´¸üÐÂ¹ý
+		if (info.kbps == 0xffff)//Î´¸üÐÂ¹ý
 		{
-			playtime = 0;
-			f_kbps = VS_Get_HeadInfo();//»ñµÃ±ÈÌØÂÊ
+			info.playtime = 0;
+			info.kbps = VS_Get_HeadInfo();//»ñµÃ±ÈÌØÂÊ
 		}
-		time = VS_Get_DecodeTime(); //µÃµ½½âÂëÊ±¼ä
+		info.time = VS_Get_DecodeTime(); //µÃµ½½âÂëÊ±¼ä
 
-		if (playtime == 0)playtime = time;
-		else if ((time != playtime) && (time != 0))//1sÊ±¼äµ½,¸üÐÂÏÔÊ¾Êý¾Ý
+		if (info.playtime == 0)info.playtime = info.time;
+		else if ((info.time != info.playtime) && (info.time != 0))//1sÊ±¼äµ½,¸üÐÂÏÔÊ¾Êý¾Ý
 		{
-			playtime = time;//¸üÐÂÊ±¼ä 	 			
+			info.playtime = info.time;//¸üÐÂÊ±¼ä 	 			
 			temp = VS_Get_HeadInfo(); //»ñµÃ±ÈÌØÂÊ	   				 
-			if (temp != f_kbps)
+			if (temp != info.kbps)
 			{
-				f_kbps = temp;//¸üÐÂKBPS	  				     
+				info.kbps = temp;//¸üÐÂKBPS	  				     
 			}
 			//ÏÔÊ¾²¥·ÅÊ±¼ä			 
-			LCD_ShowxNum(224, 60, time / 60, 2, 16, 0X80);		//·ÖÖÓ
+			LCD_ShowxNum(224, 60, info.time / 60, 2, 16, 0X80);		//·ÖÖÓ
 			LCD_ShowChar(224 + 16, 60, ':', 16, 0);
-			LCD_ShowxNum(224 + 24, 60, time % 60, 2, 16, 0X80);	//ÃëÖÓ		
+			LCD_ShowxNum(224 + 24, 60, info.time % 60, 2, 16, 0X80);	//ÃëÖÓ		
 			LCD_ShowChar(224 + 40, 60, '/', 16, 0);
 			//ÏÔÊ¾×ÜÊ±¼ä
-			if (f_kbps)time = (lenth / f_kbps) / 125;//µÃµ½ÃëÖÓÊý   (ÎÄ¼þ³¤¶È(×Ö½Ú)/(1000/8)/±ÈÌØÂÊ=³ÖÐøÃëÖÓÊý    	  
-			else time = 0;//·Ç·¨Î»ÂÊ	  
-			LCD_ShowxNum(224 + 48, 60, time / 60, 2, 16, 0X80);	//·ÖÖÓ
+			if (info.kbps)info.time = (info.fmp3->fsize / info.kbps) / 125;//µÃµ½ÃëÖÓÊý   (ÎÄ¼þ³¤¶È(×Ö½Ú)/(1000/8)/±ÈÌØÂÊ=³ÖÐøÃëÖÓÊý    	  
+			else info.time = 0;//·Ç·¨Î»ÂÊ	  
+			LCD_ShowxNum(224 + 48, 60, info.time / 60, 2, 16, 0X80);	//·ÖÖÓ
 			LCD_ShowChar(224 + 64, 60, ':', 16, 0);
-			LCD_ShowxNum(224 + 72, 60, time % 60, 2, 16, 0X80);	//ÃëÖÓ	  		    
+			LCD_ShowxNum(224 + 72, 60, info.time % 60, 2, 16, 0X80);	//ÃëÖÓ	  		    
 			//ÏÔÊ¾Î»ÂÊ			   
-			LCD_ShowxNum(224, 80, f_kbps, 3, 16, 0X80); 	//ÏÔÊ¾Î»ÂÊ	 
+			LCD_ShowxNum(224, 80, info.kbps, 3, 16, 0X80); 	//ÏÔÊ¾Î»ÂÊ	 
 			LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
 		}
 		VS_Get_Spec(info.FFTbuf); //ÌáÈ¡ÆµÆ×Êý¾Ý
 		FFT_post(info.FFTbuf);	  //½øÐÐÆµÆ×Ð§¹ûÏÔÊ¾
 	}
+}
+
+void mp3_next(void)
+{
+	LCD_ShowxNum(224, 60, 0, 2, 16, 0X80);		//·ÖÖÓ
+	LCD_ShowChar(224 + 16, 60, ':', 16, 0);
+	LCD_ShowxNum(224 + 24, 60, 0, 2, 16, 0X80);	//ÃëÖÓ		
+	LCD_ShowChar(224 + 40, 60, '/', 16, 0);
+	//ÏÔÊ¾×ÜÊ±¼ä  
+	LCD_ShowxNum(224 + 48, 60, 0, 2, 16, 0X80);	//·ÖÖÓ
+	LCD_ShowChar(224 + 64, 60, ':', 16, 0);
+	LCD_ShowxNum(224 + 72, 60, 0, 2, 16, 0X80);	//ÃëÖÓ	  		    
+	//ÏÔÊ¾Î»ÂÊ			   
+	LCD_ShowxNum(224, 80, 0, 3, 16, 0X80); 	//ÏÔÊ¾Î»ÂÊ	 
+	LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
 }
 
 //ÏÂÃæ¸ù¾ÝÊÇ·ñÊ¹ÓÃmallocÀ´¾ö¶¨±äÁ¿µÄ·ÖÅä·½·¨.
@@ -354,26 +355,18 @@ __align(4) u8 jpg_buffer[JPEG_WBUF_SIZE];	//¶¨Òåjpeg½âÂë¹¤×÷Çø´óÐ¡(×îÉÙÐèÒª3092×
 
 void show_mp3_pic(void *pdata)
 {
-	FIL* fmp3 = 0;
+	
 	u8 res;
 	UINT(*outfun)(JDEC*, void*, JRECT*);
 	u8 scale;	//Í¼ÏñÊä³ö±ÈÀý 0,1/2,1/4,1/8  
-		
-	if (f_open(fmp3, (const TCHAR*)info.pname, FA_READ | FA_OPEN_EXISTING) != FR_OK)
-		return;
+	CPU_SR_ALLOC();
 	
-	if ((pic_show_x + pic_show_size) > picinfo.lcdwidth)return;		//x×ø±ê³¬·¶Î§ÁË.
-			if ((pic_show_y + pic_show_size) > picinfo.lcdheight)return;		//y×ø±ê³¬·¶Î§ÁË.  
+		if(info.pic_show==1)
+		{
+			OS_CRITICAL_ENTER();	//½øÈëÁÙ½çÇø
 			//µÃµ½ÏÔÊ¾·½¿ò´óÐ¡	  	 
 			picinfo.S_Height = pic_show_size;
 			picinfo.S_Width = pic_show_size;
-			//ÏÔÊ¾ÇøÓòÎÞÐ§
-			if (picinfo.S_Height == 0 || picinfo.S_Width == 0)
-			{
-				picinfo.S_Height = lcddev.height;
-				picinfo.S_Width = lcddev.width;
-				return;
-			}
 			//ÏÔÊ¾µÄ¿ªÊ¼×ø±êµã
 			picinfo.S_YOFF = pic_show_y;
 			picinfo.S_XOFF = pic_show_x;
@@ -407,12 +400,17 @@ void show_mp3_pic(void *pdata)
 						picinfo.ImgWidth = jpeg_dev->width >> scale;	//Ëõ·ÅºóµÄÍ¼Æ¬³ß´ç 
 						ai_draw_init();								//³õÊ¼»¯ÖÇÄÜ»­Í¼ 
 						//Ö´ÐÐ½âÂë¹¤×÷£¬µ÷ÓÃTjpgDecÄ£¿éµÄjd_decompº¯Êý
+						OS_CRITICAL_EXIT();	//½øÈëÁÙ½çÇø
 						res = jd_decomp(jpeg_dev, outfun, scale);
+						OS_CRITICAL_ENTER();	//½øÈëÁÙ½çÇø
 					}
 				}
 			}
 #if JPEG_USE_MALLOC == 1//Ê¹ÓÃmalloc
 			jpeg_freeall();		//ÊÍ·ÅÄÚ´æ
 #endif
+			OS_CRITICAL_EXIT();	//½øÈëÁÙ½çÇø
+		}
+	info.pic_show=0;
 }
 

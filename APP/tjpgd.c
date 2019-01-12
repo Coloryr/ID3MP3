@@ -18,8 +18,7 @@
 / Sep 03,'12 R0.01b Added JD_TBLCLIP option.
 /----------------------------------------------------------------------------*/
 
-#include "tjpgd.h"
-#include "piclib.h"  
+#include "includes.h" 
 
 
 /*-----------------------------------------------*/
@@ -975,10 +974,13 @@ u32 jpeg_in_func(JDEC* jd,u8* buf,u32 num)
 { 
     u32  rb; //读取到的字节数
     FIL *dev=(FIL*)jd->device;  //待解码的文件的信息，使用FATFS中的FIL结构类型进行定义
-    if(buf)     				//读取数据有效，开始读取数据
+		CPU_SR_ALLOC();  
+		if(buf)     				//读取数据有效，开始读取数据
     { 
+			OS_CRITICAL_EXIT();	//进入临界区
         f_read(dev,buf,num,&rb);//调用FATFS的f_read函数，用于把jpeg文件的数据读取出来
-        return rb;        		//返回读取到的字节数目
+			OS_CRITICAL_ENTER();	//进入临界区
+			return rb;        		//返回读取到的字节数目
     }else return (f_lseek(dev,f_tell(dev)+num)==FR_OK)?num:0;//重新定位数据点，相当于删除之前的n字节数据 
 }  
 //采用填充的方式进行图片解码显示

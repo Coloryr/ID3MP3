@@ -1,6 +1,5 @@
-#include "sys.h"
-#include "lcd.h"
-#include "image2lcd.h"
+#include "includes.h" 
+
 //从8位数据获得16位颜色
 //mode:0,低位在前,高位在后.
 //     1,高位在前,低位在后.

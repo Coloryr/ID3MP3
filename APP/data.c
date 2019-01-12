@@ -1,8 +1,4 @@
-#include "sys.h"
-#include "flash.h"
-#include "data.h"
-#include "mp3player.h"
-#include "VS10xx.h"
+#include "includes.h" 
 
 u8 save_bit[5]={0,0,0,0,0};
 

@@ -39,11 +39,8 @@
 #define	ENTER_FF(fs)		{ if (!lock_fs(fs)) return FR_TIMEOUT; }
 #define	LEAVE_FF(fs, res)	{ unlock_fs(fs, res); return res; }
 #else
-#include "os_cpu.h"	//添加ucos的两个函数
-extern void ff_enter(void);
-extern void ff_leave(void);
-#define	ENTER_FF(fs)	{ff_enter();}
-#define LEAVE_FF(fs, res)	{ff_leave();return res;}
+#define	ENTER_FF(fs)
+#define LEAVE_FF(fs, res)	return res
 #endif
 
 #define	ABORT(fs, res)		{ fp->err = (BYTE)(res); LEAVE_FF(fs, res); }

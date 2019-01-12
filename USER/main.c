@@ -1,27 +1,7 @@
-#include "sys.h"	
-#include "delay.h"	
-#include "key.h" 
-#include "malloc.h"  
-#include "sdio_sdcard.h"
-#include "ff.h"  
-#include "exfuns.h"
-#include "fontupd.h"
-#include "text.h"	
-#include "vs10XX.h"	
-#include "mp3player.h"
-#include "lcd.h"
-#include "rtc.h"
-#include "guix.h"
-#include "spi.h"
-#include "mp3id3.h" 
-#include "piclib.h"	
 #include "includes.h" 
-#include "app_start.h" 
-#include "data.h" 
 
 int main(void)
 {
-	Stm32_Clock_Init(16);
 	delay_init(72);	    			 	//延时函数初始化	  
 	KEY_Init();								//按键初始化
 	LCD_Init();								//LCD初始化

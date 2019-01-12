@@ -1,15 +1,4 @@
-#include "mp3id3.h" 
-#include "exfuns.h"
-#include "ff.h"
-#include "malloc.h" 
-#include "lcd.h"
-#include "text.h"
-#include "delay.h"
-#include "flash.h"
-#include "mp3player.h"
-#include "show.h"
 #include "includes.h" 
-#include "app_start.h" 
 
 u16 UNICODEtoGBK(u16 unicode)  //???????
 {
@@ -52,6 +41,7 @@ void mp3id3(void)
 	u8 code_type;
 	u16 a = 0;
 	u8 temp1, temp2;
+	OS_ERR err;
 	
 	databuf = (u8*)mymalloc(READ_buff_size);
 	
@@ -355,18 +345,21 @@ void mp3id3(void)
 		{
 			i += 14 + 20;
 			info.pic_local = i;
-			//APP_pic_start();
+				info.pic_show = 1;
+			APP_pic_start();
 		}
 		else if (code_type == 1 && lcd_bit == 1)
 		{
 			LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size,
 				pic_show_y + pic_show_size, BACK_COLOR);
+			info.pic_show = 0;
 		}
 		else if (code_type == 2 && lcd_bit == 1)
 		{
 			LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size,
 				pic_show_y + pic_show_size, BACK_COLOR);
-		}		    
+			info.pic_show = 0;
+		}	
 	}
 	myfree(databuf);						//ÊÍ·ÅÄÚ´æ	
 }

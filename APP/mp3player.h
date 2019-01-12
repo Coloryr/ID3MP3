@@ -19,6 +19,10 @@ typedef struct
 	u16 size;						//MP3ID3大小
 	FIL* fmp3;					//MP3文件
 	
+	u16 playtime;				//播放时间标记
+	u16 time;						//时间变量
+	u16 kbps;						//音乐的比特率
+	
 	u16 pic_local;			//PIC位置
 
 	u8 *TIT2;						//歌名
@@ -30,6 +34,8 @@ typedef struct
 	
 	u16 FFTbuf[15];    //频谱数组
 	
+	u8 pic_show;
+	
 }mp3_info;
 
 extern mp3_info info;
@@ -39,8 +45,6 @@ void fft_show_oneband(u16 x,u16 y,u16 width,u16 height,u16 curval,u16 topval);
 void mp3_play(void *pdata);
 u16 mp3_get_tnum(u8 *path);
 u8 mp3_play_song(void);
-void mp3_index_show(u16 index,u16 total);
-void mp3_msg_show(u32 lenth);
 
 #endif
 

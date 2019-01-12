@@ -1,8 +1,4 @@
-#include "fontupd.h"
-#include "ff.h"	  
-#include "flash.h"   
-#include "lcd.h"  
-#include "malloc.h"
+#include "includes.h" 
 					   
 u32 FONTINFOADDR=(1024*2)*1024;//默认是2M的地址
 //字库信息结构体. 

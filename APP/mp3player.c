@@ -1,26 +1,20 @@
-#include "mp3player.h"
-#include "vs10xx.h"	 
-#include "delay.h"
-#include "key.h"
-#include "lcd.h"		 
-#include "malloc.h"
-#include "text.h"
-#include "string.h"
-#include "exfuns.h"	 
-#include "ff.h"   
-#include "vs_path.h"
-#include "show.h"
-#include "mp3id3.h"
-#include "piclib.h"
-#include "flash.h"
-#include "data.h"
 #include "includes.h" 
+#include "vs_path.h"
 
 mp3_info info;	//定义fft变量管理结构体
 
 //新的频率值
 const u16 VS_NEW_BANDS_FREQ_TBL[14]={80,300,800,1270,2016,3200,4500,6000,7500,9000,11000,13000,15000,20000};
 
+void vs_reset(void)
+{
+		VS_Restart_Play();  					//重启播放 
+	VS_Set_All();        					//设置音量等信息 			 
+	VS_Reset_DecodeTime();					//复位解码时间 	  
+	VS_Load_Patch((u16*)VS1053_PATCH, 1000); 	  //加载频谱分析补丁
+	VS_Set_Bands((u16*)VS_NEW_BANDS_FREQ_TBL, FFT_BANDS);//重设频谱频率
+}
+	
 //得到path路径下,目标文件的总个数
 //path:路径		    
 //返回值:总有效文件数
@@ -72,7 +66,7 @@ void FFT_post(u16 *pbuf)
 	for (i = 0; i < FFT_BANDS; i++)	//显示各个频谱	   循环显示14个段
 	{
 
-		temp = (pbuf[i] & 0X3D) * 3; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
+		temp = (pbuf[i] & 0X3E) * 3; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
 
 		if (info.fft_cur[i] < temp) 	  //当前值小于temp
 			info.fft_cur[i] = temp;
@@ -110,13 +104,10 @@ void mp3_play_ready()
 	u16 temp;
   
 	VS_Sine_Test();	
-	VS_Restart_Play();  					//重启播放 
-	VS_Set_All();        					//设置音量等信息 			 
-	VS_Reset_DecodeTime();					//复位解码时间 	  
-	VS_Load_Patch((u16*)VS1053_PATCH, 1000); 	  //加载频谱分析补丁
-	VS_Set_Bands((u16*)VS_NEW_BANDS_FREQ_TBL, FFT_BANDS);//重设频谱频率
+	vs_reset();
 	
 	lcd_bit = 1;
+	info.pic_show = 0;
 
 	init_fft();
 	Show_Str(30, 20, 240, 16, "正在读取文件", 16, 0);
@@ -140,6 +131,7 @@ void mp3_play_ready()
 	info.pname = mymalloc(info.mp3fileinfo.lfsize);				//为带路径的文件名分配内存
 	info.mp3indextbl = mymalloc(2 * info.totmp3num);				//申请2*totmp3num个字节的内存,用于存放音乐文件索引
 	info.fmp3 = (FIL*)mymalloc(sizeof(FIL));	//申请内存
+	fmp3 = (FIL*)mymalloc(sizeof(FIL));	//申请内存
 	while (info.mp3fileinfo.lfname == NULL || info.pname == NULL || 
 			info.mp3indextbl == NULL || info.fmp3 == NULL)//内存分配出错
 	{
@@ -167,6 +159,7 @@ void mp3_play_ready()
 			}
 		}
 	}
+	LCD_Clear(BLACK);
 }
 
 //播放音乐
@@ -177,13 +170,17 @@ void mp3_play(void *pdata)
 	u8 *fn;   			//长文件名
 	u8 key;					//键值		  
 	
+	CPU_SR_ALLOC();
+	OS_CRITICAL_ENTER();	//进入临界区
 	mp3_play_ready();
 	info.curindex = (save_bit[0] << 8) | save_bit[1];
 	vsset.mvol = save_bit[2];
 	VS_Set_Vol(vsset.mvol);
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
+	OS_CRITICAL_EXIT();	//退出临界区
 	while (res == FR_OK)//打开成功
 	{		
+		OS_CRITICAL_ENTER();	//进入临界区
 		dir_sdi(&mp3dir, info.mp3indextbl[info.curindex]);			//改变当前目录索引	   
 		res = f_readdir(&mp3dir, &info.mp3fileinfo);       		//读取目录下的一个文件
 		if (res != FR_OK || info.mp3fileinfo.fname[0] == 0)break;	//错误了/到末尾了,退出
@@ -192,6 +189,7 @@ void mp3_play(void *pdata)
 		strcat((char*)info.pname, (const char*)fn);  			//将文件名接在后面	
 		info.size=1;
 		res = f_open(info.fmp3, (const TCHAR*)info.pname, FA_READ);
+		fmp3=info.fmp3;
 		if(res != FR_OK)
 			while (1)
 			{
@@ -200,7 +198,7 @@ void mp3_play(void *pdata)
 			LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
 			delay_ms(200);
 			}
-		//mp3id3();
+		mp3id3();
 		if (info.size != 0)
 		{
 			LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
@@ -225,7 +223,10 @@ void mp3_play(void *pdata)
 		mp3_vol_show((vsset.mvol - 100) / 5);
 		mp3_index_show(info.curindex + 1, info.totmp3num);
 		f_lseek(info.fmp3, info.size);
+		OS_CRITICAL_EXIT();	//退出临界区
 		key = mp3_play_song(); 				 		//播放这个MP3    
+		vs_reset();
+		mp3_next();
 		if (key == KEY1_PRES)		//上一曲
 		{
 			if (info.curindex)info.curindex--;
@@ -258,23 +259,23 @@ void mp3_play(void *pdata)
 u8 mp3_play_song(void)
 {
 	u16 br;
-	u8 res, rval;
+	u8 res, rval=0;
 	u8 *databuf;
 	u16 i = 0;
 	u8 key;
-	OS_CPU_SR cpu_sr=0;
-		
-	static u8 pause = 0;		//暂停标志 
-	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)        
-	rval = 0;
-	databuf = (u8*)mymalloc(4096);		//开辟4096字节的内存区域
+	static u8 pause = 0;		//暂停标志   
+	CPU_SR_ALLOC();
+	
+	databuf = (u8*)mymalloc(1024);		//开辟4096字节的内存区域
 	if (databuf == NULL)rval = 0XFF;//内存申请失败.
 	if (rval == 0)
 	{
 			VS_SPI_SpeedHigh();	//高速						   
 			while (rval == 0)
 			{    
-				res = f_read(info.fmp3, databuf, 4096, (UINT*)&br);//读出4096个字节 			
+				OS_CRITICAL_ENTER();	//进入临界区
+				res = f_read(info.fmp3, databuf, 1024, (UINT*)&br);//读出4096个字节 			
+				OS_CRITICAL_EXIT();	//进入临界区
 				i = 0;
 				do//主播放循环
 				{
@@ -284,46 +285,46 @@ u8 mp3_play_song(void)
 					}
 					else
 					{
-						key = KEY_Scan(0);
-						switch (key)
-						{
-						case KEY0_PRES:
-							rval = KEY0_PRES;		//下一曲
-							break;
-						case KEY1_PRES:
-							rval = KEY1_PRES;		//上一曲
-							break;
-						case KEY2_PRES:
-							vsset.mvol = vsset.mvol + 10;
-							if (vsset.mvol >= 200)
+							key = KEY_Scan(0);
+							switch (key)
 							{
-								vsset.mvol = 100;
+							case KEY0_PRES:
+								rval = KEY0_PRES;		//下一曲
+								break;
+							case KEY1_PRES:
+								rval = KEY1_PRES;		//上一曲
+								break;
+							case KEY2_PRES:
+								vsset.mvol = vsset.mvol + 10;
+								if (vsset.mvol >= 200)
+								{
+									vsset.mvol = 100;
+								}
+								mp3_vol_show((vsset.mvol - 100) / 5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
+								VS_Set_Vol(vsset.mvol);
+								mp3_vol_show((vsset.mvol - 100) / 5);
+								save_bit[2] = vsset.mvol;
+								write_data();
+								break;
+							case KEY3_PRES:	   //暂停/播放
+								if (lcd_bit == 0)
+								{
+									lcd_bit = 1;
+									LCD_LED = 1;
+								}
+								else if (lcd_bit == 1)
+								{
+									lcd_bit = 0;
+									LCD_LED = 0;
+								}
+								break;
+							default:
+								break;
 							}
-							mp3_vol_show((vsset.mvol - 100) / 5);	//音量限制在:100~250,显示的时候,按照公式(vol-100)/5,显示,也就是0~30   
-							VS_Set_Vol(vsset.mvol);
-							mp3_vol_show((vsset.mvol - 100) / 5);
-							save_bit[2] = vsset.mvol;
-							write_data();
-							break;
-						case KEY3_PRES:	   //暂停/播放
-							if (lcd_bit == 0)
-							{
-								lcd_bit = 1;
-								LCD_LED = 1;
-							}
-							else if (lcd_bit == 1)
-							{
-								lcd_bit = 0;
-								LCD_LED = 0;
-							}
-							break;
-						default:
-							break;
-						}
-						mp3_msg_show(info.fmp3->fsize);//显示信息	    
+							mp3_msg_show();//显示信息	    
 					}
-				} while (i < 4096);//循环发送4096个字节 
-				if (br != 4096 || res != 0)
+				} while (i < 1024);//循环发送4096个字节 
+				if (br != 1024 || res != 0)
 				{
 					rval = KEY0_PRES;
 					break;//读完了.	

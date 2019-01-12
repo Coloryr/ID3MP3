@@ -1,5 +1,4 @@
-#include "key.h"
-#include "delay.h"
+#include "includes.h" 
 
 //按键初始化函数 
 //PA0.15和PC5 设置成输入

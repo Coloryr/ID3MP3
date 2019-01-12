@@ -1,7 +1,4 @@
-#include "flash.h" 
-#include "spi.h"
-#include "delay.h"
-#include "malloc.h"
+#include "includes.h" 
 
 u16 SPI_FLASH_TYPE=W25Q128;//Ä¬ÈÏ¾ÍÊÇ25Q64
 
