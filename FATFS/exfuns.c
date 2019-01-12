@@ -1,6 +1,5 @@
 #include "string.h"
 #include "exfuns.h"
-#include "fattester.h"	
 #include "malloc.h"
 
  //文件类型列表

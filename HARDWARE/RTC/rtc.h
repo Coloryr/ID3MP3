@@ -14,6 +14,7 @@ typedef struct
 }_calendar_obj;		
 
 extern _calendar_obj calendar;	//日历结构体
+
 void RTC_NVIC_Config(void);
 u8 RTC_Init(void);
 void RTC_IRQHandler(void);		 

@@ -9,10 +9,14 @@
 #include "key.h"
 #include "vs10xx.h"
 #include "mp3player.h"
+#include "tjpgd.h"
+#include "piclib.h"
+#include "guix.h"
 
 u8 lcd_bit=0;
 
 _lunar_obj moon;
+
 /*显示生肖-----------------------------------------------------*/
 void displaysx(void) {
 	unsigned char LunarYearD, ReYear, tiangan, dizhi;        //?????????  ??????? 
@@ -239,7 +243,7 @@ void time_go(void)
 //topval:最大值
 void fft_show_oneband(u16 x, u16 y, u16 width, u16 height, u16 curval, u16 topval)
 {
-	gui_fill_rectangle(x, y, width, height - curval, MP3_MAIN_BKCOLOR);					//填充背景色
+	gui_fill_rectangle(x, y, width, height - curval, BLACK);					//填充背景色
 	gui_fill_rectangle(x, y + height - curval, width, curval, FFT_BANDS_COLOR);	//填充柱状色
 	gui_draw_hline(x, y + height - topval - 1, width, FFT_TOP_COLOR);
 }
@@ -307,10 +311,108 @@ void mp3_msg_show(u32 lenth)
 			LCD_ShowxNum(224, 80, f_kbps, 3, 16, 0X80); 	//显示位率	 
 			LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
 		}
-		VS_Get_Spec(FFTbuf); //提取频谱数据
-		FFT_post(FFTbuf);	  //进行频谱效果显示
+		VS_Get_Spec(info.FFTbuf); //提取频谱数据
+		FFT_post(info.FFTbuf);	  //进行频谱效果显示
 	}
 }
 
+//下面根据是否使用malloc来决定变量的分配方法.
+#if JPEG_USE_MALLOC == 1 //使用malloc	 
 
+FIL *f_jpeg;			//JPEG文件指针
+JDEC *jpeg_dev;   		//待解码对象结构体指针  
+u8  *jpg_buffer;    	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
+
+//给占内存大的数组/结构体申请内存
+u8 jpeg_mallocall(void)
+{
+	f_jpeg=(FIL*)mymalloc(sizeof(FIL));
+	if(f_jpeg==NULL)return PIC_MEM_ERR;			//申请内存失败.	  
+	jpeg_dev=(JDEC*)mymalloc(sizeof(JDEC));
+	if(jpeg_dev==NULL)return PIC_MEM_ERR;		//申请内存失败.
+	jpg_buffer=(u8*)mymalloc(JPEG_WBUF_SIZE);
+	if(jpg_buffer==NULL)return PIC_MEM_ERR;		//申请内存失败. 
+	return 0;
+}
+//释放内存
+void jpeg_freeall(void)
+{
+	myfree(f_jpeg);			//释放f_jpeg申请到的内存
+	myfree(jpeg_dev);		//释放jpeg_dev申请到的内存
+	myfree(jpg_buffer);		//释放jpg_buffer申请到的内存
+}
+
+#else 	//不使用malloc   
+
+FIL  tf_jpeg; 
+JDEC tjpeg_dev;   		  
+FIL  *f_jpeg=&tf_jpeg;						//JPEG文件指针
+JDEC *jpeg_dev=&tjpeg_dev;   				//待解码对象结构体指针   
+__align(4) u8 jpg_buffer[JPEG_WBUF_SIZE];	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
+	
+#endif
+
+void show_mp3_pic(void *pdata)
+{
+	FIL* fmp3 = 0;
+	u8 res;
+	UINT(*outfun)(JDEC*, void*, JRECT*);
+	u8 scale;	//图像输出比例 0,1/2,1/4,1/8  
+		
+	if (f_open(fmp3, (const TCHAR*)info.pname, FA_READ | FA_OPEN_EXISTING) != FR_OK)
+		return;
+	
+	if ((pic_show_x + pic_show_size) > picinfo.lcdwidth)return;		//x坐标超范围了.
+			if ((pic_show_y + pic_show_size) > picinfo.lcdheight)return;		//y坐标超范围了.  
+			//得到显示方框大小	  	 
+			picinfo.S_Height = pic_show_size;
+			picinfo.S_Width = pic_show_size;
+			//显示区域无效
+			if (picinfo.S_Height == 0 || picinfo.S_Width == 0)
+			{
+				picinfo.S_Height = lcddev.height;
+				picinfo.S_Width = lcddev.width;
+				return;
+			}
+			//显示的开始坐标点
+			picinfo.S_YOFF = pic_show_y;
+			picinfo.S_XOFF = pic_show_x;
+
+#if JPEG_USE_MALLOC == 1	//使用malloc
+			res = jpeg_mallocall();
+#endif
+			if (res == 0)
+			{				
+				f_lseek(fmp3, info.pic_local);				//跳过头
+
+				//得到JPEG/JPG图片的开始信息		 
+
+				if (res == FR_OK)//打开文件成功
+				{
+					res = jd_prepare(jpeg_dev, jpeg_in_func, jpg_buffer, JPEG_WBUF_SIZE, fmp3);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
+					outfun = jpeg_out_func_point;//默认采用画点的方式显示
+					if (res == JDR_OK)//准备解码成功 
+					{
+						for (scale = 0; scale < 4; scale++)//确定输出图像的比例因子
+						{
+							if ((jpeg_dev->width >> scale) <= picinfo.S_Width && (jpeg_dev->height >> scale) <= picinfo.S_Height)//在目标区域内
+							{
+								if (((jpeg_dev->width >> scale) != picinfo.S_Width) && ((jpeg_dev->height >> scale) != picinfo.S_Height&&scale))scale = 0;//不能贴边,则不缩放
+								else outfun = jpeg_out_func_fill;	//在显示尺寸以内,可以采用填充的方式显示 
+								break;
+							}
+						}
+						if (scale == 4)scale = 0;//错误
+						picinfo.ImgHeight = jpeg_dev->height >> scale;	//缩放后的图片尺寸
+						picinfo.ImgWidth = jpeg_dev->width >> scale;	//缩放后的图片尺寸 
+						ai_draw_init();								//初始化智能画图 
+						//执行解码工作，调用TjpgDec模块的jd_decomp函数
+						res = jd_decomp(jpeg_dev, outfun, scale);
+					}
+				}
+			}
+#if JPEG_USE_MALLOC == 1//使用malloc
+			jpeg_freeall();		//释放内存
+#endif
+}
 

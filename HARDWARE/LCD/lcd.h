@@ -102,6 +102,9 @@ void LCD_WriteRAM_Prepare(void);
 void LCD_WriteRAM(u16 RGB_Code);		  
 void LCD_Scan_Dir(u8 dir);							//设置屏扫描方向
 void LCD_Display_Dir(u8 dir);						//设置屏幕显示方向
+
+void LCD_Set_Window(u16 sx, u16 sy, u16 width, u16 height);
+void LCD_WR_DATA(u16 data);
  					   																			 
 //9320/9325 LCD寄存器  
 #define R0             0x00

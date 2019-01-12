@@ -11,6 +11,8 @@
 #include "sdio_sdcard.h"
 #include "flash.h"
 #include "malloc.h"		
+#include "rtc.h"
+#include "ucos_ii.h"
 
 #define SD_CARD	 0  //SD卡,卷标为0
 #define EX_FLASH 1	//外部flash,卷标为1
@@ -34,7 +36,7 @@ DSTATUS disk_initialize (
   			break;
 		case EX_FLASH://外部flash
 			SPI_Flash_Init();
-			if(SPI_FLASH_TYPE==W25Q64)FLASH_SECTOR_COUNT=9832;	//W25Q64
+			if(SPI_FLASH_TYPE==W25Q128)FLASH_SECTOR_COUNT=9832;	//W25Q64
 			else FLASH_SECTOR_COUNT=0;							//其他
  			break;
 		default:
@@ -195,8 +197,32 @@ DRESULT disk_ioctl (
 //15-11: Hour(0-23), 10-5: Minute(0-59), 4-0: Second(0-29 *2) */                                                                                                                                                                                                                                                
 DWORD get_fattime (void)
 {				 
-	return 0;
+	    u32 ttime;
+	u32 date=0;
+    
+    RTC_Get();		//得到当前时间
+    ttime=calendar.w_year-1980;	//得到偏移后的年份
+ 	date|=ttime<<25;
+    ttime=calendar.w_month;		//得到月份
+ 	date|=ttime<<21;
+	ttime=calendar.w_date;		//得到日期
+ 	date|=ttime<<16;
+	ttime=calendar.hour;		//得到时钟
+ 	date|=ttime<<11;
+	ttime=calendar.min;			//得到分钟
+ 	date|=ttime<<5;
+ 	date|=calendar.min>>1;  	//得到秒钟	   			    
+    return date;   
 }			 
+OS_CPU_SR cpu_sr=0;
+void ff_enter(void)
+{
+ 	OS_ENTER_CRITICAL();//进入临界区(无法被中断打断)    
+}
+void ff_leave(void)
+{
+ 	OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
+}
 //动态分配内存
 void *ff_memalloc (UINT size)			
 {

@@ -33,7 +33,6 @@ void image_show(u16 xsta, u16 ysta, u16 width, u16 height, u8 scan, u8 *p)
 		LCD_Scan_Dir(D2U_L2R);//从上到下,从左到右
 		LCD_Set_Window(xsta, ysta, width, height);
 		LCD_SetCursor(xsta, ysta);//设置光标位置  		
-
 	}
 	else  //垂直扫描
 	{

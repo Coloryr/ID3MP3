@@ -35,9 +35,9 @@ u8 RTC_Init(void)
 		while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)	//检查指定的RCC标志位设置与否,等待低速晶振就绪
 		{
 			temp++;
-			delay_ms(10);
+			delay_ms(1);
+			if (temp >= 250)return 1;//初始化时钟失败,晶振有问题	 
 		}
-		if (temp >= 250)return 1;//初始化时钟失败,晶振有问题	    
 		RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);		//设置RTC时钟(RTCCLK),选择LSE作为RTC时钟    
 		RCC_RTCCLKCmd(ENABLE);	//使能RTC时钟  
 		RTC_WaitForLastTask();	//等待最近一次对RTC寄存器的写操作完成

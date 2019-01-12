@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32F103VE</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F1xx_DFP.2.2.0</PackID>
+          <PackID>Keil.STM32F1xx_DFP.2.3.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00010000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -367,7 +367,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>..\OBJ\Template.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -535,6 +535,16 @@
               <FileType>1</FileType>
               <FilePath>..\APP\tjpgd.c</FilePath>
             </File>
+            <File>
+              <FileName>data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\data.c</FilePath>
+            </File>
+            <File>
+              <FileName>APP_start.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\APP_start.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -604,11 +614,6 @@
               <FileName>exfuns.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FATFS\exfuns.c</FilePath>
-            </File>
-            <File>
-              <FileName>fattester.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FATFS\fattester.c</FilePath>
             </File>
             <File>
               <FileName>cc936.c</FileName>
