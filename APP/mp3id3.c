@@ -41,18 +41,20 @@ void mp3id3(void)
 	u8 code_type;
 	u16 a = 0;
 	u8 temp1, temp2;
-	OS_ERR err;
-	
+
 	databuf = (u8*)mymalloc(READ_buff_size);
-	
+
 	if (info.TIT2 == NULL)
 		info.TIT2 = (u8*)mymalloc(40);
 	if (info.TPE1 == NULL)
 		info.TPE1 = (u8*)mymalloc(40);
+	if (info.TALB == NULL)
+		info.TALB = (u8*)mymalloc(40);
 	for (temp = 0; temp < 40; temp++)
 	{
 		info.TIT2[temp] = 0;
 		info.TPE1[temp] = 0;
+		info.TALB[temp] = 0;
 	}
 	if (databuf == NULL)//内存申请失败.
 		while (1)
@@ -63,7 +65,7 @@ void mp3id3(void)
 			delay_ms(200);
 		}
 	res = f_read(info.fmp3, databuf, 10, (UINT*)&br);//读出mp3id3头
-	if(res!=FR_OK)
+	if (res != FR_OK)
 		return;
 	if (databuf[0] == 0x49 && databuf[1] == 0x44 && databuf[2] == 0x33)
 	{
@@ -71,7 +73,7 @@ void mp3id3(void)
 		info.size = databuf[6] & 0x7f | ((databuf[7] & 0x7f) << 7)
 			| ((databuf[8] & 0x7f) << 14) | ((databuf[9] & 0x7f) << 21);
 		res = f_read(info.fmp3, databuf, READ_buff_size, (UINT*)&br);
-		if(res!=FR_OK)
+		if (res != FR_OK)
 			return;
 		i = 0;
 		while (img)							//查找歌名
@@ -185,9 +187,8 @@ void mp3id3(void)
 			}
 			else
 				i++;
-			if (i >= READ_buff_size - 4)								//找不到位置
+			if (i >= READ_buff_size - 6)								//找不到位置
 			{
-				info.TPE1 = 0;
 				img = 0;
 				code_type = 4;
 			}
@@ -309,9 +310,131 @@ void mp3id3(void)
 			}
 			else
 				i++;
-			if (i >= READ_buff_size - 4)								//找不到位置
+			if (i >= READ_buff_size - 6)								//找不到位置
 			{
-				info.TPE1 = 0;
+				code_type = 4;
+				img = 0;
+			}
+		}
+		img = 1;
+		i = 0;
+		while(img)						//查找专辑
+		{
+			if (databuf[i] == 0x54 && databuf[i + 1] == 0x41 && databuf[i + 2] == 0x4c && databuf[i + 3] == 0x42)
+			{	//找到位置
+				tag_size = databuf[i + 4] << 24
+					| databuf[i + 5] << 16
+					| databuf[i + 6] << 8
+					| databuf[i + 7];
+				if (databuf[i + 11] == 0xFE && databuf[i + 12] == 0xFF && databuf[i + 10] == 0x01)
+				{
+					code_type = 2;							//UTF-16BE
+					i += 13;
+					tag_size -= 3;
+				}
+				else if (databuf[i + 11] == 0xFF && databuf[i + 12] == 0xFE && databuf[i + 10] == 0x01)
+				{
+					code_type = 1;							//UTF-16LE
+					i += 13;
+					tag_size -= 3;
+				}
+				else if (databuf[i + 10] == 0x00)
+				{
+					code_type = 0;							//iso-8859-1
+					i += 11;
+					tag_size -= 1;
+				}
+				else if (databuf[i + 10] == 0x03)
+				{
+					code_type = 3;							//UTF-8
+					i += 11;
+					tag_size -= 1;
+				}
+
+				if (code_type == 3)			//UTF-8
+				{
+					for (temp = 0; temp < tag_size;)
+					{
+						a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
+						if (a < 0x80) {				/* 7-bit */
+							info.TALB[temp++] = (BYTE)a;
+						}
+						else {
+							if (a < 0x800) {		/* 11-bit */
+								info.TALB[temp++] = (BYTE)(0xC0 | a >> 6);
+							}
+							else {				/* 16-bit */
+								info.TALB[temp++] = (BYTE)(0xE0 | a >> 12);
+								info.TALB[temp++] = (BYTE)(0x80 | (a >> 6 & 0x3F));
+							}
+							info.TALB[temp++] = (BYTE)(0x80 | (a & 0x3F));
+						}
+					}
+				}
+				else if (code_type == 2)			//UTF-16BE
+				{
+					temp2 = 0;
+					for (temp = 0; temp < tag_size;)
+					{
+						a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
+						a = UNICODEtoGBK(a);
+						temp1 = (a >> 8) & 0xff;
+						if (temp1 != 0x00)
+						{
+							info.TALB[temp2] = temp1;
+							temp2++;
+						}
+						temp1 = a & 0xff;
+						if (temp1 != 0x00)
+						{
+							info.TALB[temp2] = temp1;
+							temp2++;
+						}
+						temp += 2;
+					}
+				}
+				else if (code_type == 1)			//UTF-16LE
+				{
+					temp2 = 0;
+					for (temp = 0; temp < tag_size;)
+					{
+						a = (databuf[i + temp + 1] << 8) | databuf[i + temp];
+						a = UNICODEtoGBK(a);
+						temp1 = (a >> 8) & 0xff;
+						if (temp1 != 0x00)
+						{
+							info.TALB[temp2] = temp1;
+							temp2++;
+						}
+						temp1 = a & 0xff;
+						if (temp1 != 0x00)
+						{
+							info.TALB[temp2] = temp1;
+							temp2++;
+						}
+						temp += 2;
+					}
+				}
+				else if (code_type == 0)			//iso-8859-1
+				{
+					for (temp = 0; temp < tag_size;)
+					{
+						temp1 = databuf[i + temp];
+						if (temp1 != 0x00)
+						{
+							info.TALB[temp] = temp1;
+							temp++;
+						}
+						else
+							temp++;
+					}
+				}
+				img = 0;
+			}
+			else
+				i++;
+			if (i >= READ_buff_size - 6)								//找不到位置
+			{
 				code_type = 4;
 				img = 0;
 			}
@@ -345,8 +468,7 @@ void mp3id3(void)
 		{
 			i += 14 + 20;
 			info.pic_local = i;
-				info.pic_show = 1;
-			APP_pic_start();
+			info.pic_show = 1;
 		}
 		else if (code_type == 1 && lcd_bit == 1)
 		{
@@ -359,7 +481,7 @@ void mp3id3(void)
 			LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size,
 				pic_show_y + pic_show_size, BACK_COLOR);
 			info.pic_show = 0;
-		}	
+		}
 	}
 	myfree(databuf);						//释放内存	
 }

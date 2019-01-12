@@ -4,6 +4,8 @@
 u8 lcd_bit=0;
 FIL* fmp3 = 0;
 
+u8 show_mode = 0;
+
 _lunar_obj moon;
 
 /*显示生肖-----------------------------------------------------*/
@@ -218,7 +220,6 @@ void timeplay(void)
 **********************************************************/
 void time_go(void)
 {
-	RTC_Get();
 	timeplay();
 	displaynl();
 	displayjieqi();
@@ -253,7 +254,7 @@ void mp3_index_show(u16 index, u16 total)
 //显示当前音量
 void mp3_vol_show(u8 vol)
 {
-	if (lcd_bit ==1 )
+	if (lcd_bit == 1)
 	{
 		LCD_ShowString(224, 40, 32, 16, 16, "VOL:");
 		LCD_ShowxNum(224 + 32, 40, vol, 2, 16, 0X80); 	//显示音量	 
@@ -264,7 +265,7 @@ void mp3_vol_show(u8 vol)
 void mp3_msg_show(void)
 {
 	u16 temp = 0;
-	if (lcd_bit == 1 && info.pic_show==0)
+	if (lcd_bit == 1 && info.pic_show == 0)
 	{
 		if (info.kbps == 0xffff)//未更新过
 		{
@@ -317,9 +318,6 @@ void mp3_next(void)
 	LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
 }
 
-//下面根据是否使用malloc来决定变量的分配方法.
-#if JPEG_USE_MALLOC == 1 //使用malloc	 
-
 FIL *f_jpeg;			//JPEG文件指针
 JDEC *jpeg_dev;   		//待解码对象结构体指针  
 u8  *jpg_buffer;    	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
@@ -343,25 +341,16 @@ void jpeg_freeall(void)
 	myfree(jpg_buffer);		//释放jpg_buffer申请到的内存
 }
 
-#else 	//不使用malloc   
-
-FIL  tf_jpeg; 
-JDEC tjpeg_dev;   		  
-FIL  *f_jpeg=&tf_jpeg;						//JPEG文件指针
-JDEC *jpeg_dev=&tjpeg_dev;   				//待解码对象结构体指针   
-__align(4) u8 jpg_buffer[JPEG_WBUF_SIZE];	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
-	
-#endif
-
 void show_mp3_pic(void *pdata)
 {
-	
+
 	u8 res;
 	UINT(*outfun)(JDEC*, void*, JRECT*);
 	u8 scale;	//图像输出比例 0,1/2,1/4,1/8  
 	CPU_SR_ALLOC();
-	
-		if(info.pic_show==1)
+	while (1)
+	{
+		if (info.pic_show == 1 && show_mode == 1)
 		{
 			OS_CRITICAL_ENTER();	//进入临界区
 			//得到显示方框大小	  	 
@@ -371,15 +360,11 @@ void show_mp3_pic(void *pdata)
 			picinfo.S_YOFF = pic_show_y;
 			picinfo.S_XOFF = pic_show_x;
 
-#if JPEG_USE_MALLOC == 1	//使用malloc
 			res = jpeg_mallocall();
-#endif
 			if (res == 0)
-			{				
+			{
 				f_lseek(fmp3, info.pic_local);				//跳过头
-
 				//得到JPEG/JPG图片的开始信息		 
-
 				if (res == FR_OK)//打开文件成功
 				{
 					res = jd_prepare(jpeg_dev, jpeg_in_func, jpg_buffer, JPEG_WBUF_SIZE, fmp3);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
@@ -406,11 +391,72 @@ void show_mp3_pic(void *pdata)
 					}
 				}
 			}
-#if JPEG_USE_MALLOC == 1//使用malloc
 			jpeg_freeall();		//释放内存
-#endif
 			OS_CRITICAL_EXIT();	//进入临界区
+			info.pic_show = 0;
+			if (write_bit == 0x20)
+			{
+				write_bit = 0x30;
+			}
+			else if (write_bit == 0x10)
+			{
+				write_bit = 0x30;
+			}
 		}
-	info.pic_show=0;
+	}
 }
+
+void show_all(void *pdata)
+{
+	u8 *fn;
+	u8 sec;
+	CPU_SR_ALLOC();
+	while (1)
+	{
+		OS_CRITICAL_EXIT();
+		RTC_Get();
+		fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
+		if (show_mode == 0)
+		{
+			if (sec != calendar.sec)
+			{
+				sec = calendar.sec;
+				time_go();
+			}
+		}
+		else if (show_mode == 1)
+		{
+			if (info.size != 0)
+			{
+				LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
+				if (info.TIT2[0] != 0 && info.TPE1[0] != 0 && info.TALB[0] != 0)
+				{
+					strcat((char*)info.TIT2, "-");
+					strcat((char*)info.TIT2, (char*)info.TPE1);
+					strcat((char*)info.TIT2, "-");
+					strcat((char*)info.TIT2, (char*)info.TALB);
+					Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+				}
+				else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
+				{
+					Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+				}
+				else
+					Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+			}
+			else
+			{
+				LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
+				Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+			}
+			mp3_vol_show((vsset.mvol - 100) / 5);
+			mp3_index_show(info.curindex + 1, info.totmp3num);
+			mp3_msg_show();//显示信息	    
+		}
+		OS_CRITICAL_EXIT();
+		delay_ms(500);
+	}
+}
+
+
 

@@ -20,5 +20,6 @@ extern FIL* fmp3;
 
 void show_mp3_pic(void *pdata);
 void mp3_next(void);
+void show_all(void *pdata);
 
 #endif

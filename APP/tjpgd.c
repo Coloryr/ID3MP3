@@ -20,6 +20,7 @@
 
 #include "includes.h" 
 
+u8 write_bit;
 
 /*-----------------------------------------------*/
 /* Zigzag-order to raster-order conversion table */
@@ -947,6 +948,7 @@ JRESULT jd_decomp (
 	rst = rsc = 0;
 
 	rc = JDR_OK;
+	write_bit = 0x10;
 	for (y = 0; y < jd->height; y += my) {		/* Vertical loop of MCUs */
 		for (x = 0; x < jd->width; x += mx) {	/* Horizontal loop of MCUs */
 			if (jd->nrst && rst++ == jd->nrst) {	/* Process restart interval if enabled */
@@ -958,6 +960,10 @@ JRESULT jd_decomp (
 			if (rc != JDR_OK) return rc;
 			rc = mcu_output(jd, outfunc, x, y);	/* Output the MCU (color space conversion, scaling and output) */
 			if (rc != JDR_OK) return rc;
+			if(write_bit == 0x20)
+			{
+				return rc;
+			}
 		}
 	}
 
@@ -974,12 +980,12 @@ u32 jpeg_in_func(JDEC* jd,u8* buf,u32 num)
 { 
     u32  rb; //读取到的字节数
     FIL *dev=(FIL*)jd->device;  //待解码的文件的信息，使用FATFS中的FIL结构类型进行定义
-		CPU_SR_ALLOC();  
+		CPU_SR_ALLOC();
 		if(buf)     				//读取数据有效，开始读取数据
     { 
-			OS_CRITICAL_EXIT();	//进入临界区
-        f_read(dev,buf,num,&rb);//调用FATFS的f_read函数，用于把jpeg文件的数据读取出来
 			OS_CRITICAL_ENTER();	//进入临界区
+			f_read(dev,buf,num,&rb);//调用FATFS的f_read函数，用于把jpeg文件的数据读取出来
+			OS_CRITICAL_EXIT();
 			return rb;        		//返回读取到的字节数目
     }else return (f_lseek(dev,f_tell(dev)+num)==FR_OK)?num:0;//重新定位数据点，相当于删除之前的n字节数据 
 }  

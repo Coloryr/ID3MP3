@@ -2,7 +2,7 @@
 
 int main(void)
 {
-	delay_init(72);	    			 	//延时函数初始化	  
+	delay_init(72);	    			//延时函数初始化	  
 	KEY_Init();								//按键初始化
 	LCD_Init();								//LCD初始化
 	mem_init();								//初始化内存池	    
@@ -17,7 +17,6 @@ int main(void)
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_2);//设置为18M时钟,高速模式		
 	VS1053_Init();						//VS1053初始化
 	LCD_Clear(BLACK);
-	read_data();
 	POINT_COLOR = RED;
 	BACK_COLOR = BLACK;
 	if (font_init() == 1 || KEY_Scan(0) ==1)

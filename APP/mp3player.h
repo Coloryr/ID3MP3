@@ -27,6 +27,7 @@ typedef struct
 
 	u8 *TIT2;						//歌名
 	u8 *TPE1;						//作者
+	u8 *TALB;           //专辑
 	
   u8 fft_top[FFT_BANDS];	 //频谱顶值表
   u8 fft_cur[FFT_BANDS];	 //频谱当前值表

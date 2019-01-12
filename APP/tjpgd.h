@@ -86,6 +86,8 @@ u32 jpeg_in_func(JDEC* jd,u8* buf,u32 num) ;
 u32 jpeg_out_func_fill(JDEC* jd,void* rgbbuf,JRECT* rect) ;
 u32 jpeg_out_func_point(JDEC* jd,void* rgbbuf,JRECT* rect) ;
 
+extern u8 write_bit;
+
 #ifdef __cplusplus
 }
 #endif
