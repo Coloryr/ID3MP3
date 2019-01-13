@@ -3,7 +3,7 @@
 #include "sys.h"
 
 void APP_start(void);
-void APP_stop(void);
+void APP_pic_start(void);
 
 #endif
 

@@ -96,7 +96,7 @@ void FFT_post(u16 *pbuf)
 	}
 }
 
-u8 mp3_play_ready(void)
+void mp3_play_ready()
 {
 	u8 res;
 	DIR mp3dir;	 		//目录
@@ -111,20 +111,21 @@ u8 mp3_play_ready(void)
 	info.pic_show = 0;
 
 	init_fft();
-	Show_Str(30, 120, 240, 16, "正在读取文件", 16, 0);
+	Show_Str(30, 20, 240, 16, "正在读取文件", 16, 0);
 	while (f_opendir(&mp3dir, "0:/MUSIC"))//打开音乐文件夹
 	{
-		Show_Str(30, 120, 240, 16, "文件夹错误!", 16, 0);
+		Show_Str(30, 20, 240, 16, "MUSIC文件夹错误!", 16, 0);
 		delay_ms(200);
-		LCD_Fill(30, 120, 240, 226, BLACK);//清除显示	     
+		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
 	info.totmp3num = mp3_get_tnum("0:/MUSIC"); //得到总有效文件数
-	if (info.totmp3num == NULL)//音乐文件总数为0		
+	while (info.totmp3num == NULL)//音乐文件总数为0		
 	{
-		Show_Str(30, 120, 240, 16, "没有文件!", 16, 0);
+		Show_Str(30, 20, 240, 16, "没有音乐文件!", 16, 0);
 		delay_ms(200);
-		return 1;
+		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
+		delay_ms(200);
 	}
 	info.mp3fileinfo.lfsize = _MAX_LFN * 2 + 1;				//长文件名最大长度
 	info.mp3fileinfo.lfname = mymalloc(info.mp3fileinfo.lfsize);//为长文件缓存区分配内存
@@ -135,9 +136,10 @@ u8 mp3_play_ready(void)
 	while (info.mp3fileinfo.lfname == NULL || info.pname == NULL ||
 		info.mp3indextbl == NULL || info.fmp3 == NULL)//内存分配出错
 	{
-		Show_Str(30, 120, 240, 16, "内存分配失败!", 16, 0);
+		Show_Str(30, 20, 240, 16, "内存分配失败!", 16, 0);
 		delay_ms(200);
-		return 1;
+		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
+		delay_ms(200);
 	}
 	//记录索引
 	res = f_opendir(&mp3dir, "0:/MUSIC"); //打开目录
@@ -160,7 +162,6 @@ u8 mp3_play_ready(void)
 	}
 	read_data();
 	LCD_Clear(BLACK);
-	return 0;
 }
 
 //播放音乐
@@ -168,25 +169,20 @@ void mp3_play(void *pdata)
 {
 	u8 res;
 	DIR mp3dir;	 		//目录
-	u8 *fn;   			//长文件名  
+	u8 *fn;   			//长文件名
+	u8 key;					//键值		  
 	u8 *databuf;
 	u8 rval = 0;
 	u16 i = 0;
 	static u8 pause = 0;		//暂停标志   
 	CPU_SR_ALLOC();
 
-	databuf = (u8*)mymalloc(2048);		//开辟4096字节的内存区域
+	databuf = (u8*)mymalloc(1024);		//开辟4096字节的内存区域
 	if (databuf == NULL)rval = 0XFF;//内存申请失败.
 
 	OS_CRITICAL_ENTER();	//进入临界区
-	if (mp3_play_ready() == 1)
-	{
-		LCD_Clear(BLACK);
-		APP_stop();
-		OS_CRITICAL_EXIT();
-		return;
-	}
-
+	mp3_play_ready();
+	
 	VS_Set_Vol(vsset.mvol);
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
 	OS_CRITICAL_EXIT();
@@ -201,20 +197,20 @@ void mp3_play(void *pdata)
 		strcat((char*)info.pname, (const char*)fn);  			//将文件名接在后面	
 		info.size = 1;
 		res = f_open(info.fmp3, (const TCHAR*)info.pname, FA_READ);
-		if (write_bit == 0x10)
+		if(write_bit==0x10)
 		{
 			write_bit = 0x20;
 			OS_CRITICAL_EXIT();
-			while (write_bit == 0x20);
+			while(write_bit==0x20);
 			OS_CRITICAL_ENTER();
 		}
 		f_open(fmp3, (const TCHAR*)info.pname, FA_READ);
 		if (res != FR_OK)
 			while (1)
 			{
-				Show_Str(30, 220, 240, 16, "文件错误!", 16, 0);
+				Show_Str(30, 120, 240, 16, "MUSIC文件夹错误!", 16, 0);
 				delay_ms(200);
-				LCD_Fill(30, 220, 240, 226, BLACK);//清除显示	     
+				LCD_Fill(30, 120, 240, 226, BLACK);//清除显示	     
 				delay_ms(200);
 			}
 		mp3id3();
@@ -224,7 +220,7 @@ void mp3_play(void *pdata)
 		while (rval == 0)
 		{
 			OS_CRITICAL_ENTER();	//进入临界区
-			res = f_read(info.fmp3, databuf, 2048, (UINT*)&br);//读出4096个字节 			
+			res = f_read(info.fmp3, databuf, 1024, (UINT*)&br);//读出4096个字节 			
 			OS_CRITICAL_EXIT();
 			i = 0;
 			do//主播放循环
@@ -235,7 +231,8 @@ void mp3_play(void *pdata)
 				}
 				else
 				{
-					switch (key_now)
+					key = KEY_Scan(0);
+					switch (key)
 					{
 					case KEY0_PRES:
 						rval = KEY0_PRES;		//下一曲
@@ -264,6 +261,7 @@ void mp3_play(void *pdata)
 							lcd_bit = 0;
 							LCD_LED = 0;
 						}*/
+					LCD_Clear(BLACK);
 					if(show_mode==0)
 						show_mode=1;
 					else
@@ -271,16 +269,15 @@ void mp3_play(void *pdata)
 						break;
 					default:
 						break;
-					}
+					}					
 				}
-			} while (i < 2048);//循环发送4096个字节 
-			if (br != 2048 || res != 0)
+			} while (i < 1024);//循环发送4096个字节 
+			if (br != 1024 || res != 0)
 			{
 				rval = KEY0_PRES;
 			}
 		}
 		f_close(info.fmp3);
-		show_clear();
 		vs_reset();
 		if (rval == KEY1_PRES)		//上一曲
 		{
