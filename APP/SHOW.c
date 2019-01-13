@@ -324,6 +324,7 @@ void show_mp3_pic(void *pdata)
 			}
 		}
 	}
+	
 }
 
 void show_clear(void)
@@ -332,6 +333,15 @@ void show_clear(void)
 		LCD_Fill(0, 162, 320, 178, BLACK);
 	else
 		LCD_Fill(0, 0, 320, 16, BLACK);
+}
+
+void show_pic_clear(void)
+{
+	if(show_mode==0)
+	{
+		LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size,
+				pic_show_y + pic_show_size, BACK_COLOR);
+	}
 }
 
 void show_all(void *pdata)

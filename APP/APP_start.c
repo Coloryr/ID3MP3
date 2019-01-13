@@ -15,7 +15,7 @@ void start_task(void *pdata);
  			   
 //MP3任务
 //设置任务优先级
-#define MUSIC_PLAY_TASK_PRIO       	2
+#define MUSIC_PLAY_TASK_PRIO       	4
 //设置任务堆栈大小
 #define MUSIC_PLAY_STK_SIZE  		    256
 //任务控制块
@@ -27,9 +27,9 @@ void mp3_play(void *pdata);
 
 //图片显示任务
 //设置任务优先级
-#define PIC_SHOW_TASK_PRIO       		2
+#define PIC_SHOW_TASK_PRIO       		4
 //设置任务堆栈大小
-#define PIC_SHOW_STK_SIZE  		    2048
+#define PIC_SHOW_STK_SIZE  		    256
 //任务控制块
 OS_TCB PICTaskTCB;
 //任务堆栈	
@@ -39,7 +39,7 @@ void show_mp3_pic(void *pdata);
 
 //显示任务
 //设置任务优先级
-#define SHOW_TASK_PRIO       			2
+#define SHOW_TASK_PRIO       			4
 //设置任务堆栈大小
 #define SHOW_STK_SIZE  		    		256
 //任务控制块
@@ -48,6 +48,18 @@ OS_TCB SHOWTaskTCB;
 CPU_STK SHOW_TASK_STK[SHOW_STK_SIZE];
 //任务函数
 void show_all(void *pdata);
+
+//按键任务
+//设置任务优先级
+#define KEY_TASK_PRIO 				4
+//任务堆栈大小
+#define KEY_STK_SIZE				128
+//任务控制块
+OS_TCB KeyTaskTCB;
+//任务堆栈
+CPU_STK KEY_TASK_STK[KEY_STK_SIZE];
+//key任务
+void KEY_task(void *pdata);
 
 ////////////////////////////////伪随机数产生办法////////////////////////////////
 u32 random_seed=1;
@@ -129,8 +141,23 @@ void start_task(void *pdata)
 		(void   	*)0,
 		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
 		(OS_ERR 	*)&err);
-	OS_TaskSuspend((OS_TCB*)&StartTaskTCB, &err);		//挂起开始任务			 
+	//按键任务
+	OSTaskCreate((OS_TCB*)&KeyTaskTCB,
+		(CPU_CHAR*)"Key task",
+		(OS_TASK_PTR)KEY_task,
+		(void*)0,
+		(OS_PRIO)KEY_TASK_PRIO,
+		(CPU_STK*)&KEY_TASK_STK[0],
+		(CPU_STK_SIZE)KEY_STK_SIZE / 10,
+		(CPU_STK_SIZE)KEY_STK_SIZE,
+		(OS_MSG_QTY)0,
+		(OS_TICK)0,
+		(void*)0,
+		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
+		(OS_ERR*)&err);
+	OS_TaskSuspend((OS_TCB*)&StartTaskTCB, &err);		//挂起开始任务			
 	OS_CRITICAL_EXIT();	//进入临界区
+		OSTaskDel((OS_TCB*)&StartTaskTCB,&err);
 }
 
 void APP_start(void)

@@ -1,5 +1,7 @@
 #include "includes.h" 
 
+u8 key_now;
+
 //按键初始化函数 
 //PA0.15和PC5 设置成输入
 void KEY_Init(void)
@@ -31,7 +33,7 @@ u8 KEY_Scan(u8 mode)
 	if (mode)key_up = 1;  //支持连按		  
 	if (key_up && (KEY0 == 0 || KEY1 == 0 || KEY2 == 0 || KEY3 == 0))
 	{
-		delay_ms(10);//去抖动 
+		delay_ms(10);
 		key_up = 0;
 		if (KEY0 == 0)return KEY0_PRES;
 		else if (KEY1 == 0)return KEY1_PRES;
@@ -56,7 +58,15 @@ u8 KEY0_Scan(void)
 	return 0;// 无按键按下
 }
 
-
+void KEY_task(void *pdata)
+{
+	OS_ERR err;
+	while(1)
+	{
+		key_now = KEY_Scan(0);
+		OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_PERIODIC,&err);//延时10ms
+	}
+}
 
 
 

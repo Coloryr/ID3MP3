@@ -168,8 +168,7 @@ void mp3_play(void *pdata)
 {
 	u8 res;
 	DIR mp3dir;	 		//目录
-	u8 *fn;   			//长文件名
-	u8 key;					//键值		  
+	u8 *fn;   			//长文件名  
 	u8 *databuf;
 	u8 rval = 0;
 	u16 i = 0;
@@ -236,8 +235,7 @@ void mp3_play(void *pdata)
 				}
 				else
 				{
-					key = KEY_Scan(0);
-					switch (key)
+					switch (key_now)
 					{
 					case KEY0_PRES:
 						rval = KEY0_PRES;		//下一曲
@@ -256,7 +254,7 @@ void mp3_play(void *pdata)
 						write_data();
 						break;
 					case KEY3_PRES:	   //暂停/播放
-						if (lcd_bit == 0)
+						/*if (lcd_bit == 0)
 						{
 							lcd_bit = 1;
 							LCD_LED = 1;
@@ -265,7 +263,11 @@ void mp3_play(void *pdata)
 						{
 							lcd_bit = 0;
 							LCD_LED = 0;
-						}
+						}*/
+					if(show_mode==0)
+						show_mode=1;
+					else
+						show_mode=0;
 						break;
 					default:
 						break;
@@ -277,7 +279,6 @@ void mp3_play(void *pdata)
 				rval = KEY0_PRES;
 			}
 		}
-		OS_CRITICAL_ENTER();
 		f_close(info.fmp3);
 		show_clear();
 		vs_reset();
@@ -294,7 +295,6 @@ void mp3_play(void *pdata)
 			write_data();
 		}
 		else break;	//产生了错误 	 
-		OS_CRITICAL_EXIT();
 	}
 	myfree(info.mp3fileinfo.lfname);	//释放内存			    
 	myfree(info.pname);				//释放内存			    
