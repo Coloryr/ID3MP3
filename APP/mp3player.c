@@ -96,7 +96,7 @@ void FFT_post(u16 *pbuf)
 	}
 }
 
-void mp3_play_ready()
+u8 mp3_play_ready(void)
 {
 	u8 res;
 	DIR mp3dir;	 		//目录
@@ -111,21 +111,20 @@ void mp3_play_ready()
 	info.pic_show = 0;
 
 	init_fft();
-	Show_Str(30, 20, 240, 16, "正在读取文件", 16, 0);
+	Show_Str(30, 80, 240, 16, "正在读取文件", 16, 0);
 	while (f_opendir(&mp3dir, "0:/MUSIC"))//打开音乐文件夹
 	{
-		Show_Str(30, 20, 240, 16, "MUSIC文件夹错误!", 16, 0);
+		Show_Str(30, 80, 240, 16, "文件夹错误!", 16, 0);
 		delay_ms(200);
-		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
+		LCD_Fill(30, 80, 240, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
 	info.totmp3num = mp3_get_tnum("0:/MUSIC"); //得到总有效文件数
-	while (info.totmp3num == NULL)//音乐文件总数为0		
+	if (info.totmp3num == NULL)//音乐文件总数为0		
 	{
-		Show_Str(30, 20, 240, 16, "没有音乐文件!", 16, 0);
+		Show_Str(30, 80, 240, 16, "没有文件!", 16, 0);
 		delay_ms(200);
-		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
-		delay_ms(200);
+		return 1;
 	}
 	info.mp3fileinfo.lfsize = _MAX_LFN * 2 + 1;				//长文件名最大长度
 	info.mp3fileinfo.lfname = mymalloc(info.mp3fileinfo.lfsize);//为长文件缓存区分配内存
@@ -136,10 +135,9 @@ void mp3_play_ready()
 	while (info.mp3fileinfo.lfname == NULL || info.pname == NULL ||
 		info.mp3indextbl == NULL || info.fmp3 == NULL)//内存分配出错
 	{
-		Show_Str(30, 20, 240, 16, "内存分配失败!", 16, 0);
+		Show_Str(30, 80, 240, 16, "内存分配失败!", 16, 0);
 		delay_ms(200);
-		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
-		delay_ms(200);
+		return 1;
 	}
 	//记录索引
 	res = f_opendir(&mp3dir, "0:/MUSIC"); //打开目录
@@ -162,6 +160,7 @@ void mp3_play_ready()
 	}
 	read_data();
 	LCD_Clear(BLACK);
+	return 0;
 }
 
 //播放音乐
@@ -181,8 +180,13 @@ void mp3_play(void *pdata)
 	if (databuf == NULL)rval = 0XFF;//内存申请失败.
 
 	OS_CRITICAL_ENTER();	//进入临界区
-	mp3_play_ready();
-	
+	if (mp3_play_ready() == 1)
+	{
+		APP_stop();
+		OS_CRITICAL_EXIT();
+		return;
+	}
+
 	VS_Set_Vol(vsset.mvol);
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
 	OS_CRITICAL_EXIT();
@@ -197,20 +201,20 @@ void mp3_play(void *pdata)
 		strcat((char*)info.pname, (const char*)fn);  			//将文件名接在后面	
 		info.size = 1;
 		res = f_open(info.fmp3, (const TCHAR*)info.pname, FA_READ);
-		if(write_bit==0x10)
+		if (write_bit == 0x10)
 		{
 			write_bit = 0x20;
 			OS_CRITICAL_EXIT();
-			while(write_bit==0x20);
+			while (write_bit == 0x20);
 			OS_CRITICAL_ENTER();
 		}
 		f_open(fmp3, (const TCHAR*)info.pname, FA_READ);
 		if (res != FR_OK)
 			while (1)
 			{
-				Show_Str(30, 20, 240, 16, "MUSIC文件夹错误!", 16, 0);
+				Show_Str(30, 220, 240, 16, "文件错误!", 16, 0);
 				delay_ms(200);
-				LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
+				LCD_Fill(30, 220, 240, 226, BLACK);//清除显示	     
 				delay_ms(200);
 			}
 		mp3id3();
@@ -264,7 +268,7 @@ void mp3_play(void *pdata)
 						break;
 					default:
 						break;
-					}					
+					}
 				}
 			} while (i < 1024);//循环发送4096个字节 
 			if (br != 1024 || res != 0)

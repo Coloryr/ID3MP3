@@ -78,42 +78,42 @@ void displaynl(void)
 	Conversion(0, a, b, c);        //?????
 /*****	显示农历月份  *****/
 
-	if (moon.month_moon == 1) { Show_Str(108, 130, 24, 24, "正", 24, 0); }
-	if (moon.month_moon == 2) { Show_Str(108, 130, 24, 24, "二", 24, 0); }
-	if (moon.month_moon == 3) { Show_Str(108, 130, 24, 24, "三", 24, 0); }
-	if (moon.month_moon == 4) { Show_Str(108, 130, 24, 24, "四", 24, 0); }
-	if (moon.month_moon == 5) { Show_Str(108, 130, 24, 24, "五", 24, 0); }
-	if (moon.month_moon == 6) { Show_Str(108, 130, 24, 24, "六", 24, 0); }
-	if (moon.month_moon == 7) { Show_Str(108, 130, 24, 24, "七", 24, 0); }
-	if (moon.month_moon == 8) { Show_Str(108, 130, 24, 24, "八", 24, 0); }
-	if (moon.month_moon == 9) { Show_Str(108, 130, 24, 24, "九", 24, 0); }
-	if (moon.month_moon == 10) { Show_Str(108, 130, 24, 24, "十", 24, 0); }
-	if (moon.month_moon == 11) { Show_Str(108, 130, 24, 24, "冬", 24, 0); }
-	if (moon.month_moon == 12) { Show_Str(108, 130, 24, 24, "腊", 24, 0); }
-	Show_Str(132, 130, 24, 24, "月", 24, 0);
+	if (moon.month_moon == 1) { Show_Str(116, 130, 24, 24, "正", 24, 0); }
+	if (moon.month_moon == 2) { Show_Str(116, 130, 24, 24, "二", 24, 0); }
+	if (moon.month_moon == 3) { Show_Str(116, 130, 24, 24, "三", 24, 0); }
+	if (moon.month_moon == 4) { Show_Str(116, 130, 24, 24, "四", 24, 0); }
+	if (moon.month_moon == 5) { Show_Str(116, 130, 24, 24, "五", 24, 0); }
+	if (moon.month_moon == 6) { Show_Str(116, 130, 24, 24, "六", 24, 0); }
+	if (moon.month_moon == 7) { Show_Str(116, 130, 24, 24, "七", 24, 0); }
+	if (moon.month_moon == 8) { Show_Str(116, 130, 24, 24, "八", 24, 0); }
+	if (moon.month_moon == 9) { Show_Str(116, 130, 24, 24, "九", 24, 0); }
+	if (moon.month_moon == 10) { Show_Str(116, 130, 24, 24, "十", 24, 0); }
+	if (moon.month_moon == 11) { Show_Str(116, 130, 24, 24, "冬", 24, 0); }
+	if (moon.month_moon == 12) { Show_Str(116, 130, 24, 24, "腊", 24, 0); }
+	Show_Str(140, 130, 24, 24, "月", 24, 0);
 
 	/*****	显示农历日的十位  *****/
-	if (moon.day_moon / 10 == 0) { Show_Str(156, 130, 24, 24, "初", 24, 0); }    //
+	if (moon.day_moon / 10 == 0) { Show_Str(164, 130, 24, 24, "初", 24, 0); }    //
 	if (moon.day_moon / 10 == 1)
-		if (moon.day_moon / 10 == 1 & moon.day_moon % 10 == 0) { Show_Str(156, 130, 24, 24, "初", 24, 0); }
-		else { Show_Str(156, 130, 24, 24, "十", 24, 0); }    //
+		if (moon.day_moon / 10 == 1 & moon.day_moon % 10 == 0) { Show_Str(164, 130, 24, 24, "初", 24, 0); }
+		else { Show_Str(164, 130, 24, 24, "十", 24, 0); }    //
 	if (moon.day_moon / 10 == 2)
-		if (moon.day_moon / 10 == 2 & moon.day_moon % 10 == 0) { Show_Str(156, 130, 24, 24, "二", 24, 0); }
-		else { Show_Str(156, 130, 24, 24, "廿", 24, 0); }   //
-	if (moon.day_moon / 10 == 3) { Show_Str(156, 130, 24, 24, "三", 24, 0); }	  //"三"字的代码
+		if (moon.day_moon / 10 == 2 & moon.day_moon % 10 == 0) { Show_Str(164, 130, 24, 24, "二", 24, 0); }
+		else { Show_Str(164, 130, 24, 24, "廿", 24, 0); }   //
+	if (moon.day_moon / 10 == 3) { Show_Str(164, 130, 24, 24, "三", 24, 0); }	  //"三"字的代码
 
 /*****	显示农历日的个位  *****/
 
-	if (moon.day_moon % 10 == 1) { Show_Str(180, 130, 24, 24, "一", 24, 0); }    //
-	if (moon.day_moon % 10 == 2) { Show_Str(180, 130, 24, 24, "二", 24, 0); }    //
-	if (moon.day_moon % 10 == 3) { Show_Str(180, 130, 24, 24, "三", 24, 0); }	  //"三"字的代码
-	if (moon.day_moon % 10 == 4) { Show_Str(180, 130, 24, 24, "四", 24, 0); }    //
-	if (moon.day_moon % 10 == 5) { Show_Str(180, 130, 24, 24, "五", 24, 0); }    //
-	if (moon.day_moon % 10 == 6) { Show_Str(180, 130, 24, 24, "六", 24, 0); }    //
-	if (moon.day_moon % 10 == 7) { Show_Str(180, 130, 24, 24, "七", 24, 0); }    //
-	if (moon.day_moon % 10 == 8) { Show_Str(180, 130, 24, 24, "八", 24, 0); }    //
-	if (moon.day_moon % 10 == 9) { Show_Str(180, 130, 24, 24, "九", 24, 0); }    //
-	if (moon.day_moon % 10 == 0) { Show_Str(180, 130, 24, 24, "十", 24, 0); }    //
+	if (moon.day_moon % 10 == 1) { Show_Str(188, 130, 24, 24, "一", 24, 0); }    //
+	if (moon.day_moon % 10 == 2) { Show_Str(188, 130, 24, 24, "二", 24, 0); }    //
+	if (moon.day_moon % 10 == 3) { Show_Str(188, 130, 24, 24, "三", 24, 0); }	  //"三"字的代码
+	if (moon.day_moon % 10 == 4) { Show_Str(188, 130, 24, 24, "四", 24, 0); }    //
+	if (moon.day_moon % 10 == 5) { Show_Str(188, 130, 24, 24, "五", 24, 0); }    //
+	if (moon.day_moon % 10 == 6) { Show_Str(188, 130, 24, 24, "六", 24, 0); }    //
+	if (moon.day_moon % 10 == 7) { Show_Str(188, 130, 24, 24, "七", 24, 0); }    //
+	if (moon.day_moon % 10 == 8) { Show_Str(188, 130, 24, 24, "八", 24, 0); }    //
+	if (moon.day_moon % 10 == 9) { Show_Str(188, 130, 24, 24, "九", 24, 0); }    //
+	if (moon.day_moon % 10 == 0) { Show_Str(188, 130, 24, 24, "十", 24, 0); }    //
 }
 
 /*----------显示节气---------------------------------------------*/
@@ -127,65 +127,65 @@ void displayjieqi(void)
 	c = calendar.w_date % 10;
 	c = c + (calendar.w_date / 10) * 16;
 	j = jieqi(a, b, c);
-	if (j == 1) { Show_Str(204, 130, 96, 24, "今天小寒", 24, 0); }
-	if (j == 2) { Show_Str(204, 130, 96, 24, "今天大寒", 24, 0); }
-	if (j == 3) { Show_Str(204, 130, 96, 24, "今天立春", 24, 0); }
-	if (j == 4) { Show_Str(204, 130, 96, 24, "今天雨水", 24, 0); }
-	if (j == 5) { Show_Str(204, 130, 96, 24, "今天惊蛰", 24, 0); }
-	if (j == 6) { Show_Str(204, 130, 96, 24, "今天春分", 24, 0); }
-	if (j == 7) { Show_Str(204, 130, 96, 24, "今天清明", 24, 0); }
-	if (j == 8) { Show_Str(204, 130, 96, 24, "今天谷雨", 24, 0); }
-	if (j == 9) { Show_Str(204, 130, 96, 24, "今天立夏", 24, 0); }
-	if (j == 10) { Show_Str(204, 130, 96, 24, "今天小满", 24, 0); }
-	if (j == 11) { Show_Str(204, 130, 96, 24, "今天芒种", 24, 0); }
-	if (j == 12) { Show_Str(204, 130, 96, 24, "今天夏至", 24, 0); }
-	if (j == 13) { Show_Str(204, 130, 96, 24, "今天小暑", 24, 0); }
-	if (j == 14) { Show_Str(204, 130, 96, 24, "今天大暑", 24, 0); }
-	if (j == 15) { Show_Str(204, 130, 96, 24, "今天立秋", 24, 0); }
-	if (j == 16) { Show_Str(204, 130, 96, 24, "今天处暑", 24, 0); }
-	if (j == 17) { Show_Str(204, 130, 96, 24, "今天白露", 24, 0); }
-	if (j == 18) { Show_Str(204, 130, 96, 24, "今天秋分", 24, 0); }
-	if (j == 19) { Show_Str(204, 130, 96, 24, "今天寒露", 24, 0); }
-	if (j == 20) { Show_Str(204, 130, 96, 24, "今天霜降", 24, 0); }
-	if (j == 21) { Show_Str(204, 130, 96, 24, "今天立冬", 24, 0); }
-	if (j == 22) { Show_Str(204, 130, 96, 24, "今天小雪", 24, 0); }
-	if (j == 23) { Show_Str(204, 130, 96, 24, "今天大雪", 24, 0); }
-	if (j == 24) { Show_Str(204, 130, 96, 24, "今天冬至", 24, 0); }
-	if (j == 0) { Show_Str(216, 130, 96, 24, "无节气", 24, 0); }
+	if (j == 1) { Show_Str(220, 130, 96, 24, "今天小寒", 24, 0); }
+	if (j == 2) { Show_Str(220, 130, 96, 24, "今天大寒", 24, 0); }
+	if (j == 3) { Show_Str(220, 130, 96, 24, "今天立春", 24, 0); }
+	if (j == 4) { Show_Str(220, 130, 96, 24, "今天雨水", 24, 0); }
+	if (j == 5) { Show_Str(220, 130, 96, 24, "今天惊蛰", 24, 0); }
+	if (j == 6) { Show_Str(220, 130, 96, 24, "今天春分", 24, 0); }
+	if (j == 7) { Show_Str(220, 130, 96, 24, "今天清明", 24, 0); }
+	if (j == 8) { Show_Str(220, 130, 96, 24, "今天谷雨", 24, 0); }
+	if (j == 9) { Show_Str(220, 130, 96, 24, "今天立夏", 24, 0); }
+	if (j == 10) { Show_Str(220, 130, 96, 24, "今天小满", 24, 0); }
+	if (j == 11) { Show_Str(220, 130, 96, 24, "今天芒种", 24, 0); }
+	if (j == 12) { Show_Str(220, 130, 96, 24, "今天夏至", 24, 0); }
+	if (j == 13) { Show_Str(220, 130, 96, 24, "今天小暑", 24, 0); }
+	if (j == 14) { Show_Str(220, 130, 96, 24, "今天大暑", 24, 0); }
+	if (j == 15) { Show_Str(220, 130, 96, 24, "今天立秋", 24, 0); }
+	if (j == 16) { Show_Str(220, 130, 96, 24, "今天处暑", 24, 0); }
+	if (j == 17) { Show_Str(220, 130, 96, 24, "今天白露", 24, 0); }
+	if (j == 18) { Show_Str(220, 130, 96, 24, "今天秋分", 24, 0); }
+	if (j == 19) { Show_Str(220, 130, 96, 24, "今天寒露", 24, 0); }
+	if (j == 20) { Show_Str(220, 130, 96, 24, "今天霜降", 24, 0); }
+	if (j == 21) { Show_Str(220, 130, 96, 24, "今天立冬", 24, 0); }
+	if (j == 22) { Show_Str(220, 130, 96, 24, "今天小雪", 24, 0); }
+	if (j == 23) { Show_Str(220, 130, 96, 24, "今天大雪", 24, 0); }
+	if (j == 24) { Show_Str(220, 130, 96, 24, "今天冬至", 24, 0); }
+	if (j == 0) { Show_Str(224, 130, 96, 24, "无节气", 24, 0); }
 }
 
 void timeplay(void)
 {
 	Show_Str(58, 0, 24, 24, "年", 24, 0);
-	Show_Str(106, 0, 24, 24, "月", 24, 0);
-	Show_Str(154, 0, 24, 24, "日", 24, 0);
-	Show_Str(180, 0, 48, 24, "星期", 24, 0);
+	Show_Str(114, 0, 24, 24, "月", 24, 0);
+	Show_Str(170, 0, 24, 24, "日", 24, 0);
+	Show_Str(220, 0, 48, 24, "星期", 24, 0);
 	LCD_ShowxNum(10, 0, calendar.w_year, 4, 24, 0);//显示年
-	LCD_ShowxNum(82, 0, calendar.w_month, 2, 24, 0);//显示月
-	LCD_ShowxNum(130, 0, calendar.w_date, 2, 24, 0);//显示日
+	LCD_ShowxNum(90, 0, calendar.w_month, 2, 24, 0);//显示月
+	LCD_ShowxNum(146, 0, calendar.w_date, 2, 24, 0);//显示日
 
 	switch (calendar.week)
 	{
 	case 0:
-		Show_Font(228, 0, "天", 24, 0);
+		Show_Font(268, 0, "天", 24, 0);
 		break;
 	case 1:
-		Show_Font(228, 0, "一", 24, 0);
+		Show_Font(268, 0, "一", 24, 0);
 		break;
 	case 2:
-		Show_Font(228, 0, "二", 24, 0);
+		Show_Font(268, 0, "二", 24, 0);
 		break;
 	case 3:
-		Show_Font(228, 0, "三", 24, 0);
+		Show_Font(268, 0, "三", 24, 0);
 		break;
 	case 4:
-		Show_Font(228, 0, "四", 24, 0);
+		Show_Font(268, 0, "四", 24, 0);
 		break;
 	case 5:
-		Show_Font(228, 0, "五", 24, 0);
+		Show_Font(268, 0, "五", 24, 0);
 		break;
 	case 6:
-		Show_Font(228, 0, "六", 24, 0);
+		Show_Font(268, 0, "六", 24, 0);
 		break;
 	}
 
@@ -236,86 +236,6 @@ void fft_show_oneband(u16 x, u16 y, u16 width, u16 height, u16 curval, u16 topva
 	gui_fill_rectangle(x, y, width, height - curval, BLACK);					//填充背景色
 	gui_fill_rectangle(x, y + height - curval, width, curval, FFT_BANDS_COLOR);	//填充柱状色
 	gui_draw_hline(x, y + height - topval - 1, width, FFT_TOP_COLOR);
-}
-
-//显示曲目索引
-//index:当前索引
-//total:总文件数
-void mp3_index_show(u16 index, u16 total)
-{
-	//显示当前曲目的索引,及总曲目数
-	if (lcd_bit ==1)
-	{
-		LCD_ShowxNum(224 + 0, 20, index, 3, 16, 0X80);		//索引
-		LCD_ShowChar(224 + 24, 20, '/', 16, 0);
-		LCD_ShowxNum(224 + 32, 20, total, 3, 16, 0X80); 	//总曲目	
-	}
-}
-//显示当前音量
-void mp3_vol_show(u8 vol)
-{
-	if (lcd_bit == 1)
-	{
-		LCD_ShowString(224, 40, 32, 16, 16, "VOL:");
-		LCD_ShowxNum(224 + 32, 40, vol, 2, 16, 0X80); 	//显示音量	 
-	}
-}
-//显示播放时间,比特率 信息 
-//lenth:歌曲总长度
-void mp3_msg_show(void)
-{
-	u16 temp = 0;
-	if (lcd_bit == 1 && info.pic_show == 0)
-	{
-		if (info.kbps == 0xffff)//未更新过
-		{
-			info.playtime = 0;
-			info.kbps = VS_Get_HeadInfo();//获得比特率
-		}
-		info.time = VS_Get_DecodeTime(); //得到解码时间
-
-		if (info.playtime == 0)info.playtime = info.time;
-		else if ((info.time != info.playtime) && (info.time != 0))//1s时间到,更新显示数据
-		{
-			info.playtime = info.time;//更新时间 	 			
-			temp = VS_Get_HeadInfo(); //获得比特率	   				 
-			if (temp != info.kbps)
-			{
-				info.kbps = temp;//更新KBPS	  				     
-			}
-			//显示播放时间			 
-			LCD_ShowxNum(224, 60, info.time / 60, 2, 16, 0X80);		//分钟
-			LCD_ShowChar(224 + 16, 60, ':', 16, 0);
-			LCD_ShowxNum(224 + 24, 60, info.time % 60, 2, 16, 0X80);	//秒钟		
-			LCD_ShowChar(224 + 40, 60, '/', 16, 0);
-			//显示总时间
-			if (info.kbps)info.time = (info.fmp3->fsize / info.kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
-			else info.time = 0;//非法位率	  
-			LCD_ShowxNum(224 + 48, 60, info.time / 60, 2, 16, 0X80);	//分钟
-			LCD_ShowChar(224 + 64, 60, ':', 16, 0);
-			LCD_ShowxNum(224 + 72, 60, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
-			//显示位率			   
-			LCD_ShowxNum(224, 80, info.kbps, 3, 16, 0X80); 	//显示位率	 
-			LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
-		}
-		VS_Get_Spec(info.FFTbuf); //提取频谱数据
-		FFT_post(info.FFTbuf);	  //进行频谱效果显示
-	}
-}
-
-void mp3_next(void)
-{
-	LCD_ShowxNum(224, 60, 0, 2, 16, 0X80);		//分钟
-	LCD_ShowChar(224 + 16, 60, ':', 16, 0);
-	LCD_ShowxNum(224 + 24, 60, 0, 2, 16, 0X80);	//秒钟		
-	LCD_ShowChar(224 + 40, 60, '/', 16, 0);
-	//显示总时间  
-	LCD_ShowxNum(224 + 48, 60, 0, 2, 16, 0X80);	//分钟
-	LCD_ShowChar(224 + 64, 60, ':', 16, 0);
-	LCD_ShowxNum(224 + 72, 60, 0, 2, 16, 0X80);	//秒钟	  		    
-	//显示位率			   
-	LCD_ShowxNum(224, 80, 0, 3, 16, 0X80); 	//显示位率	 
-	LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
 }
 
 FIL *f_jpeg;			//JPEG文件指针
@@ -409,52 +329,130 @@ void show_mp3_pic(void *pdata)
 void show_all(void *pdata)
 {
 	u8 *fn;
-	u8 sec;
+	u16 temp = 0;
 	CPU_SR_ALLOC();
 	while (1)
 	{
-		OS_CRITICAL_EXIT();
-		RTC_Get();
-		fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
-		if (show_mode == 0)
+		if (lcd_bit == 1)
 		{
-			if (sec != calendar.sec)
+			OS_CRITICAL_EXIT();
+			RTC_Get();
+			fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
+			temp = VS_Get_HeadInfo(); //获得比特率
+			if (info.kbps == 0xffff)//未更新过
 			{
-				sec = calendar.sec;
-				time_go();
+				info.playtime = 0;
+				info.kbps = VS_Get_HeadInfo();//获得比特率
 			}
-		}
-		else if (show_mode == 1)
-		{
-			if (info.size != 0)
+			info.time = VS_Get_DecodeTime(); //得到解码时间
+			if (show_mode == 0)
 			{
-				LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
-				if (info.TIT2[0] != 0 && info.TPE1[0] != 0 && info.TALB[0] != 0)
+				time_go();
+				if (info.size != 0)
 				{
-					strcat((char*)info.TIT2, "-");
-					strcat((char*)info.TIT2, (char*)info.TPE1);
-					strcat((char*)info.TIT2, "-");
-					strcat((char*)info.TIT2, (char*)info.TALB);
-					Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
-				}
-				else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
-				{
-					Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+					if (info.TIT2[0] != 0 && info.TPE1[0] != 0 && info.TALB[0] != 0)
+					{
+						strcat((char*)info.TIT2, "-");
+						strcat((char*)info.TIT2, (char*)info.TPE1);
+						strcat((char*)info.TIT2, "-");
+						strcat((char*)info.TIT2, (char*)info.TALB);
+						Show_Str(0, 162, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+					}
+					else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
+					{
+						Show_Str(0, 162, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+					}
+					else
+						Show_Str(0, 162, 320, 16, fn, 16, 0);				//显示歌曲名字 
 				}
 				else
-					Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+				{
+					Show_Str(0, 162, 320, 16, fn, 16, 0);				//显示歌曲名字 
+				}
+				LCD_ShowxNum(0, 182, info.curindex + 1, 3, 16, 0X80);		//索引
+				LCD_ShowChar(24, 182, '/', 16, 0);
+				LCD_ShowxNum(32, 182, info.totmp3num, 3, 16, 0X80); 	//总曲目	
+				LCD_ShowString(32 + 30, 182, 32, 16, 16, "VOL:");
+				LCD_ShowxNum(64 + 30, 182, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量		
+
+				if (temp != info.kbps)
+				{
+					info.kbps = temp;//更新KBPS	  				     
+				}
+				//显示播放时间			 
+				LCD_ShowxNum(118, 182, info.time / 60, 2, 16, 0X80);		//分钟
+				LCD_ShowChar(118 + 16, 182, ':', 16, 0);
+				LCD_ShowxNum(118 + 24, 182, info.time % 60, 2, 16, 0X80);	//秒钟		
+				LCD_ShowChar(118 + 40, 182, '/', 16, 0);
+				//显示总时间
+				if (info.kbps)info.time = (info.fmp3->fsize / info.kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
+				else info.time = 0;//非法位率	  
+				LCD_ShowxNum(118 + 48, 182, info.time / 60, 2, 16, 0X80);	//分钟
+				LCD_ShowChar(118 + 64, 182, ':', 16, 0);
+				LCD_ShowxNum(118 + 72, 182, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
+				//显示位率			   
+				LCD_ShowxNum(214, 182, info.kbps, 3, 16, 0X80); 	//显示位率	 
+				LCD_ShowString(214 + 48, 182, 200, 16, 16, "Kbps");
+				delay_ms(500);
 			}
-			else
+			else if (show_mode == 1)
 			{
-				LCD_Fill(0, 0, 320, 16, BLACK);				//清除之前的显示
-				Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+				if (info.size != 0)
+				{
+					if (info.TIT2[0] != 0 && info.TPE1[0] != 0 && info.TALB[0] != 0)
+					{
+						strcat((char*)info.TIT2, "-");
+						strcat((char*)info.TIT2, (char*)info.TPE1);
+						strcat((char*)info.TIT2, "-");
+						strcat((char*)info.TIT2, (char*)info.TALB);
+						Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+					}
+					else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
+					{
+						Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+					}
+					else
+						Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+				}
+				else
+				{
+					Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+				}
+				LCD_ShowString(224, 40, 32, 16, 16, "VOL:");
+				LCD_ShowxNum(224 + 32, 40, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量	 
+				LCD_ShowxNum(224 + 0, 20, info.curindex + 1, 3, 16, 0X80);		//索引
+				LCD_ShowChar(224 + 24, 20, '/', 16, 0);
+				LCD_ShowxNum(224 + 32, 20, info.totmp3num, 3, 16, 0X80); 	//总曲目	
+
+				if (info.playtime == 0)info.playtime = info.time;
+				else if ((info.time != info.playtime) && (info.time != 0))//1s时间到,更新显示数据
+				{
+					info.playtime = info.time;//更新时间 	 			
+					temp = VS_Get_HeadInfo(); //获得比特率	   				 
+					if (temp != info.kbps)
+					{
+						info.kbps = temp;//更新KBPS	  				     
+					}
+					//显示播放时间			 
+					LCD_ShowxNum(224, 60, info.time / 60, 2, 16, 0X80);		//分钟
+					LCD_ShowChar(224 + 16, 60, ':', 16, 0);
+					LCD_ShowxNum(224 + 24, 60, info.time % 60, 2, 16, 0X80);	//秒钟		
+					LCD_ShowChar(224 + 40, 60, '/', 16, 0);
+					//显示总时间
+					if (info.kbps)info.time = (info.fmp3->fsize / info.kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
+					else info.time = 0;//非法位率	  
+					LCD_ShowxNum(224 + 48, 60, info.time / 60, 2, 16, 0X80);	//分钟
+					LCD_ShowChar(224 + 64, 60, ':', 16, 0);
+					LCD_ShowxNum(224 + 72, 60, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
+					//显示位率			   
+					LCD_ShowxNum(224, 80, info.kbps, 3, 16, 0X80); 	//显示位率	 
+					LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
+				}
+				VS_Get_Spec(info.FFTbuf); //提取频谱数据
+				FFT_post(info.FFTbuf);	  //进行频谱效果显示
 			}
-			mp3_vol_show((vsset.mvol - 100) / 5);
-			mp3_index_show(info.curindex + 1, info.totmp3num);
-			mp3_msg_show();//显示信息	    
+			OS_CRITICAL_EXIT();
 		}
-		OS_CRITICAL_EXIT();
-		delay_ms(500);
 	}
 }
 

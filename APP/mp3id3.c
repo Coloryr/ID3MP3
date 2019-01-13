@@ -59,9 +59,9 @@ void mp3id3(void)
 	if (databuf == NULL)//内存申请失败.
 		while (1)
 		{
-			Show_Str(30, 20, 160, 16, "MP3ID3：内存申请失败", 16, 0);
+			Show_Str(30, 220, 160, 16, "MP3ID3：内存申请失败", 16, 0);
 			delay_ms(200);
-			LCD_Fill(30, 20, 160, 16, BLACK);//清除显示	     
+			LCD_Fill(30, 220, 160, 16, BLACK);//清除显示	     
 			delay_ms(200);
 		}
 	res = f_read(info.fmp3, databuf, 10, (UINT*)&br);//读出mp3id3头
