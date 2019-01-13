@@ -111,18 +111,18 @@ u8 mp3_play_ready(void)
 	info.pic_show = 0;
 
 	init_fft();
-	Show_Str(30, 80, 240, 16, "正在读取文件", 16, 0);
+	Show_Str(30, 120, 240, 16, "正在读取文件", 16, 0);
 	while (f_opendir(&mp3dir, "0:/MUSIC"))//打开音乐文件夹
 	{
-		Show_Str(30, 80, 240, 16, "文件夹错误!", 16, 0);
+		Show_Str(30, 120, 240, 16, "文件夹错误!", 16, 0);
 		delay_ms(200);
-		LCD_Fill(30, 80, 240, 226, BLACK);//清除显示	     
+		LCD_Fill(30, 120, 240, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
 	info.totmp3num = mp3_get_tnum("0:/MUSIC"); //得到总有效文件数
 	if (info.totmp3num == NULL)//音乐文件总数为0		
 	{
-		Show_Str(30, 80, 240, 16, "没有文件!", 16, 0);
+		Show_Str(30, 120, 240, 16, "没有文件!", 16, 0);
 		delay_ms(200);
 		return 1;
 	}
@@ -135,7 +135,7 @@ u8 mp3_play_ready(void)
 	while (info.mp3fileinfo.lfname == NULL || info.pname == NULL ||
 		info.mp3indextbl == NULL || info.fmp3 == NULL)//内存分配出错
 	{
-		Show_Str(30, 80, 240, 16, "内存分配失败!", 16, 0);
+		Show_Str(30, 120, 240, 16, "内存分配失败!", 16, 0);
 		delay_ms(200);
 		return 1;
 	}
@@ -182,6 +182,7 @@ void mp3_play(void *pdata)
 	OS_CRITICAL_ENTER();	//进入临界区
 	if (mp3_play_ready() == 1)
 	{
+		LCD_Clear(BLACK);
 		APP_stop();
 		OS_CRITICAL_EXIT();
 		return;

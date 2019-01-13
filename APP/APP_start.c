@@ -15,7 +15,7 @@ void start_task(void *pdata);
  			   
 //MP3任务
 //设置任务优先级
-#define MUSIC_PLAY_TASK_PRIO       	2 
+#define MUSIC_PLAY_TASK_PRIO       	2
 //设置任务堆栈大小
 #define MUSIC_PLAY_STK_SIZE  		    256
 //任务控制块

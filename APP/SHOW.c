@@ -330,12 +330,12 @@ void show_all(void *pdata)
 {
 	u8 *fn;
 	u16 temp = 0;
-	CPU_SR_ALLOC();
 	while (1)
 	{
+		if(show_mode == 0)
+			delay_ms(300);
 		if (lcd_bit == 1)
 		{
-			OS_CRITICAL_EXIT();
 			RTC_Get();
 			fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
 			temp = VS_Get_HeadInfo(); //获得比特率
@@ -393,7 +393,6 @@ void show_all(void *pdata)
 				//显示位率			   
 				LCD_ShowxNum(214, 182, info.kbps, 3, 16, 0X80); 	//显示位率	 
 				LCD_ShowString(214 + 48, 182, 200, 16, 16, "Kbps");
-				delay_ms(500);
 			}
 			else if (show_mode == 1)
 			{
@@ -451,7 +450,6 @@ void show_all(void *pdata)
 				VS_Get_Spec(info.FFTbuf); //提取频谱数据
 				FFT_post(info.FFTbuf);	  //进行频谱效果显示
 			}
-			OS_CRITICAL_EXIT();
 		}
 	}
 }

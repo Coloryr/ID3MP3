@@ -58,3 +58,4 @@ dkms.conf
 *.dep
 *.sct
 *.uvoptx
+*.__i

@@ -16,9 +16,9 @@ u8 RTC_Init(void)
 	vu8 first_hour = 12;
 	vu8 first_min = 0;
 	vu8 first_sec = 0;
-	vu16 first_year = 2018;
-	vu8  first_month = 12;
-	vu8  first_date = 22;
+	vu16 first_year = 2019;
+	vu8  first_month = 1;
+	vu8  first_date = 13;
 
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = RTC_IRQn;		//RTC全局中断
@@ -35,7 +35,7 @@ u8 RTC_Init(void)
 		while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)	//检查指定的RCC标志位设置与否,等待低速晶振就绪
 		{
 			temp++;
-			delay_ms(1);
+			delay_ms(10);
 			if (temp >= 250)return 1;//初始化时钟失败,晶振有问题	 
 		}
 		RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);		//设置RTC时钟(RTCCLK),选择LSE作为RTC时钟    
