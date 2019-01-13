@@ -54,6 +54,7 @@ int main(void)
 			goto a;
 		}
 	}
+	show_mode=1;
 	Show_Str(30, 100, 320, 16, "ÖÐÎÄ×Ö¿â -> OK!", 16, 0);	
 	APP_start();
 }

@@ -318,7 +318,7 @@ void mp3id3(void)
 		}
 		img = 1;
 		i = 0;
-		while(img)						//查找专辑
+		while (img)						//查找专辑
 		{
 			if (databuf[i] == 0x54 && databuf[i + 1] == 0x41 && databuf[i + 2] == 0x4c && databuf[i + 3] == 0x42)
 			{	//找到位置
@@ -472,14 +472,12 @@ void mp3id3(void)
 		}
 		else if (code_type == 1 && lcd_bit == 1)
 		{
-			LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size,
-				pic_show_y + pic_show_size, BACK_COLOR);
+			show_pic_clear();
 			info.pic_show = 0;
 		}
 		else if (code_type == 2 && lcd_bit == 1)
 		{
-			LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size,
-				pic_show_y + pic_show_size, BACK_COLOR);
+			show_pic_clear();
 			info.pic_show = 0;
 		}
 	}

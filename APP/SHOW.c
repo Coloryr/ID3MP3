@@ -263,7 +263,6 @@ void jpeg_freeall(void)
 
 void show_mp3_pic(void *pdata)
 {
-
 	u8 res;
 	UINT(*outfun)(JDEC*, void*, JRECT*);
 	u8 scale;	//图像输出比例 0,1/2,1/4,1/8  
@@ -344,137 +343,129 @@ void show_pic_clear(void)
 	}
 }
 
-void show_all(void *pdata)
+void show_all(void)
 {
 	u8 *fn;
 	u16 temp = 0;
-	u8 sec;
-	CPU_SR_ALLOC();
-	OS_ERR err;
-	while (1)
+	static u8 sec;
+	RTC_Get();
+	info.time = VS_Get_DecodeTime(); //得到解码时间
+	if (sec != calendar.sec && lcd_bit == 1)
 	{
-		RTC_Get();
-		if (sec != calendar.sec && lcd_bit == 1)
+		sec = calendar.sec;
+		fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
+		temp = VS_Get_HeadInfo(); //获得比特率
+		if (info.kbps == 0xffff)//未更新过
 		{
-			OS_CRITICAL_ENTER();
-			sec = calendar.sec;
-			fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
-			temp = VS_Get_HeadInfo(); //获得比特率
-			if (info.kbps == 0xffff)//未更新过
+			info.playtime = 0;
+			info.kbps = VS_Get_HeadInfo();//获得比特率
+		}
+		
+		if (show_mode == 0)
+		{
+			time_go();
+			if (info.size != 0)
 			{
-				info.playtime = 0;
-				info.kbps = VS_Get_HeadInfo();//获得比特率
-			}
-			info.time = VS_Get_DecodeTime(); //得到解码时间
-			if (show_mode == 0)
-			{
-				time_go();
-				if (info.size != 0)
+				if (info.TIT2[0] != 0 && info.TPE1[0] != 0 && info.TALB[0] != 0)
 				{
-					if (info.TIT2[0] != 0 && info.TPE1[0] != 0 && info.TALB[0] != 0)
-					{
-						strcat((char*)info.TIT2, "-");
-						strcat((char*)info.TIT2, (char*)info.TPE1);
-						strcat((char*)info.TIT2, "-");
-						strcat((char*)info.TIT2, (char*)info.TALB);
-						Show_Str(0, 162, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
-					}
-					else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
-					{
-						Show_Str(0, 162, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
-					}
-					else
-						Show_Str(0, 162, 320, 16, fn, 16, 0);				//显示歌曲名字 
+					strcat((char*)info.TIT2, "-");
+					strcat((char*)info.TIT2, (char*)info.TPE1);
+					strcat((char*)info.TIT2, "-");
+					strcat((char*)info.TIT2, (char*)info.TALB);
+					Show_Str(0, 162, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+				}
+				else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
+				{
+					Show_Str(0, 162, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
 				}
 				else
-				{
 					Show_Str(0, 162, 320, 16, fn, 16, 0);				//显示歌曲名字 
-				}
-				LCD_ShowxNum(0, 182, info.curindex + 1, 3, 16, 0X80);		//索引
-				LCD_ShowChar(24, 182, '/', 16, 0);
-				LCD_ShowxNum(32, 182, info.totmp3num, 3, 16, 0X80); 	//总曲目	
-				LCD_ShowString(32 + 30, 182, 32, 16, 16, "VOL:");
-				LCD_ShowxNum(64 + 30, 182, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量		
+			}
+			else
+			{
+				Show_Str(0, 162, 320, 16, fn, 16, 0);				//显示歌曲名字 
+			}
+			LCD_ShowxNum(0, 182, info.curindex + 1, 3, 16, 0X80);		//索引
+			LCD_ShowChar(24, 182, '/', 16, 0);
+			LCD_ShowxNum(32, 182, info.totmp3num, 3, 16, 0X80); 	//总曲目	
+			LCD_ShowString(32 + 30, 182, 32, 16, 16, "VOL:");
+			LCD_ShowxNum(64 + 30, 182, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量		
 
+			if (temp != info.kbps)
+			{
+				info.kbps = temp;//更新KBPS	  				     
+			}
+			//显示播放时间			 
+			LCD_ShowxNum(118, 182, info.time / 60, 2, 16, 0X80);		//分钟
+			LCD_ShowChar(118 + 16, 182, ':', 16, 0);
+			LCD_ShowxNum(118 + 24, 182, info.time % 60, 2, 16, 0X80);	//秒钟		
+			LCD_ShowChar(118 + 40, 182, '/', 16, 0);
+			//显示总时间
+			if (info.kbps)info.time = (info.fmp3->fsize / info.kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
+			else info.time = 0;//非法位率	  
+			LCD_ShowxNum(118 + 48, 182, info.time / 60, 2, 16, 0X80);	//分钟
+			LCD_ShowChar(118 + 64, 182, ':', 16, 0);
+			LCD_ShowxNum(118 + 72, 182, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
+			//显示位率			   
+			LCD_ShowxNum(214, 182, info.kbps, 3, 16, 0X80); 	//显示位率	 
+			LCD_ShowString(214 + 48, 182, 200, 16, 16, "Kbps");
+		}
+		else if (show_mode == 1 && show_mode == 0)
+		{
+			if (info.size != 0)
+			{
+				if (info.TIT2[0] != 0 && info.TPE1[0] != 0 && info.TALB[0] != 0)
+				{
+					strcat((char*)info.TIT2, "-");
+					strcat((char*)info.TIT2, (char*)info.TPE1);
+					strcat((char*)info.TIT2, "-");
+					strcat((char*)info.TIT2, (char*)info.TALB);
+					Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+				}
+				else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
+				{
+					Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+				}
+				else
+					Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+			}
+			else
+			{
+				Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+			}
+			LCD_ShowString(224, 40, 32, 16, 16, "VOL:");
+			LCD_ShowxNum(224 + 32, 40, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量	 
+			LCD_ShowxNum(224 + 0, 20, info.curindex + 1, 3, 16, 0X80);		//索引
+			LCD_ShowChar(224 + 24, 20, '/', 16, 0);
+			LCD_ShowxNum(224 + 32, 20, info.totmp3num, 3, 16, 0X80); 	//总曲目	
+
+			if (info.playtime == 0)info.playtime = info.time;
+			else if ((info.time != info.playtime) && (info.time != 0))//1s时间到,更新显示数据
+			{
+				info.playtime = info.time;//更新时间 	 			
+				temp = VS_Get_HeadInfo(); //获得比特率	   				 
 				if (temp != info.kbps)
 				{
 					info.kbps = temp;//更新KBPS	  				     
 				}
 				//显示播放时间			 
-				LCD_ShowxNum(118, 182, info.time / 60, 2, 16, 0X80);		//分钟
-				LCD_ShowChar(118 + 16, 182, ':', 16, 0);
-				LCD_ShowxNum(118 + 24, 182, info.time % 60, 2, 16, 0X80);	//秒钟		
-				LCD_ShowChar(118 + 40, 182, '/', 16, 0);
+				LCD_ShowxNum(224, 60, info.time / 60, 2, 16, 0X80);		//分钟
+				LCD_ShowChar(224 + 16, 60, ':', 16, 0);
+				LCD_ShowxNum(224 + 24, 60, info.time % 60, 2, 16, 0X80);	//秒钟		
+				LCD_ShowChar(224 + 40, 60, '/', 16, 0);
 				//显示总时间
 				if (info.kbps)info.time = (info.fmp3->fsize / info.kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
 				else info.time = 0;//非法位率	  
-				LCD_ShowxNum(118 + 48, 182, info.time / 60, 2, 16, 0X80);	//分钟
-				LCD_ShowChar(118 + 64, 182, ':', 16, 0);
-				LCD_ShowxNum(118 + 72, 182, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
+				LCD_ShowxNum(224 + 48, 60, info.time / 60, 2, 16, 0X80);	//分钟
+				LCD_ShowChar(224 + 64, 60, ':', 16, 0);
+				LCD_ShowxNum(224 + 72, 60, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
 				//显示位率			   
-				LCD_ShowxNum(214, 182, info.kbps, 3, 16, 0X80); 	//显示位率	 
-				LCD_ShowString(214 + 48, 182, 200, 16, 16, "Kbps");
+				LCD_ShowxNum(224, 80, info.kbps, 3, 16, 0X80); 	//显示位率	 
+				LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
 			}
-			else if (show_mode == 1)
-			{
-				if (info.size != 0)
-				{
-					if (info.TIT2[0] != 0 && info.TPE1[0] != 0 && info.TALB[0] != 0)
-					{
-						strcat((char*)info.TIT2, "-");
-						strcat((char*)info.TIT2, (char*)info.TPE1);
-						strcat((char*)info.TIT2, "-");
-						strcat((char*)info.TIT2, (char*)info.TALB);
-						Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
-					}
-					else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
-					{
-						Show_Str(0, 0, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
-					}
-					else
-						Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
-				}
-				else
-				{
-					Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
-				}
-				LCD_ShowString(224, 40, 32, 16, 16, "VOL:");
-				LCD_ShowxNum(224 + 32, 40, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量	 
-				LCD_ShowxNum(224 + 0, 20, info.curindex + 1, 3, 16, 0X80);		//索引
-				LCD_ShowChar(224 + 24, 20, '/', 16, 0);
-				LCD_ShowxNum(224 + 32, 20, info.totmp3num, 3, 16, 0X80); 	//总曲目	
-
-				if (info.playtime == 0)info.playtime = info.time;
-				else if ((info.time != info.playtime) && (info.time != 0))//1s时间到,更新显示数据
-				{
-					info.playtime = info.time;//更新时间 	 			
-					temp = VS_Get_HeadInfo(); //获得比特率	   				 
-					if (temp != info.kbps)
-					{
-						info.kbps = temp;//更新KBPS	  				     
-					}
-					//显示播放时间			 
-					LCD_ShowxNum(224, 60, info.time / 60, 2, 16, 0X80);		//分钟
-					LCD_ShowChar(224 + 16, 60, ':', 16, 0);
-					LCD_ShowxNum(224 + 24, 60, info.time % 60, 2, 16, 0X80);	//秒钟		
-					LCD_ShowChar(224 + 40, 60, '/', 16, 0);
-					//显示总时间
-					if (info.kbps)info.time = (info.fmp3->fsize / info.kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
-					else info.time = 0;//非法位率	  
-					LCD_ShowxNum(224 + 48, 60, info.time / 60, 2, 16, 0X80);	//分钟
-					LCD_ShowChar(224 + 64, 60, ':', 16, 0);
-					LCD_ShowxNum(224 + 72, 60, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
-					//显示位率			   
-					LCD_ShowxNum(224, 80, info.kbps, 3, 16, 0X80); 	//显示位率	 
-					LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
-				}
-				VS_Get_Spec(info.FFTbuf); //提取频谱数据
-				FFT_post(info.FFTbuf);	  //进行频谱效果显示
-			}
-			OS_CRITICAL_EXIT();
+			//VS_Get_Spec(info.FFTbuf); //提取频谱数据
+			//FFT_post(info.FFTbuf);	  //进行频谱效果显示
 		}
-		else
-			OSTimeDlyHMSM(0,0,0,500,OS_OPT_TIME_PERIODIC,&err);//延时10ms
 	}
 }
 

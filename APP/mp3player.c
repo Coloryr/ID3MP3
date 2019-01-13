@@ -182,7 +182,7 @@ void mp3_play(void *pdata)
 
 	OS_CRITICAL_ENTER();	//进入临界区
 	mp3_play_ready();
-	
+
 	VS_Set_Vol(vsset.mvol);
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
 	OS_CRITICAL_EXIT();
@@ -197,11 +197,11 @@ void mp3_play(void *pdata)
 		strcat((char*)info.pname, (const char*)fn);  			//将文件名接在后面	
 		info.size = 1;
 		res = f_open(info.fmp3, (const TCHAR*)info.pname, FA_READ);
-		if(write_bit==0x10)
+		if (write_bit == 0x10)
 		{
 			write_bit = 0x20;
 			OS_CRITICAL_EXIT();
-			while(write_bit==0x20);
+			while (write_bit == 0x20);
 			OS_CRITICAL_ENTER();
 		}
 		f_open(fmp3, (const TCHAR*)info.pname, FA_READ);
@@ -261,15 +261,16 @@ void mp3_play(void *pdata)
 							lcd_bit = 0;
 							LCD_LED = 0;
 						}*/
-					LCD_Clear(BLACK);
-					if(show_mode==0)
-						show_mode=1;
-					else
-						show_mode=0;
+						LCD_Clear(BLACK);
+						if (show_mode == 0)
+							show_mode = 1;
+						else
+							show_mode = 0;
 						break;
 					default:
 						break;
-					}					
+					}
+					show_all();
 				}
 			} while (i < 1024);//循环发送4096个字节 
 			if (br != 1024 || res != 0)

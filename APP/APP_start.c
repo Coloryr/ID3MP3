@@ -29,7 +29,7 @@ void mp3_play(void *pdata);
 //设置任务优先级
 #define PIC_SHOW_TASK_PRIO       		2
 //设置任务堆栈大小
-#define PIC_SHOW_STK_SIZE  		    2048
+#define PIC_SHOW_STK_SIZE  		    2096
 //任务控制块
 OS_TCB PICTaskTCB;
 //任务堆栈	
@@ -41,13 +41,13 @@ void show_mp3_pic(void *pdata);
 //设置任务优先级
 #define SHOW_TASK_PRIO       			2
 //设置任务堆栈大小
-#define SHOW_STK_SIZE  		    		256
+#define SHOW_STK_SIZE  		    		64
 //任务控制块
 OS_TCB SHOWTaskTCB;
 //任务堆栈	
 CPU_STK SHOW_TASK_STK[SHOW_STK_SIZE];
 //任务函数
-void show_all(void *pdata);
+//void show_all(void *pdata);
 
 ////////////////////////////////伪随机数产生办法////////////////////////////////
 u32 random_seed=1;
@@ -74,18 +74,8 @@ void start_task(void *pdata)
 	pdata = pdata;
 
 	CPU_Init();
-#if OS_CFG_STAT_TASK_EN > 0u
-	OSStatTaskCPUUsageInit(&err);  	//统计任务                
-#endif
-
-#ifdef CPU_CFG_INT_DIS_MEAS_EN		//如果使能了测量中断关闭时间
-	CPU_IntDisMeasMaxCurReset();
-#endif
-
-#if	OS_CFG_SCHED_ROUND_ROBIN_EN  //当使用时间片轮转的时候
 	//使能时间片轮转调度功能,时间片长度为1个系统时钟节拍，既1*5=5ms
-	OSSchedRoundRobinCfg(DEF_ENABLED, 1, &err);
-#endif		
+	OSSchedRoundRobinCfg(DEF_ENABLED, 1, &err);	
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);//开启CRC时钟		
 
 	OS_CRITICAL_ENTER();	//进入临界区
@@ -103,6 +93,34 @@ void start_task(void *pdata)
 		(void   	*)0,
 		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
 		(OS_ERR 	*)&err);
+	OSTaskCreate((OS_TCB 	*)&PICTaskTCB,
+		(CPU_CHAR	*)"pic_show task",
+		(OS_TASK_PTR)show_mp3_pic,
+		(void		*)0,
+		(OS_PRIO)PIC_SHOW_TASK_PRIO,
+		(CPU_STK   *)&PIC_SHOW_TASK_STK[0],
+		(CPU_STK_SIZE)PIC_SHOW_STK_SIZE / 10,
+		(CPU_STK_SIZE)PIC_SHOW_STK_SIZE,
+		(OS_MSG_QTY)0,
+		(OS_TICK)0,
+		(void   	*)0,
+		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
+		(OS_ERR 	*)&err);
+	/*
+	OSTaskCreate((OS_TCB 	*)&SHOWTaskTCB,
+		(CPU_CHAR	*)"show task",
+		(OS_TASK_PTR)show_all,
+		(void		*)0,
+		(OS_PRIO)SHOW_TASK_PRIO,
+		(CPU_STK   *)&SHOW_TASK_STK[0],
+		(CPU_STK_SIZE)SHOW_STK_SIZE / 10,
+		(CPU_STK_SIZE)SHOW_STK_SIZE,
+		(OS_MSG_QTY)0,
+		(OS_TICK)0,
+		(void   	*)0,
+		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
+		(OS_ERR 	*)&err);
+		*/
 	OS_TaskSuspend((OS_TCB*)&StartTaskTCB, &err);		//挂起开始任务			 
 	OS_CRITICAL_EXIT();	//进入临界区
 }
@@ -127,53 +145,9 @@ void APP_start(void)
 		(void   	*)0,					//用户补充的存储区
 		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR, //任务选项
 		(OS_ERR 	*)&err);				//存放该函数错误时的返回值
-	OSTaskCreate((OS_TCB 	*)&PICTaskTCB,
-		(CPU_CHAR	*)"pic_show task",
-		(OS_TASK_PTR)show_mp3_pic,
-		(void		*)0,
-		(OS_PRIO)PIC_SHOW_TASK_PRIO,
-		(CPU_STK   *)&PIC_SHOW_TASK_STK[0],
-		(CPU_STK_SIZE)PIC_SHOW_STK_SIZE / 10,
-		(CPU_STK_SIZE)PIC_SHOW_STK_SIZE,
-		(OS_MSG_QTY)0,
-		(OS_TICK)0,
-		(void   	*)0,
-		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
-		(OS_ERR 	*)&err);
-	OSTaskCreate((OS_TCB 	*)&SHOWTaskTCB,
-		(CPU_CHAR	*)"show task",
-		(OS_TASK_PTR)show_all,
-		(void		*)0,
-		(OS_PRIO)SHOW_TASK_PRIO,
-		(CPU_STK   *)&SHOW_TASK_STK[0],
-		(CPU_STK_SIZE)SHOW_STK_SIZE / 10,
-		(CPU_STK_SIZE)SHOW_STK_SIZE,
-		(OS_MSG_QTY)0,
-		(OS_TICK)0,
-		(void   	*)0,
-		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
-		(OS_ERR 	*)&err);
 	OS_CRITICAL_EXIT();	//退出临界区	 
 	OSStart(&err);  //开启UCOSIII
 	while (1);
-}
-
-void APP_pic_start(void)
-{
-	OS_ERR err;
-	OSTaskCreate((OS_TCB 	*)&PICTaskTCB,
-		(CPU_CHAR	*)"pic_show task",
-		(OS_TASK_PTR)show_mp3_pic,
-		(void		*)0,
-		(OS_PRIO)PIC_SHOW_TASK_PRIO,
-		(CPU_STK   *)&PIC_SHOW_TASK_STK[0],
-		(CPU_STK_SIZE)PIC_SHOW_STK_SIZE / 10,
-		(CPU_STK_SIZE)PIC_SHOW_STK_SIZE,
-		(OS_MSG_QTY)0,
-		(OS_TICK)0,
-		(void   	*)0,
-		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
-		(OS_ERR 	*)&err);
 }
 
 
