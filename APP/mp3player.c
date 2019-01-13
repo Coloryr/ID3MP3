@@ -176,7 +176,7 @@ void mp3_play(void *pdata)
 	static u8 pause = 0;		//暂停标志   
 	CPU_SR_ALLOC();
 
-	databuf = (u8*)mymalloc(1024);		//开辟4096字节的内存区域
+	databuf = (u8*)mymalloc(2048);		//开辟4096字节的内存区域
 	if (databuf == NULL)rval = 0XFF;//内存申请失败.
 
 	OS_CRITICAL_ENTER();	//进入临界区
@@ -225,7 +225,7 @@ void mp3_play(void *pdata)
 		while (rval == 0)
 		{
 			OS_CRITICAL_ENTER();	//进入临界区
-			res = f_read(info.fmp3, databuf, 1024, (UINT*)&br);//读出4096个字节 			
+			res = f_read(info.fmp3, databuf, 2048, (UINT*)&br);//读出4096个字节 			
 			OS_CRITICAL_EXIT();
 			i = 0;
 			do//主播放循环
@@ -271,13 +271,15 @@ void mp3_play(void *pdata)
 						break;
 					}
 				}
-			} while (i < 1024);//循环发送4096个字节 
-			if (br != 1024 || res != 0)
+			} while (i < 2048);//循环发送4096个字节 
+			if (br != 2048 || res != 0)
 			{
 				rval = KEY0_PRES;
 			}
 		}
+		OS_CRITICAL_ENTER();
 		f_close(info.fmp3);
+		show_clear();
 		vs_reset();
 		if (rval == KEY1_PRES)		//上一曲
 		{
@@ -292,6 +294,7 @@ void mp3_play(void *pdata)
 			write_data();
 		}
 		else break;	//产生了错误 	 
+		OS_CRITICAL_EXIT();
 	}
 	myfree(info.mp3fileinfo.lfname);	//释放内存			    
 	myfree(info.pname);				//释放内存			    

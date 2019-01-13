@@ -326,17 +326,28 @@ void show_mp3_pic(void *pdata)
 	}
 }
 
+void show_clear(void)
+{
+	if(show_mode==0)
+		LCD_Fill(0, 162, 320, 178, BLACK);
+	else
+		LCD_Fill(0, 0, 320, 16, BLACK);
+}
+
 void show_all(void *pdata)
 {
 	u8 *fn;
 	u16 temp = 0;
+	u8 sec;
+	CPU_SR_ALLOC();
+	OS_ERR err;
 	while (1)
 	{
-		if(show_mode == 0)
-			delay_ms(300);
-		if (lcd_bit == 1)
+		RTC_Get();
+		if (sec != calendar.sec && lcd_bit == 1)
 		{
-			RTC_Get();
+			OS_CRITICAL_ENTER();
+			sec = calendar.sec;
 			fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
 			temp = VS_Get_HeadInfo(); //获得比特率
 			if (info.kbps == 0xffff)//未更新过
@@ -450,7 +461,10 @@ void show_all(void *pdata)
 				VS_Get_Spec(info.FFTbuf); //提取频谱数据
 				FFT_post(info.FFTbuf);	  //进行频谱效果显示
 			}
+			OS_CRITICAL_EXIT();
 		}
+		else
+			OSTimeDlyHMSM(0,0,0,500,OS_OPT_TIME_PERIODIC,&err);//延时10ms
 	}
 }
 
