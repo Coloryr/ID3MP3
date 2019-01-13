@@ -2,16 +2,16 @@
 #define __RTC_H	 
 #include "sys.h"
  
-typedef struct 
+typedef struct
 {
 	vu8 hour;
 	vu8 min;
-	vu8 sec;			
+	vu8 sec;
 	vu16 w_year;
 	vu8  w_month;
 	vu8  w_date;
-	vu8  week;		 
-}_calendar_obj;		
+	vu8  week;
+}_calendar_obj;
 
 extern _calendar_obj calendar;	//日历结构体
 

@@ -10,8 +10,8 @@
 #define VS_XCS      PAout(1)  	//XCS
 #define VS_XDCS     PAout(0)  	//XDCS 
 
-__packed typedef struct 
-{							  
+__packed typedef struct
+{
 	u8 mvol;		//主音量,范围:0~254
 	u8 bflimit;		//低音频率限定,范围:2~15(单位:10Hz)
 	u8 bass;		//低音,范围:0~15.0表示关闭.(单位:1dB)

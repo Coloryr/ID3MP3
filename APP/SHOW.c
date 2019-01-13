@@ -156,6 +156,7 @@ void displayjieqi(void)
 
 void timeplay(void)
 {
+	static u8 h = 0, m = 0;
 	Show_Str(58, 0, 24, 24, "年", 24, 0);
 	Show_Str(114, 0, 24, 24, "月", 24, 0);
 	Show_Str(170, 0, 24, 24, "日", 24, 0);
@@ -189,14 +190,17 @@ void timeplay(void)
 		break;
 	}
 
-	if (calendar.hour / 10 != 0)
+	if (h != calendar.hour)
 	{
-		image_display(0, 30, (u8*)gImage[calendar.hour / 10]);//在指定地址显示图?
+		if (calendar.hour / 10 != 0)
+		{
+			image_display(0, 30, (u8*)gImage[calendar.hour / 10]);//在指定地址显示图?
+		}
+		else { image_display(0, 30, (u8*)gImage[11]); }
+
+		image_display(50, 30, (u8*)gImage[calendar.hour % 10]);//在指定地址显示图片?
+		h = calendar.hour;
 	}
-	else { image_display(0, 30, (u8*)gImage[11]); }
-
-	image_display(50, 30, (u8*)gImage[calendar.hour % 10]);//在指定地址显示图片?
-
 	if (calendar.sec % 10 == 0) { image_display(100, 30, (u8*)gImage[10]); }
 	if (calendar.sec % 10 == 2) { image_display(100, 30, (u8*)gImage[10]); }
 	if (calendar.sec % 10 == 4) { image_display(100, 30, (u8*)gImage[10]); }
@@ -208,9 +212,12 @@ void timeplay(void)
 	if (calendar.sec % 10 == 7) { image_display(100, 30, (u8*)gImage[12]); }
 	if (calendar.sec % 10 == 9) { image_display(100, 30, (u8*)gImage[12]); }
 
-	image_display(150, 30, (u8*)gImage[calendar.min / 10]);
-	image_display(200, 30, (u8*)gImage[calendar.min % 10]);
-
+	if (m != calendar.min)
+	{
+		image_display(150, 30, (u8*)gImage[calendar.min / 10]);
+		image_display(200, 30, (u8*)gImage[calendar.min % 10]);
+		m = calendar.min;
+	}
 	LCD_ShowChar(250, 86, ':', 24, 0);
 	LCD_ShowxNum(262, 86, calendar.sec, 2, 24, 0x80);
 }
@@ -323,7 +330,6 @@ void show_mp3_pic(void *pdata)
 			OS_CRITICAL_EXIT();	//进入临界区			
 		}
 	}
-	
 }
 
 void show_clear(void)
@@ -348,6 +354,11 @@ void show_all(void)
 	u8 *fn;
 	u16 temp = 0;
 	static u8 sec;
+	if (show_mode == 1 && info.pic_show == 0)
+	{
+		VS_Get_Spec(info.FFTbuf); //提取频谱数据
+		FFT_post(info.FFTbuf);	  //进行频谱效果显示
+	}
 	RTC_Get();
 	info.time = VS_Get_DecodeTime(); //得到解码时间
 	if (sec != calendar.sec && lcd_bit == 1)
@@ -360,7 +371,7 @@ void show_all(void)
 			info.playtime = 0;
 			info.kbps = VS_Get_HeadInfo();//获得比特率
 		}
-		
+
 		if (show_mode == 0)
 		{
 			time_go();
@@ -410,7 +421,7 @@ void show_all(void)
 			LCD_ShowxNum(214, 182, info.kbps, 3, 16, 0X80); 	//显示位率	 
 			LCD_ShowString(214 + 48, 182, 200, 16, 16, "Kbps");
 		}
-		else if (show_mode == 1 && show_mode == 0)
+		else if (show_mode == 1 && info.pic_show == 0)
 		{
 			if (info.size != 0)
 			{
@@ -463,8 +474,6 @@ void show_all(void)
 				LCD_ShowxNum(224, 80, info.kbps, 3, 16, 0X80); 	//显示位率	 
 				LCD_ShowString(224 + 24, 80, 200, 16, 16, "Kbps");
 			}
-			//VS_Get_Spec(info.FFTbuf); //提取频谱数据
-			//FFT_post(info.FFTbuf);	  //进行频谱效果显示
 		}
 	}
 }

@@ -47,14 +47,14 @@ const BYTE Zig[64] = {	/* Zigzag-order to raster-order conversion table */
 
 static
 const WORD Ipsf[64] = {	/* See also aa_idct.png */
-	(WORD)(1.00000*8192), (WORD)(1.38704*8192), (WORD)(1.30656*8192), (WORD)(1.17588*8192), (WORD)(1.00000*8192), (WORD)(0.78570*8192), (WORD)(0.54120*8192), (WORD)(0.27590*8192),
-	(WORD)(1.38704*8192), (WORD)(1.92388*8192), (WORD)(1.81226*8192), (WORD)(1.63099*8192), (WORD)(1.38704*8192), (WORD)(1.08979*8192), (WORD)(0.75066*8192), (WORD)(0.38268*8192),
-	(WORD)(1.30656*8192), (WORD)(1.81226*8192), (WORD)(1.70711*8192), (WORD)(1.53636*8192), (WORD)(1.30656*8192), (WORD)(1.02656*8192), (WORD)(0.70711*8192), (WORD)(0.36048*8192),
-	(WORD)(1.17588*8192), (WORD)(1.63099*8192), (WORD)(1.53636*8192), (WORD)(1.38268*8192), (WORD)(1.17588*8192), (WORD)(0.92388*8192), (WORD)(0.63638*8192), (WORD)(0.32442*8192),
-	(WORD)(1.00000*8192), (WORD)(1.38704*8192), (WORD)(1.30656*8192), (WORD)(1.17588*8192), (WORD)(1.00000*8192), (WORD)(0.78570*8192), (WORD)(0.54120*8192), (WORD)(0.27590*8192),
-	(WORD)(0.78570*8192), (WORD)(1.08979*8192), (WORD)(1.02656*8192), (WORD)(0.92388*8192), (WORD)(0.78570*8192), (WORD)(0.61732*8192), (WORD)(0.42522*8192), (WORD)(0.21677*8192),
-	(WORD)(0.54120*8192), (WORD)(0.75066*8192), (WORD)(0.70711*8192), (WORD)(0.63638*8192), (WORD)(0.54120*8192), (WORD)(0.42522*8192), (WORD)(0.29290*8192), (WORD)(0.14932*8192),
-	(WORD)(0.27590*8192), (WORD)(0.38268*8192), (WORD)(0.36048*8192), (WORD)(0.32442*8192), (WORD)(0.27590*8192), (WORD)(0.21678*8192), (WORD)(0.14932*8192), (WORD)(0.07612*8192)
+	(WORD)(1.00000 * 8192), (WORD)(1.38704 * 8192), (WORD)(1.30656 * 8192), (WORD)(1.17588 * 8192), (WORD)(1.00000 * 8192), (WORD)(0.78570 * 8192), (WORD)(0.54120 * 8192), (WORD)(0.27590 * 8192),
+	(WORD)(1.38704 * 8192), (WORD)(1.92388 * 8192), (WORD)(1.81226 * 8192), (WORD)(1.63099 * 8192), (WORD)(1.38704 * 8192), (WORD)(1.08979 * 8192), (WORD)(0.75066 * 8192), (WORD)(0.38268 * 8192),
+	(WORD)(1.30656 * 8192), (WORD)(1.81226 * 8192), (WORD)(1.70711 * 8192), (WORD)(1.53636 * 8192), (WORD)(1.30656 * 8192), (WORD)(1.02656 * 8192), (WORD)(0.70711 * 8192), (WORD)(0.36048 * 8192),
+	(WORD)(1.17588 * 8192), (WORD)(1.63099 * 8192), (WORD)(1.53636 * 8192), (WORD)(1.38268 * 8192), (WORD)(1.17588 * 8192), (WORD)(0.92388 * 8192), (WORD)(0.63638 * 8192), (WORD)(0.32442 * 8192),
+	(WORD)(1.00000 * 8192), (WORD)(1.38704 * 8192), (WORD)(1.30656 * 8192), (WORD)(1.17588 * 8192), (WORD)(1.00000 * 8192), (WORD)(0.78570 * 8192), (WORD)(0.54120 * 8192), (WORD)(0.27590 * 8192),
+	(WORD)(0.78570 * 8192), (WORD)(1.08979 * 8192), (WORD)(1.02656 * 8192), (WORD)(0.92388 * 8192), (WORD)(0.78570 * 8192), (WORD)(0.61732 * 8192), (WORD)(0.42522 * 8192), (WORD)(0.21677 * 8192),
+	(WORD)(0.54120 * 8192), (WORD)(0.75066 * 8192), (WORD)(0.70711 * 8192), (WORD)(0.63638 * 8192), (WORD)(0.54120 * 8192), (WORD)(0.42522 * 8192), (WORD)(0.29290 * 8192), (WORD)(0.14932 * 8192),
+	(WORD)(0.27590 * 8192), (WORD)(0.38268 * 8192), (WORD)(0.36048 * 8192), (WORD)(0.32442 * 8192), (WORD)(0.27590 * 8192), (WORD)(0.21678 * 8192), (WORD)(0.14932 * 8192), (WORD)(0.07612 * 8192)
 };
 
 
@@ -110,7 +110,7 @@ const BYTE Clip8[1024] = {
 #else	/* JD_TBLCLIP */
 
 inline
-BYTE BYTECLIP (
+BYTE BYTECLIP(
 	INT val
 )
 {
@@ -129,7 +129,7 @@ BYTE BYTECLIP (
 /*-----------------------------------------------------------------------*/
 
 static
-void* alloc_pool (	/* Pointer to allocated memory block (NULL:no memory available) */
+void* alloc_pool(	/* Pointer to allocated memory block (NULL:no memory available) */
 	JDEC* jd,		/* Pointer to the decompressor object */
 	UINT nd			/* Number of bytes to allocate */
 )
@@ -156,7 +156,7 @@ void* alloc_pool (	/* Pointer to allocated memory block (NULL:no memory availabl
 /*-----------------------------------------------------------------------*/
 
 static
-UINT create_qt_tbl (	/* 0:OK, !0:Failed */
+UINT create_qt_tbl(	/* 0:OK, !0:Failed */
 	JDEC* jd,			/* Pointer to the decompressor object */
 	const BYTE* data,	/* Pointer to the quantizer tables */
 	UINT ndata			/* Size of input data */
@@ -173,7 +173,7 @@ UINT create_qt_tbl (	/* 0:OK, !0:Failed */
 		d = *data++;							/* Get table property */
 		if (d & 0xF0) return JDR_FMT1;			/* Err: not 8-bit resolution */
 		i = d & 3;								/* Get table ID */
-		pb = alloc_pool(jd, 64 * sizeof (LONG));/* Allocate a memory block for the table */
+		pb = alloc_pool(jd, 64 * sizeof(LONG));/* Allocate a memory block for the table */
 		if (!pb) return JDR_MEM1;				/* Err: not enough memory */
 		jd->qttbl[i] = pb;						/* Register the table */
 		for (i = 0; i < 64; i++) {				/* Load the table */
@@ -193,7 +193,7 @@ UINT create_qt_tbl (	/* 0:OK, !0:Failed */
 /*-----------------------------------------------------------------------*/
 
 static
-UINT create_huffman_tbl (	/* 0:OK, !0:Failed */
+UINT create_huffman_tbl(	/* 0:OK, !0:Failed */
 	JDEC* jd,				/* Pointer to the decompressor object */
 	const BYTE* data,		/* Pointer to the packed huffman tables */
 	UINT ndata				/* Size of input data */
@@ -218,7 +218,7 @@ UINT create_huffman_tbl (	/* 0:OK, !0:Failed */
 			np += b;	/* Get sum of code words for each code */
 		}
 
-		ph = alloc_pool(jd, np * sizeof (WORD));/* Allocate a memory block for the code word table */
+		ph = alloc_pool(jd, np * sizeof(WORD));/* Allocate a memory block for the code word table */
 		if (!ph) return JDR_MEM1;			/* Err: not enough memory */
 		jd->huffcode[num][cls] = ph;
 		hc = 0;
@@ -251,7 +251,7 @@ UINT create_huffman_tbl (	/* 0:OK, !0:Failed */
 /*-----------------------------------------------------------------------*/
 
 static
-INT bitext (	/* >=0: extracted data, <0: error code */
+INT bitext(	/* >=0: extracted data, <0: error code */
 	JDEC* jd,	/* Pointer to the decompressor object */
 	UINT nbit	/* Number of bits to extract (1 to 11) */
 )
@@ -268,7 +268,8 @@ INT bitext (	/* >=0: extracted data, <0: error code */
 				dp = jd->inbuf;	/* Top of input buffer */
 				dc = jd->infunc(jd, dp, JD_SZBUF);
 				if (!dc) return 0 - (INT)JDR_INP;	/* Err: read error or wrong stream termination */
-			} else {
+			}
+			else {
 				dp++;			/* Next data ptr */
 			}
 			dc--;				/* Decrement number of available bytes */
@@ -276,7 +277,8 @@ INT bitext (	/* >=0: extracted data, <0: error code */
 				f = 0;			/* Exit flag sequence */
 				if (*dp != 0) return 0 - (INT)JDR_FMT1;	/* Err: unexpected flag is detected (may be collapted data) */
 				*dp = s = 0xFF;			/* The flag is a data 0xFF */
-			} else {
+			}
+			else {
 				s = *dp;				/* Get next data byte */
 				if (s == 0xFF) {		/* Is start of flag sequence? */
 					f = 1; continue;	/* Enter flag sequence */
@@ -302,7 +304,7 @@ INT bitext (	/* >=0: extracted data, <0: error code */
 /*-----------------------------------------------------------------------*/
 
 static
-INT huffext (			/* >=0: decoded data, <0: error code */
+INT huffext(			/* >=0: decoded data, <0: error code */
 	JDEC* jd,			/* Pointer to the decompressor object */
 	const BYTE* hbits,	/* Pointer to the bit distribution table */
 	const WORD* hcode,	/* Pointer to the code word table */
@@ -322,7 +324,8 @@ INT huffext (			/* >=0: decoded data, <0: error code */
 				dp = jd->inbuf;	/* Top of input buffer */
 				dc = jd->infunc(jd, dp, JD_SZBUF);
 				if (!dc) return 0 - (INT)JDR_INP;	/* Err: read error or wrong stream termination */
-			} else {
+			}
+			else {
 				dp++;	/* Next data ptr */
 			}
 			dc--;		/* Decrement number of available bytes */
@@ -331,7 +334,8 @@ INT huffext (			/* >=0: decoded data, <0: error code */
 				if (*dp != 0)
 					return 0 - (INT)JDR_FMT1;	/* Err: unexpected flag is detected (may be collapted data) */
 				*dp = s = 0xFF;			/* The flag is a data 0xFF */
-			} else {
+			}
+			else {
 				s = *dp;				/* Get next data byte */
 				if (s == 0xFF) {		/* Is start of flag sequence? */
 					f = 1; continue;	/* Enter flag sequence, get trailing byte */
@@ -364,12 +368,12 @@ INT huffext (			/* >=0: decoded data, <0: error code */
 /*-----------------------------------------------------------------------*/
 
 static
-void block_idct (
+void block_idct(
 	LONG* src,	/* Input block data (de-quantized and pre-scaled for Arai Algorithm) */
 	BYTE* dst	/* Pointer to the destination to store the block as byte array */
 )
 {
-	const LONG M13 = (LONG)(1.41421*4096), M2 = (LONG)(1.08239*4096), M4 = (LONG)(2.61313*4096), M5 = (LONG)(1.84776*4096);
+	const LONG M13 = (LONG)(1.41421 * 4096), M2 = (LONG)(1.08239 * 4096), M4 = (LONG)(2.61313 * 4096), M5 = (LONG)(1.84776 * 4096);
 	LONG v0, v1, v2, v3, v4, v5, v6, v7;
 	LONG t10, t11, t12, t13;
 	UINT i;
@@ -477,7 +481,7 @@ void block_idct (
 /*-----------------------------------------------------------------------*/
 
 static
-JRESULT mcu_load (
+JRESULT mcu_load(
 	JDEC* jd		/* Pointer to the decompressor object */
 )
 {
@@ -533,7 +537,7 @@ JRESULT mcu_load (
 			}
 			if (b &= 0x0F) {					/* Bit length */
 				d = bitext(jd, b);				/* Extract data bits */
-				if (d<0)return (JRESULT)(0-d);	/* Err: input device */
+				if (d < 0)return (JRESULT)(0 - d);	/* Err: input device */
 				b = 1 << (b - 1);				/* MSB position */
 				if (!(d & b)) d -= (b << 1) - 1;/* Restore negative value if needed */
 				z = ZIG(i);						/* Zigzag-order to raster-order converted index */
@@ -560,14 +564,14 @@ JRESULT mcu_load (
 /*-----------------------------------------------------------------------*/
 
 static
-JRESULT mcu_output (
+JRESULT mcu_output(
 	JDEC* jd,	/* Pointer to the decompressor object */
-	UINT (*outfunc)(JDEC*, void*, JRECT*),	/* RGB output function */
+	UINT(*outfunc)(JDEC*, void*, JRECT*),	/* RGB output function */
 	UINT x,		/* MCU position in the image (left of the MCU) */
 	UINT y		/* MCU position in the image (top of the MCU) */
 )
 {
-	const INT CVACC = (sizeof (INT) > 2) ? 1024 : 128;
+	const INT CVACC = (sizeof(INT) > 2) ? 1024 : 128;
 	UINT ix, iy, mx, my, rx, ry;
 	INT yy, cb, cr;
 	BYTE *py, *pc, *rgb24;
@@ -596,7 +600,8 @@ JRESULT mcu_output (
 			if (my == 16) {		/* Double block height? */
 				pc += 64 * 4 + (iy >> 1) * 8;
 				if (iy >= 8) py += 64;
-			} else {			/* Single block height */
+			}
+			else {			/* Single block height */
 				pc += mx * 8 + iy * 8;
 			}
 			for (ix = 0; ix < mx; ix++) {
@@ -605,7 +610,8 @@ JRESULT mcu_output (
 				if (mx == 16) {					/* Double block width? */
 					if (ix == 8) py += 64 - 8;	/* Jump to next block if double block heigt */
 					pc += ix & 1;				/* Increase chroma pointer every two pixels */
-				} else {						/* Single block width */
+				}
+				else {						/* Single block width */
 					pc++;						/* Increase chroma pointer every pixel */
 				}
 				yy = *py++;			/* Get Y component */
@@ -646,9 +652,10 @@ JRESULT mcu_output (
 			}
 		}
 
-	} else {	/* For only 1/8 scaling (left-top pixel in each block are the DC value of the block) */
+	}
+	else {	/* For only 1/8 scaling (left-top pixel in each block are the DC value of the block) */
 
-		/* Build a 1/8 descaled RGB MCU from discrete comopnents */
+	 /* Build a 1/8 descaled RGB MCU from discrete comopnents */
 		rgb24 = (BYTE*)jd->workbuf;
 		pc = jd->mcubuf + mx * my;
 		cb = pc[0] - 128;		/* Get Cb/Cr component and restore right level */
@@ -700,7 +707,7 @@ JRESULT mcu_output (
 	}
 
 	/* Output the RGB rectangular */
-	return (JRESULT)outfunc(jd, jd->workbuf,&rect); //去掉三目运算,节省时间
+	return (JRESULT)outfunc(jd, jd->workbuf, &rect); //去掉三目运算,节省时间
 }
 
 
@@ -711,7 +718,7 @@ JRESULT mcu_output (
 /*-----------------------------------------------------------------------*/
 
 static
-JRESULT restart (
+JRESULT restart(
 	JDEC* jd,	/* Pointer to the decompressor object */
 	WORD rstn	/* Expected restert sequense number */
 )
@@ -729,7 +736,8 @@ JRESULT restart (
 			dp = jd->inbuf;
 			dc = jd->infunc(jd, dp, JD_SZBUF);
 			if (!dc) return JDR_INP;
-		} else {
+		}
+		else {
 			dp++;
 		}
 		dc--;
@@ -757,9 +765,9 @@ JRESULT restart (
 #define	LDB_WORD(ptr)		(WORD)(((WORD)*((BYTE*)(ptr))<<8)|(WORD)*(BYTE*)((ptr)+1))
 
 
-JRESULT jd_prepare (
+JRESULT jd_prepare(
 	JDEC* jd,			/* Blank decompressor object */
-	UINT (*infunc)(JDEC*, BYTE*, UINT),	/* JPEG strem input function */
+	UINT(*infunc)(JDEC*, BYTE*, UINT),	/* JPEG strem input function */
 	void* pool,			/* Working buffer for the decompression session */
 	UINT sz_pool,		/* Size of working buffer */
 	void* dev			/* I/O device identifier for the session */
@@ -811,18 +819,19 @@ JRESULT jd_prepare (
 			if (len > JD_SZBUF) return JDR_MEM2;
 			if (jd->infunc(jd, seg, len) != len) return JDR_INP;
 
-			jd->width = LDB_WORD(seg+3);		/* Image width in unit of pixel */
-			jd->height = LDB_WORD(seg+1);		/* Image height in unit of pixel */
+			jd->width = LDB_WORD(seg + 3);		/* Image width in unit of pixel */
+			jd->height = LDB_WORD(seg + 1);		/* Image height in unit of pixel */
 			if (seg[5] != 3) return JDR_FMT3;	/* Err: Supports only Y/Cb/Cr format */
 
 			/* Check three image components */
-			for (i = 0; i < 3; i++) {	
+			for (i = 0; i < 3; i++) {
 				b = seg[7 + 3 * i];							/* Get sampling factor */
 				if (!i) {	/* Y component */
 					if (b != 0x11 && b != 0x22 && b != 0x21)/* Check sampling factor */
 						return JDR_FMT3;					/* Err: Supports only 4:4:4, 4:2:0 or 4:2:2 */
 					jd->msx = b >> 4; jd->msy = b & 15;		/* Size of MCU [blocks] */
-				} else {	/* Cb/Cr component */
+				}
+				else {	/* Cb/Cr component */
 					if (b != 0x11) return JDR_FMT3;			/* Err: Sampling factor of Cr/Cb must be 1 */
 				}
 				b = seg[8 + 3 * i];							/* Get dequantizer table ID for this component */
@@ -928,9 +937,9 @@ JRESULT jd_prepare (
 /* Start to decompress the JPEG picture                                  */
 /*-----------------------------------------------------------------------*/
 
-JRESULT jd_decomp (
+JRESULT jd_decomp(
 	JDEC* jd,								/* Initialized decompression object */
-	UINT (*outfunc)(JDEC*, void*, JRECT*),	/* RGB output function */
+	UINT(*outfunc)(JDEC*, void*, JRECT*),	/* RGB output function */
 	BYTE scale								/* Output de-scaling factor (0 to 3) */
 )
 {
@@ -960,7 +969,7 @@ JRESULT jd_decomp (
 			if (rc != JDR_OK) return rc;
 			rc = mcu_output(jd, outfunc, x, y);	/* Output the MCU (color space conversion, scaling and output) */
 			if (rc != JDR_OK) return rc;
-			if(write_bit == 0x20)
+			if (write_bit == 0x20)
 			{
 				return rc;
 			}
@@ -968,7 +977,7 @@ JRESULT jd_decomp (
 	}
 
 	return rc;
-}	    
+}
 					
 
 //jpeg数据输入回调函数
@@ -976,68 +985,69 @@ JRESULT jd_decomp (
 //buf:输入数据缓冲区 (NULL:执行地址偏移)
 //num:需要从输入数据流读出的数据量/地址偏移量
 //返回值:读取到的字节数/地址偏移量
-u32 jpeg_in_func(JDEC* jd,u8* buf,u32 num) 
-{ 
-    u32  rb; //读取到的字节数
-    FIL *dev=(FIL*)jd->device;  //待解码的文件的信息，使用FATFS中的FIL结构类型进行定义
-		CPU_SR_ALLOC();
-		if(buf)     				//读取数据有效，开始读取数据
-    { 
-			OS_CRITICAL_ENTER();	//进入临界区
-			f_read(dev,buf,num,&rb);//调用FATFS的f_read函数，用于把jpeg文件的数据读取出来
-			OS_CRITICAL_EXIT();
-			return rb;        		//返回读取到的字节数目
-    }else return (f_lseek(dev,f_tell(dev)+num)==FR_OK)?num:0;//重新定位数据点，相当于删除之前的n字节数据 
-}  
+u32 jpeg_in_func(JDEC* jd, u8* buf, u32 num)
+{
+	u32  rb; //读取到的字节数
+	FIL *dev = (FIL*)jd->device;  //待解码的文件的信息，使用FATFS中的FIL结构类型进行定义
+	CPU_SR_ALLOC();
+	if (buf)     				//读取数据有效，开始读取数据
+	{
+		OS_CRITICAL_ENTER();	//进入临界区
+		f_read(dev, buf, num, &rb);//调用FATFS的f_read函数，用于把jpeg文件的数据读取出来
+		OS_CRITICAL_EXIT();
+		return rb;        		//返回读取到的字节数目
+	}
+	else return (f_lseek(dev, f_tell(dev) + num) == FR_OK) ? num : 0;//重新定位数据点，相当于删除之前的n字节数据 
+}
 //采用填充的方式进行图片解码显示
 //jd:储存待解码的对象信息的结构体
 //rgbbuf:指向等待输出的RGB位图数据的指针
 //rect:等待输出的矩形图像的参数
 //返回值:0,输出成功;1,输出失败/结束输出
-u32 jpeg_out_func_fill(JDEC* jd,void* rgbbuf,JRECT* rect) 
-{ 
-	u16 *pencolor=(u16*)rgbbuf;
-	u16 width=rect->right-rect->left+1;		//填充的宽度
-	u16 height=rect->bottom-rect->top+1;	//填充的高度 
-	pic_phy.fillcolor(rect->left+picinfo.S_XOFF,rect->top+picinfo.S_YOFF,width,height,pencolor);//颜色填充 
-    return 0;    //返回0,使得解码工作继续执行 
-} 
+u32 jpeg_out_func_fill(JDEC* jd, void* rgbbuf, JRECT* rect)
+{
+	u16 *pencolor = (u16*)rgbbuf;
+	u16 width = rect->right - rect->left + 1;		//填充的宽度
+	u16 height = rect->bottom - rect->top + 1;	//填充的高度 
+	pic_phy.fillcolor(rect->left + picinfo.S_XOFF, rect->top + picinfo.S_YOFF, width, height, pencolor);//颜色填充 
+	return 0;    //返回0,使得解码工作继续执行 
+}
 //采用画点的方式进行图片解码显示
 //jd:储存待解码的对象信息的结构体
 //rgbbuf:指向等待输出的RGB位图数据的指针
 //rect:等待输出的矩形图像的参数
 //返回值:0,输出成功;1,输出失败/结束输出
-u32 jpeg_out_func_point(JDEC* jd,void* rgbbuf,JRECT* rect) 
-{ 
-	u16 i,j;
-	u16 realx=rect->left,realy=0;
-	u16 *pencolor=rgbbuf;
-	u16 width=rect->right-rect->left+1;		//图片的宽度
-	u16 height=rect->bottom-rect->top+1;	//图片的高度
-   	for(i=0;i<height;i++)//y坐标
+u32 jpeg_out_func_point(JDEC* jd, void* rgbbuf, JRECT* rect)
+{
+	u16 i, j;
+	u16 realx = rect->left, realy = 0;
+	u16 *pencolor = rgbbuf;
+	u16 width = rect->right - rect->left + 1;		//图片的宽度
+	u16 height = rect->bottom - rect->top + 1;	//图片的高度
+	for (i = 0; i < height; i++)//y坐标
 	{
-		realy=(picinfo.Div_Fac*(rect->top+i))>>13;//实际Y坐标											 
+		realy = (picinfo.Div_Fac*(rect->top + i)) >> 13;//实际Y坐标											 
 		//在这里不改变picinfo.staticx和picinfo.staticy的值 ,如果在这里改变,则会造成每块的第一个点不显示!!!
-		if(!is_element_ok(realx,realy,0))//行值是否满足条件? 寻找满足条件的行
-		{ 
-			pencolor+=width;
+		if (!is_element_ok(realx, realy, 0))//行值是否满足条件? 寻找满足条件的行
+		{
+			pencolor += width;
 			continue;
 		}
-		for(j=0;j<width;j++)//x坐标
+		for (j = 0; j < width; j++)//x坐标
 		{
-			realx=(picinfo.Div_Fac*(rect->left+j))>>13;//实际X坐标
+			realx = (picinfo.Div_Fac*(rect->left + j)) >> 13;//实际X坐标
 			//在这里改变picinfo.staticx和picinfo.staticy的值
-			if(!is_element_ok(realx,realy,1))//列值是否满足条件? 寻找满足条件的列
+			if (!is_element_ok(realx, realy, 1))//列值是否满足条件? 寻找满足条件的列
 			{
 				pencolor++;
 				continue;
 			}
-			pic_phy.draw_point(realx+picinfo.S_XOFF,realy+picinfo.S_YOFF,*pencolor);//显示图片						
+			pic_phy.draw_point(realx + picinfo.S_XOFF, realy + picinfo.S_YOFF, *pencolor);//显示图片						
 			pencolor++;
 		}
 	}
-    return 0;    //返回0,使得解码工作继续执行 
-} 
+	return 0;    //返回0,使得解码工作继续执行 
+}
 /*
 //解码jpeg/jpg文件s
 //filename:jpeg/jpg路径+文件名

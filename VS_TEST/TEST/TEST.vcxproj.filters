@@ -93,9 +93,6 @@
     <ClInclude Include="..\..\HARDWARE\SPI\spi.h">
       <Filter>HARDWARE</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\HARDWARE\VS10XX\flac.h">
-      <Filter>HARDWARE</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\HARDWARE\VS10XX\SPEC_REW.H">
       <Filter>HARDWARE</Filter>
     </ClInclude>
@@ -212,6 +209,15 @@
     </ClInclude>
     <ClInclude Include="..\..\APP\tjpgd.h">
       <Filter>APP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\APP\APP_start.h">
+      <Filter>APP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\APP\data.h">
+      <Filter>APP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\HARDWARE\VS10XX\VS_PATH.h">
+      <Filter>HARDWARE</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -372,6 +378,12 @@
       <Filter>APP</Filter>
     </ClCompile>
     <ClCompile Include="..\..\APP\tjpgd.c">
+      <Filter>APP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\APP_start.c">
+      <Filter>APP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\data.c">
       <Filter>APP</Filter>
     </ClCompile>
   </ItemGroup>

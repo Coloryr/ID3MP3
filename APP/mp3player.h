@@ -18,25 +18,25 @@ typedef struct
 	u16 *mp3indextbl;		//音乐索引表 
 	u16 size;						//MP3ID3大小
 	FIL* fmp3;					//MP3文件
-	
+
 	u16 playtime;				//播放时间标记
 	u16 time;						//时间变量
 	u16 kbps;						//音乐的比特率
-	
+
 	u16 pic_local;			//PIC位置
 
 	u8 *TIT2;						//歌名
 	u8 *TPE1;						//作者
 	u8 *TALB;           //专辑
-	
-  u8 fft_top[FFT_BANDS];	 //频谱顶值表
-  u8 fft_cur[FFT_BANDS];	 //频谱当前值表
-  u8 fft_time[FFT_BANDS];	 //顶值停留时间表
-	
+
+	u8 fft_top[FFT_BANDS];	 //频谱顶值表
+	u8 fft_cur[FFT_BANDS];	 //频谱当前值表
+	u8 fft_time[FFT_BANDS];	 //顶值停留时间表
+
 	u16 FFTbuf[15];    //频谱数组
-	
+
 	u8 pic_show;
-	
+
 }mp3_info;
 
 extern mp3_info info;

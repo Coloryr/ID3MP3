@@ -11,7 +11,7 @@ const u32 memsize=MEM_MAX_SIZE;					//内存总大小
 
 
 //内存管理控制器
-struct _m_mallco_dev mallco_dev=
+struct _m_mallco_dev mallco_dev =
 {
 	mem_init,			//内存初始化
 	mem_perused,		//内存使用率

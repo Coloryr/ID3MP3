@@ -75,7 +75,7 @@ void start_task(void *pdata)
 
 	CPU_Init();
 	//使能时间片轮转调度功能,时间片长度为1个系统时钟节拍，既1*5=5ms
-	OSSchedRoundRobinCfg(DEF_ENABLED, 1, &err);	
+	OSSchedRoundRobinCfg(DEF_ENABLED, 1, &err);
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);//开启CRC时钟		
 
 	OS_CRITICAL_ENTER();	//进入临界区

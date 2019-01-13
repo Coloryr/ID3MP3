@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\APP\APP_start.h" />
     <ClInclude Include="..\..\APP\bit.h" />
+    <ClInclude Include="..\..\APP\data.h" />
     <ClInclude Include="..\..\APP\fontupd.h" />
     <ClInclude Include="..\..\APP\gui.h" />
     <ClInclude Include="..\..\APP\guix.h" />
@@ -48,9 +50,9 @@
     <ClInclude Include="..\..\HARDWARE\RTC\rtc.h" />
     <ClInclude Include="..\..\HARDWARE\SD\sdio_sdcard.h" />
     <ClInclude Include="..\..\HARDWARE\SPI\spi.h" />
-    <ClInclude Include="..\..\HARDWARE\VS10XX\flac.h" />
     <ClInclude Include="..\..\HARDWARE\VS10XX\SPEC_REW.H" />
     <ClInclude Include="..\..\HARDWARE\VS10XX\vs10XX.h" />
+    <ClInclude Include="..\..\HARDWARE\VS10XX\VS_PATH.h" />
     <ClInclude Include="..\..\STM32F10x_FWLib\inc\misc.h" />
     <ClInclude Include="..\..\STM32F10x_FWLib\inc\stm32f10x_adc.h" />
     <ClInclude Include="..\..\STM32F10x_FWLib\inc\stm32f10x_bkp.h" />
@@ -84,6 +86,8 @@
     <ClInclude Include="..\..\USER\system_stm32f10x.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\APP\APP_start.c" />
+    <ClCompile Include="..\..\APP\data.c" />
     <ClCompile Include="..\..\APP\fontupd.c" />
     <ClCompile Include="..\..\APP\gui.c" />
     <ClCompile Include="..\..\APP\LUNAR.c" />

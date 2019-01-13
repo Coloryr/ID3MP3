@@ -4,8 +4,8 @@
 #include "stdlib.h"
   
 //LCD重要参数集
-typedef struct  
-{										    
+typedef struct
+{
 	u16 width;			//LCD 宽度
 	u16 height;			//LCD 高度
 	u16 id;				//LCD ID
@@ -13,7 +13,7 @@ typedef struct
 	u16	wramcmd;		//开始写gram指令
 	u16  setxcmd;		//设置x坐标指令
 	u16  setycmd;		//设置y坐标指令 
-}_lcd_dev; 	  
+}_lcd_dev;
 
 //LCD参数
 extern _lcd_dev lcddev;	//管理LCD重要参数
@@ -30,7 +30,7 @@ typedef struct
 {
 	u16 LCD_REG;
 	u16 LCD_RAM;
-} LCD_TypeDef;
+}LCD_TypeDef;
 
 #define LCD_BASE        ((u32)(0x60000000 | 0x0001FFFE))
 #define LCD             ((LCD_TypeDef *) LCD_BASE)

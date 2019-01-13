@@ -15,8 +15,8 @@
 //内存管理控制器
 struct _m_mallco_dev
 {
-	void (*init)(void);				//初始化
-	u8 (*perused)(void);		  	//内存使用率
+	void(*init)(void);				//初始化
+	u8(*perused)(void);		  	//内存使用率
 	u8 	*membase;					//内存池 
 	u16 *memmap; 					//内存管理状态表
 	u8  memrdy; 					//内存管理是否就绪

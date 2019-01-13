@@ -16,7 +16,6 @@ void KEY_Init(void)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_2 | GPIO_Pin_1 | GPIO_Pin_0;//PA15
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //设置成上拉输入
 	GPIO_Init(GPIOC, &GPIO_InitStructure);//初始化GPIOA15
-
 }
 //按键处理函数
 //返回按键值
@@ -61,27 +60,12 @@ u8 KEY0_Scan(void)
 void KEY_task(void *pdata)
 {
 	OS_ERR err;
-	while(1)
+	while (1)
 	{
 		key_now = KEY_Scan(0);
-		OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_PERIODIC,&err);//延时10ms
+		OSTimeDlyHMSM(0, 0, 0, 10, OS_OPT_TIME_PERIODIC, &err);//延时10ms
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

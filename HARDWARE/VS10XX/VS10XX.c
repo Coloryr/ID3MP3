@@ -1,7 +1,7 @@
 #include "includes.h" 
 
 //VS10XX默认设置参数
-_vs10xx_obj vsset=
+_vs10xx_obj vsset =
 {
 	140,	//音量:220
 	15,		//低音上线 100Hz
@@ -34,12 +34,12 @@ void VS1053_Init(void)
 //data:要写入的数据
 //返回值:读到的数据
 u8 VS_SPI_ReadWriteByte(u8 data)
-{			  	 
-	return SPI1_ReadWriteByte(data);	  
+{
+	return SPI1_ReadWriteByte(data);
 }
 //SD卡初始化的时候,需要低速
 void VS_SPI_SpeedLow(void)
-{								 
+{
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_32);//设置到低速模式 
 }
 //SD卡正常工作的时候,可以高速了
@@ -93,20 +93,20 @@ void VS_Soft_Reset(void)
 //返回1:复位失败;0:复位成功	   
 u8 VS_HD_Reset(void)
 {
-	u8 retry=0;
-	VS_RST=0;
+	u8 retry = 0;
+	VS_RST = 0;
 	delay_ms(20);
-	VS_XDCS=1;//取消数据传输
-	VS_XCS=1;//取消数据传输
-	VS_RST=1;	   
-	while(VS_DQ==0&&retry<200)//等待DREQ为高
+	VS_XDCS = 1;//取消数据传输
+	VS_XCS = 1;//取消数据传输
+	VS_RST = 1;
+	while (VS_DQ == 0 && retry < 200)//等待DREQ为高
 	{
 		retry++;
 		delay_us(50);
 	};
-	delay_ms(20);	
-	if(retry>=200)return 1;
-	else return 0;	    		 
+	delay_ms(20);
+	if (retry >= 200)return 1;
+	else return 0;
 }
 //正弦测试 
 void VS_Sine_Test(void)
@@ -248,7 +248,6 @@ u16 VS_WRAM_Read(u16 addr)
 	res = VS_RD_Reg(SPI_WRAM);
 	OS_CRITICAL_EXIT();	//退出临界区
 	return res;
-
 }
 //设置播放速度（仅VS1053有效） 
 //t:0,1,正常速度;2,2倍速度;3,3倍速度;4,4倍速;以此类推
@@ -475,7 +474,7 @@ void VS_Set_Vol(u8 volx)
 	volt = 254 - volx;			//取反一下,得到最大值,表示最大的表示 
 	volt <<= 8;
 	volt += 254 - volx;			//得到音量设置后大小
- 	OS_CRITICAL_ENTER();	//进入临界区  
+	OS_CRITICAL_ENTER();	//进入临界区  
 	VS_WR_Cmd(SPI_VOL, volt);//设音量 
 	OS_CRITICAL_EXIT();	//退出临界区
 }
@@ -488,7 +487,7 @@ void VS_Set_Bass(u8 bfreq, u8 bass, u8 tfreq, u8 treble)
 {
 	u16 bass_set = 0; //暂存音调寄存器值
 	signed char temp = 0;
-	CPU_SR_ALLOC(); 
+	CPU_SR_ALLOC();
 	if (treble == 0)temp = 0;	   		//变换
 	else if (treble > 8)temp = treble - 8;
 	else temp = treble - 9;
@@ -499,7 +498,7 @@ void VS_Set_Bass(u8 bfreq, u8 bass, u8 tfreq, u8 treble)
 	bass_set += bass & 0xf;				//低音设定
 	bass_set <<= 4;
 	bass_set += bfreq & 0xf;			//低音上限    
- 	OS_CRITICAL_ENTER();	//进入临界区           
+	OS_CRITICAL_ENTER();	//进入临界区           
 	VS_WR_Cmd(SPI_BASS, bass_set);	//BASS 
 	OS_CRITICAL_EXIT();	//退出临界区
 }

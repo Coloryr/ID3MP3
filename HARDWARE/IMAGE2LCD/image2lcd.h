@@ -6,13 +6,13 @@
 //图像数据头结构体  
 __packed typedef struct _HEADCOLOR
 {
-   unsigned char scan;
-   unsigned char gray;
-   unsigned short w;
-   unsigned short h;
-   unsigned char is565;
-   unsigned char rgb;
-}HEADCOLOR;  
+	unsigned char scan;
+	unsigned char gray;
+	unsigned short w;
+	unsigned short h;
+	unsigned char is565;
+	unsigned char rgb;
+}HEADCOLOR;
 //scan: 扫描模式 	    
 //Bit7: 0:自左至右扫描，1:自右至左扫描。 
 //Bit6: 0:自顶至底扫描，1:自底至顶扫描。 

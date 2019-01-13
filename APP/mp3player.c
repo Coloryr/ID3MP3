@@ -8,7 +8,7 @@ const u16 VS_NEW_BANDS_FREQ_TBL[14]={80,300,800,1270,2016,3200,4500,6000,7500,90
 
 void vs_reset(void)
 {
-		VS_Restart_Play();  					//重启播放 
+	VS_Restart_Play();  					//重启播放 
 	VS_Set_All();        					//设置音量等信息 			 
 	VS_Reset_DecodeTime();					//复位解码时间 	  
 	VS_Load_Patch((u16*)VS1053_PATCH, 1000); 	  //加载频谱分析补丁
@@ -45,6 +45,8 @@ u16 mp3_get_tnum(u8 *path)
 	myfree(tfileinfo.fname);
 	return rval;
 }
+
+
 //初始化频谱管理数据
 void init_fft(void)
 {
@@ -56,6 +58,8 @@ void init_fft(void)
 		info.fft_time[i] = 30;
 	}
 }
+
+
 //显示FFT_BANDS根柱子
 //mp3devx:MP3结构体
 //pdt:频谱数据
@@ -96,6 +100,7 @@ void FFT_post(u16 *pbuf)
 	}
 }
 
+
 void mp3_play_ready()
 {
 	u8 res;
@@ -106,7 +111,7 @@ void mp3_play_ready()
 	VS_Sine_Test();
 	vs_reset();
 	VS_SPI_SpeedHigh();	//高速			
-	
+
 	lcd_bit = 1;
 	info.pic_show = 0;
 
