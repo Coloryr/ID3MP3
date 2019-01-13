@@ -38,7 +38,9 @@
 
 
     EXPORT  OSStartHighRdy                                      ; Functions declared in this file
-    EXPORT  PendSV_Handler
+    EXPORT  OSCtxSw
+    EXPORT  OSIntCtxSw
+	EXPORT  PendSV_Handler
 
 ;PAGE
 ;********************************************************************************************************
@@ -60,17 +62,20 @@ NVIC_PENDSVSET  EQU     0x10000000  ; 触发软件中断的值.
     AREA CODE, CODE, READONLY
 
 
-;PAGE
-
-;/**************************************************************************************
-;* 函数名称: OSStartHighRdy
-;*
-;* 功能描述: 使用调度器运行第一个任务
-;* 
-;* 参    数: None
-;*
-;* 返 回 值: None
-;**************************************************************************************/  
+;********************************************************************************************************
+;                                         START MULTITASKING
+;                                      void OSStartHighRdy(void)
+;
+; Note(s) : 1) This function triggers a PendSV exception (essentially, causes a context switch) to cause
+;              the first task to start.
+;
+;           2) OSStartHighRdy() MUST:
+;              a) Setup PendSV exception priority to lowest;
+;              b) Set initial PSP to 0, to tell context switcher this is first run;
+;              c) Set the main stack to OS_CPU_ExceptStkBase
+;              d) Trigger PendSV exception;
+;              e) Enable interrupts (tasks will run with interrupts enabled).
+;********************************************************************************************************
 
 OSStartHighRdy
     LDR     R0, =NVIC_SYSPRI4                                  ; Set the PendSV exception priority

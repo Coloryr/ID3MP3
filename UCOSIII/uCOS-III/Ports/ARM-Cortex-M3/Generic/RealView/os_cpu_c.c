@@ -4,41 +4,45 @@
 *                                          The Real-Time Kernel
 *
 *
-*                           (c) Copyright 2009-2010; Micrium, Inc.; Weston, FL
+*                         (c) Copyright 2009-2013; Micrium, Inc.; Weston, FL
 *                    All rights reserved.  Protected by international copyright laws.
 *
-*                                           ARM Cortex-M3 Port
+*                                           ARM Cortex-M4 Port
 *
 * File      : OS_CPU_C.C
-* Version   : V3.01.2
+* Version   : V3.03.02
 * By        : JJL
 *             BAN
+*             JBL
 *
 * LICENSING TERMS:
 * ---------------
-*             uC/OS-III is provided in source form to registered licensees ONLY.  It is 
-*             illegal to distribute this source code to any third party unless you receive 
-*             written permission by an authorized Micrium representative.  Knowledge of 
-*             the source code may NOT be used to develop a similar product.
+*           uC/OS-III is provided in source form for FREE short-term evaluation, for educational use or 
+*           for peaceful research.  If you plan or intend to use uC/OS-III in a commercial application/
+*           product then, you need to contact Micrium to properly license uC/OS-III for its use in your 
+*           application/product.   We provide ALL the source code for your convenience and to help you 
+*           experience uC/OS-III.  The fact that the source is provided does NOT mean that you can use 
+*           it commercially without paying a licensing fee.
 *
-*             Please help us continue to provide the Embedded community with the finest
-*             software available.  Your honesty is greatly appreciated.
+*           Knowledge of the source code may NOT be used to develop a similar product.
 *
-*             You can contact us at www.micrium.com.
+*           Please help us continue to provide the embedded community with the finest software available.
+*           Your honesty is greatly appreciated.
 *
-* For       : ARMv7M Cortex-M3
-* Mode      : Thumb2
+*           You can contact us at www.micrium.com, or by phone at +1 (954) 217-2036.
+*
+* For       : ARMv7 Cortex-M4
+* Mode      : Thumb-2 ISA
 * Toolchain : RealView
 *********************************************************************************************************
 */
 
 #define   OS_CPU_GLOBALS
-
 #ifdef VSC_INCLUDE_SOURCE_FILE_NAMES
 const  CPU_CHAR  *os_cpu_c__c = "$Id: $";
 #endif
 
-/*$PAGE*/
+
 /*
 *********************************************************************************************************
 *                                             INCLUDE FILES
@@ -46,6 +50,12 @@ const  CPU_CHAR  *os_cpu_c__c = "$Id: $";
 */
 
 #include  <os.h>
+#include "includes.h"   	//添加头文件   
+
+#ifdef __cplusplus
+extern  "C" {
+#endif
+
 
 /*
 *********************************************************************************************************
@@ -70,7 +80,6 @@ void  OSIdleTaskHook (void)
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                       OS INITIALIZATION HOOK
@@ -85,19 +94,12 @@ void  OSIdleTaskHook (void)
 
 void  OSInitHook (void)
 {
-    CPU_STK_SIZE   i;
-    CPU_STK       *p_stk;
-
-
-    p_stk = OSCfg_ISRStkBasePtr;                            /* Clear the ISR stack                                    */
-    for (i = 0u; i < OSCfg_ISRStkSize; i++) {
-        *p_stk++ = (CPU_STK)0u;
-    }
-    OS_CPU_ExceptStkBase = (CPU_STK *)(OSCfg_ISRStkBasePtr + OSCfg_ISRStkSize - 1u);
+                                                                    /* 8-byte align the ISR stack.                            */    
+    OS_CPU_ExceptStkBase = (CPU_STK *)(OSCfg_ISRStkBasePtr + OSCfg_ISRStkSize);
+    OS_CPU_ExceptStkBase = (CPU_STK *)((CPU_STK)(OS_CPU_ExceptStkBase) & 0xFFFFFFF8);
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                         STATISTIC TASK HOOK
@@ -121,7 +123,6 @@ void  OSStatTaskHook (void)
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                          TASK CREATION HOOK
@@ -146,7 +147,6 @@ void  OSTaskCreateHook (OS_TCB  *p_tcb)
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                           TASK DELETION HOOK
@@ -171,7 +171,6 @@ void  OSTaskDelHook (OS_TCB  *p_tcb)
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                            TASK RETURN HOOK
@@ -197,7 +196,6 @@ void  OSTaskReturnHook (OS_TCB  *p_tcb)
 }
 
 
-/*$PAGE*/
 /*
 **********************************************************************************************************
 *                                       INITIALIZE A TASK'S STACK
@@ -233,14 +231,16 @@ CPU_STK  *OSTaskStkInit (OS_TASK_PTR    p_task,
                          CPU_STK_SIZE   stk_size,
                          OS_OPT         opt)
 {
-    CPU_STK  *p_stk;
+    CPU_STK    *p_stk;
 
 
-    (void)opt;                                              /* Prevent compiler warning                               */
+    (void)opt;                                                  /* Prevent compiler warning                               */
 
-    p_stk = &p_stk_base[stk_size];                          /* Load stack pointer                                     */
-                                                            /* Registers stacked as if auto-saved on exception        */
-    *--p_stk = (CPU_STK)0x01000000u;                        /* xPSR                                                   */
+    p_stk = &p_stk_base[stk_size];                              /* Load stack pointer                                     */
+                                                                /* Align the stack to 8-bytes.                            */
+    p_stk = (CPU_STK *)((CPU_STK)(p_stk) & 0xFFFFFFF8);
+
+	*--p_stk = (CPU_STK)0x01000000u;                        /* xPSR                                                   */
     *--p_stk = (CPU_STK)p_task;                             /* Entry Point                                            */
     *--p_stk = (CPU_STK)OS_TaskReturn;                      /* R14 (LR)                                               */
     *--p_stk = (CPU_STK)0x12121212u;                        /* R12                                                    */
@@ -256,13 +256,12 @@ CPU_STK  *OSTaskStkInit (OS_TASK_PTR    p_task,
     *--p_stk = (CPU_STK)0x07070707u;                        /* R7                                                     */
     *--p_stk = (CPU_STK)0x06060606u;                        /* R6                                                     */
     *--p_stk = (CPU_STK)0x05050505u;                        /* R5                                                     */
-    *--p_stk = (CPU_STK)0x04040404u;                        /* R4                                                     */
+    *--p_stk = (CPU_STK)0x04040404u;                            /* R4                                                     */
 
     return (p_stk);
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                           TASK SWITCH HOOK
@@ -289,11 +288,24 @@ void  OSTaskSwHook (void)
 #endif
 
 
+#if (OS_CPU_ARM_FP_EN == DEF_ENABLED)
+//    if ((OSTCBCurPtr->Opt & OS_OPT_TASK_SAVE_FP) != (OS_OPT)0) {
+//        OS_CPU_FP_Reg_Push(OSTCBCurPtr->StkPtr);
+//    }
+
+//    if ((OSTCBHighRdyPtr->Opt & OS_OPT_TASK_SAVE_FP) != (OS_OPT)0) {
+//        OS_CPU_FP_Reg_Pop(OSTCBHighRdyPtr->StkPtr);
+//    }
+#endif
 
 #if OS_CFG_APP_HOOKS_EN > 0u
     if (OS_AppTaskSwHookPtr != (OS_APP_HOOK_VOID)0) {
         (*OS_AppTaskSwHookPtr)();
     }
+#endif
+
+#if (defined(TRACE_CFG_EN) && (TRACE_CFG_EN > 0u))
+    TRACE_OS_TASK_SWITCHED_IN(OSTCBHighRdyPtr);             /* Record the event.                                      */
 #endif
 
 #if OS_CFG_TASK_PROFILE_EN > 0u
@@ -307,23 +319,22 @@ void  OSTaskSwHook (void)
 #endif
 
 #ifdef  CPU_CFG_INT_DIS_MEAS_EN
-    int_dis_time = CPU_IntDisMeasMaxCurReset();             /* Keep track of per-task interrupt disable time          */
+    int_dis_time = CPU_IntDisMeasMaxCurReset();                 /* Keep track of per-task interrupt disable time          */
     if (OSTCBCurPtr->IntDisTimeMax < int_dis_time) {
         OSTCBCurPtr->IntDisTimeMax = int_dis_time;
     }
 #endif
 
 #if OS_CFG_SCHED_LOCK_TIME_MEAS_EN > 0u
-                                                            /* Keep track of per-task scheduler lock time             */
+                                                                /* Keep track of per-task scheduler lock time             */
     if (OSTCBCurPtr->SchedLockTimeMax < OSSchedLockTimeMaxCur) {
         OSTCBCurPtr->SchedLockTimeMax = OSSchedLockTimeMaxCur;
     }
-    OSSchedLockTimeMaxCur = (CPU_TS)0;                      /* Reset the per-task value                               */
+    OSSchedLockTimeMaxCur = (CPU_TS)0;                          /* Reset the per-task value                               */
 #endif
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                              TICK HOOK
@@ -346,7 +357,6 @@ void  OSTimeTickHook (void)
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                          SYS TICK HANDLER
@@ -375,7 +385,6 @@ void  OS_CPU_SysTickHandler (void)
 }
 
 
-/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                         INITIALIZE SYS TICK
@@ -396,16 +405,19 @@ void  OS_CPU_SysTickInit (CPU_INT32U  cnts)
     CPU_REG_NVIC_ST_RELOAD = cnts - 1u;
 
                                                             /* Set SysTick handler prio.                              */
-    prio  = CPU_REG_NVIC_SHPRI3;
-    prio &= DEF_BIT_FIELD(24, 0);
-    prio |= DEF_BIT_MASK(OS_CPU_CFG_SYSTICK_PRIO, 24);
+    prio                   = CPU_REG_NVIC_SHPRI3;
+    prio                  &= DEF_BIT_FIELD(24, 0);
+    prio                  |= DEF_BIT_MASK(OS_CPU_CFG_SYSTICK_PRIO, 24);
 
-    CPU_REG_NVIC_SHPRI3 = prio;
+    CPU_REG_NVIC_SHPRI3    = prio;
 
                                                             /* Enable timer.                                          */
-    CPU_REG_NVIC_ST_CTRL |= CPU_REG_NVIC_ST_CTRL_CLKSOURCE |
-                            CPU_REG_NVIC_ST_CTRL_ENABLE;
+    CPU_REG_NVIC_ST_CTRL  |= CPU_REG_NVIC_ST_CTRL_CLKSOURCE |
+                             CPU_REG_NVIC_ST_CTRL_ENABLE;
                                                             /* Enable timer interrupt.                                */
-    CPU_REG_NVIC_ST_CTRL |= CPU_REG_NVIC_ST_CTRL_TICKINT;
+    CPU_REG_NVIC_ST_CTRL  |= CPU_REG_NVIC_ST_CTRL_TICKINT;
 }
 
+#ifdef __cplusplus
+}
+#endif

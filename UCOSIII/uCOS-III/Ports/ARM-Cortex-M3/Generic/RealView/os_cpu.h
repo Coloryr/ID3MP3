@@ -4,29 +4,34 @@
 *                                          The Real-Time Kernel
 *
 *
-*                           (c) Copyright 2009-2010; Micrium, Inc.; Weston, FL
+*                         (c) Copyright 2009-2013; Micrium, Inc.; Weston, FL
 *                    All rights reserved.  Protected by international copyright laws.
 *
-*                                           ARM Cortex-M3 Port
+*                                           ARM Cortex-M4 Port
 *
 * File      : OS_CPU.H
-* Version   : V3.01.2
+* Version   : V3.03.02
 * By        : JJL
+*             JBL
 *
 * LICENSING TERMS:
 * ---------------
-*             uC/OS-III is provided in source form to registered licensees ONLY.  It is 
-*             illegal to distribute this source code to any third party unless you receive 
-*             written permission by an authorized Micrium representative.  Knowledge of 
-*             the source code may NOT be used to develop a similar product.
+*           uC/OS-III is provided in source form for FREE short-term evaluation, for educational use or 
+*           for peaceful research.  If you plan or intend to use uC/OS-III in a commercial application/
+*           product then, you need to contact Micrium to properly license uC/OS-III for its use in your 
+*           application/product.   We provide ALL the source code for your convenience and to help you 
+*           experience uC/OS-III.  The fact that the source is provided does NOT mean that you can use 
+*           it commercially without paying a licensing fee.
 *
-*             Please help us continue to provide the Embedded community with the finest
-*             software available.  Your honesty is greatly appreciated.
+*           Knowledge of the source code may NOT be used to develop a similar product.
 *
-*             You can contact us at www.micrium.com.
+*           Please help us continue to provide the embedded community with the finest software available.
+*           Your honesty is greatly appreciated.
 *
-* For       : ARMv7M Cortex-M3
-* Mode      : Thumb2
+*           You can contact us at www.micrium.com, or by phone at +1 (954) 217-2036.
+*
+* For       : ARMv7 Cortex-M4
+* Mode      : Thumb-2 ISA
 * Toolchain : RealView
 *********************************************************************************************************
 */
@@ -40,22 +45,33 @@
 #define  OS_CPU_EXT  extern
 #endif
 
+#ifdef __cplusplus
+extern  "C" {
+#endif
+
+
+/*
+*********************************************************************************************************
+*                                               DEFINES
+*********************************************************************************************************
+*/
+
+#ifndef  __TARGET_FPU_SOFTVFP
+#define  OS_CPU_ARM_FP_EN                              DEF_ENABLED
+#else
+#define  OS_CPU_ARM_FP_EN                              DEF_DISABLED
+#endif
+
+#define  OS_CPU_ARM_FP_REG_NBR                           32u
+
+
 /*
 *********************************************************************************************************
 *                                               MACROS
 *********************************************************************************************************
 */
 
-#ifndef  NVIC_INT_CTRL
-#define  NVIC_INT_CTRL                      *((CPU_REG32 *)0xE000ED04)
-#endif
-
-#ifndef  NVIC_PENDSVSET
-#define  NVIC_PENDSVSET                                    0x10000000
-#endif
-
-#define  OS_TASK_SW()               NVIC_INT_CTRL = NVIC_PENDSVSET
-#define  OSIntCtxSw()               NVIC_INT_CTRL = NVIC_PENDSVSET
+#define  OS_TASK_SW()               OSCtxSw()
 
 
 /*
@@ -114,6 +130,7 @@
 
 #define  OS_CPU_CFG_SYSTICK_PRIO           0u
 
+
 /*
 *********************************************************************************************************
 *                                          GLOBAL VARIABLES
@@ -122,18 +139,30 @@
 
 OS_CPU_EXT  CPU_STK  *OS_CPU_ExceptStkBase;
 
+
 /*
 *********************************************************************************************************
 *                                         FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
 
+void  OSCtxSw              (void);
+void  OSIntCtxSw           (void);
 void  OSStartHighRdy       (void);
 
 void  OS_CPU_PendSVHandler (void);
 
-
 void  OS_CPU_SysTickHandler(void);
 void  OS_CPU_SysTickInit   (CPU_INT32U  cnts);
+
+#if (OS_CPU_ARM_FP_EN == DEF_ENABLED)
+void  OS_CPU_FP_Reg_Push   (CPU_STK    *stkPtr);
+void  OS_CPU_FP_Reg_Pop    (CPU_STK    *stkPtr);
+#endif
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

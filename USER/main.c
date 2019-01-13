@@ -3,6 +3,8 @@
 int main(void)
 {
 	delay_init(72);	    			//延时函数初始化	  
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//中断分组配置
+	
 	KEY_Init();								//按键初始化
 	LCD_Init();								//LCD初始化	
 	POINT_COLOR = RED;

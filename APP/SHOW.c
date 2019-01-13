@@ -311,7 +311,6 @@ void show_mp3_pic(void *pdata)
 				}
 			}
 			jpeg_freeall();		//释放内存
-			OS_CRITICAL_EXIT();	//进入临界区
 			info.pic_show = 0;
 			if (write_bit == 0x20)
 			{
@@ -321,6 +320,7 @@ void show_mp3_pic(void *pdata)
 			{
 				write_bit = 0x30;
 			}
+			OS_CRITICAL_EXIT();	//进入临界区			
 		}
 	}
 	
