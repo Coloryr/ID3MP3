@@ -68,7 +68,7 @@ void init_fft(void)
 	{
 		info.fft_cur[i] = 0;
 		info.fft_top[i] = 63;
-		info.fft_time[i] = 1;
+		info.fft_time[i] = 50;
 	}
 }
 
@@ -89,14 +89,14 @@ void FFT_post(u16 *pbuf)
 			info.fft_cur[i] = temp;
 		else							  //当前值大于等于temp	 开始往下降 一次降1
 		{
-			if (info.fft_cur[i] > 1)info.fft_cur[i] -= 2;
+			if (info.fft_cur[i] > 1)info.fft_cur[i] -= 1;
 			else info.fft_cur[i] = 0;
 		}
 
 		if (info.fft_cur[i] > info.fft_top[i])//当前值大于峰值时 更新峰值
 		{
 			info.fft_top[i] = info.fft_cur[i];
-			info.fft_time[i] = 1;               //重设峰值停顿时间
+			info.fft_time[i] = 50;               //重设峰值停顿时间
 		}
 
 		if (info.fft_time[i])info.fft_time[i]--;   //如果停顿时间大于1 即未减完
@@ -207,6 +207,8 @@ void mp3_play(void *pdata)
 	while (res == FR_OK)//打开成功
 	{
 		OS_CRITICAL_ENTER();	//进入临界区
+		LCD_Fill(0, 0, pic_show_size,
+				16 + pic_show_size, BACK_COLOR);
 		dir_sdi(&mp3dir, info.mp3indextbl[info.curindex]);			//改变当前目录索引	   
 		res = f_readdir(&mp3dir, &info.mp3fileinfo);       		//读取目录下的一个文件
 		if (res != FR_OK || info.mp3fileinfo.fname[0] == 0)break;	//错误了/到末尾了,退出

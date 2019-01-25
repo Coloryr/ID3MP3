@@ -345,23 +345,6 @@ void show_mp3_pic(void *pdata)
 	}
 }
 
-void show_clear(void)
-{
-	if(show_mode==0)
-		LCD_Fill(0, 162, 320, 178, BLACK);
-	else
-		LCD_Fill(0, 0, 320, 16, BLACK);
-}
-
-void show_pic_clear(void)
-{
-	if(show_mode==0)
-	{
-		LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size,
-				pic_show_y + pic_show_size, BACK_COLOR);
-	}
-}
-
 void show_all(void)
 {
 	u8 *fn;
@@ -396,18 +379,18 @@ void show_all(void)
 					strcat((char*)info.TIT2, (char*)info.TPE1);
 					strcat((char*)info.TIT2, "-");
 					strcat((char*)info.TIT2, (char*)info.TALB);
-					Show_Str(0, 162, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+					Show_Str(0, 162, 240, 16, info.TIT2, 16, 0);				//显示歌曲名字 
 				}
 				else if (info.TIT2 != NULL && info.TIT2[0] != 0x00)
 				{
-					Show_Str(0, 162, 320, 16, info.TIT2, 16, 0);				//显示歌曲名字 
+					Show_Str(0, 162, 240, 16, info.TIT2, 16, 0);				//显示歌曲名字 
 				}
 				else
-					Show_Str(0, 162, 320, 16, fn, 16, 0);				//显示歌曲名字 
+					Show_Str(0, 162, 240, 16, fn, 16, 0);				//显示歌曲名字 
 			}
 			else
 			{
-				Show_Str(0, 162, 320, 16, fn, 16, 0);				//显示歌曲名字 
+				Show_Str(0, 162, 240, 16, fn, 16, 0);				//显示歌曲名字 
 			}
 			LCD_ShowxNum(0, 182, info.curindex + 1, 3, 16, 0X80);		//索引
 			LCD_ShowChar(24, 182, '/', 16, 0);

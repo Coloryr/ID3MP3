@@ -9,8 +9,6 @@ void fft_show_oneband(u16 x, u16 y, u16 width, u16 height, u16 curval, u16 topva
 void FFT_post(u16 *pbuf);
 void show_mp3_pic(void *pdata);
 void show_all(void);
-void show_clear(void);	
-void show_pic_clear(void);
 
 extern u8 time_k;
 extern u8 lcd_bit;

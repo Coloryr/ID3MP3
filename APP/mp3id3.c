@@ -481,12 +481,10 @@ void mp3id3(void)
 		}
 		else if (code_type == 1 && lcd_bit == 1)
 		{
-			show_pic_clear();
 			info.pic_show = 0;
 		}
 		else if (code_type == 2 && lcd_bit == 1)
 		{
-			show_pic_clear();
 			info.pic_show = 0;
 		}
 	}
