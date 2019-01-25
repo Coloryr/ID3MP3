@@ -1,4 +1,9 @@
-#include "includes.h" 									   
+#include "sys.h"
+#include "text.h" 		
+#include "flash.h" 		
+#include "fontupd.h"
+#include "lcd.h"
+#include "string.h"
 						            
 //code 字符指针开始
 //从字库中查找出字模

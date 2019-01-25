@@ -20,7 +20,6 @@ extern u8 *fatbuf;//SD卡数据缓存区
 #define T_TEXT		0X30	//.txt文件
 #define T_C			0X31	//.c文件
 #define T_H			0X32    //.h文件
-#define T_FLAC		0X4C	//flac文件
 #define T_BMP		0X50	//bmp文件
 #define T_JPG		0X51	//jpg文件
 #define T_JPEG		0X52	//jpeg文件		 

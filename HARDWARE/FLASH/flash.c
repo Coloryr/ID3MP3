@@ -1,4 +1,6 @@
-#include "includes.h" 
+#include "flash.h" 
+#include "spi.h" 
+#include "delay.h" 
 
 u16 SPI_FLASH_TYPE=W25Q128;//默认就是25Q64
 
@@ -6,24 +8,6 @@ u16 SPI_FLASH_TYPE=W25Q128;//默认就是25Q64
 //16个扇区为1个Block
 //W25Q64
 //容量为8M字节,共有128个Block,2048个Sector 
-
-//初始化SPI FLASH的IO口
-void SPI_Flash_Init(void)
-{
-
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;  //SPI CS
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  //复用推挽输出
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOC, &GPIO_InitStructure);
-	GPIO_SetBits(GPIOC, GPIO_Pin_13);
-	SPI1_Init();		   //初始化SPI
-	SPI1_SetSpeed(SPI_BaudRatePrescaler_4);	//设置为18M时钟,高速模式
-	SPI_FLASH_TYPE = SPI_Flash_ReadID();//读取FLASH ID.
-}
 
 //读取SPI_FLASH的状态寄存器
 //BIT7  6   5   4   3   2   1   0
@@ -37,7 +21,7 @@ u8 SPI_Flash_ReadSR(void)
 {
 	u8 byte = 0;
 	SPI_FLASH_CS = 0;                            //使能器件   
-	SPI1_ReadWriteByte(W25X_ReadStatusReg);    //发送读取状态寄存器命令    
+	SPI1_ReadWriteByte(W25X_ReadStatusReg);    	 //发送读取状态寄存器命令    
 	byte = SPI1_ReadWriteByte(0Xff);             //读取一个字节  
 	SPI_FLASH_CS = 1;                            //取消片选     
 	return byte;

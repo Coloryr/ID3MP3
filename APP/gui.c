@@ -1,4 +1,5 @@
-#include "includes.h" 										   
+#include "sys.h" 			
+#include "guix.h"
 
 //此处必须在外部申明asc2_1206和asc2_1608;
 //#include "font.h" 

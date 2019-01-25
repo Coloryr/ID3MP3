@@ -1,4 +1,6 @@
-#include "includes.h" 
+#include "vs10xx.h" 
+#include "includes.h"
+#include "spi.h" 
 
 //VS10XX默认设置参数
 _vs10xx_obj vsset =
@@ -10,24 +12,6 @@ _vs10xx_obj vsset =
 	10,		//高音提升 10.5dB
 	0,		//空间效果	
 };
-
-
-//初始化VS10XX的IO口	 
-void VS1053_Init(void)
-{
-	GPIO_InitTypeDef  GPIO_InitStructure;
-
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	 //使能PA端口时钟
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;				 //PA3 上拉输入  判断VS是否繁忙
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; 		 //输入
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	//PA0,PA1,PA2 配置为推挽输出
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 //推挽输出
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 //移植时候的接口

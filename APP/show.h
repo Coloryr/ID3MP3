@@ -1,6 +1,7 @@
 #ifndef __SHOW_H_
 #define __SHOW_H_
 #include "sys.h"
+#include "ff.h"
 #include "stdlib.h"
 
 void time_go(void);

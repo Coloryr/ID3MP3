@@ -1,4 +1,6 @@
-#include "includes.h" 
+#include "ff.h"   
+#include "fontupd.h"
+#include "flash.h"    
 
 WCHAR ff_convert (	/* Converted code, 0 means conversion error */
 	WCHAR	src,	/* Character code to be converted */

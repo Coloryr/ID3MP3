@@ -4,10 +4,10 @@
 
 extern u8 save_bit[5];
 
-#define save_bit_local (1024*15)*1024			//默认是15M的地址
-
 void read_data(void);
 void write_data(void);
+void TP_Save_Adjdata(void);						//保存校准参数
+u8 TP_Get_Adjdata(void);						//读取校准参数
 
 #endif
 

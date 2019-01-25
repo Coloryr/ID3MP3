@@ -1,6 +1,12 @@
-#include "includes.h" 
+#include "fontupd.h"
+#include "ff.h"	  
+#include "flash.h"   
+#include "lcd.h"  
+#include "string.h"
+#include "malloc.h"
+#include "delay.h"
 					   
-u32 FONTINFOADDR=(1024*2)*1024;//默认是2M的地址
+u32 FONTINFOADDR=(1024*25)*1024;//默认是24M的地址
 //字库信息结构体. 
 //用来保存字库基本信息，地址，大小等
 _font_info ftinfo;
@@ -141,6 +147,7 @@ u8 update_font(u16 x, u16 y, u8 size, u8 src)
 	}
 	res = 0XFF;
 	ftinfo.fontok = 0XFF;
+	LCD_ShowString(x, y, 240, 320, size, "FLASH Erasing.......");
 	SPI_Flash_Erase_Chip();
 	SPI_Flash_Write((u8*)&ftinfo, FONTINFOADDR, sizeof(ftinfo));	//清除之前字库成功的标志.防止更新到一半重启,导致的字库部分数据丢失.
 	SPI_Flash_Read((u8*)&ftinfo, FONTINFOADDR, sizeof(ftinfo));	//重新读出ftinfo结构体数据
@@ -169,8 +176,7 @@ u8 update_font(u16 x, u16 y, u8 size, u8 src)
 //		 其他,字库丢失
 u8 font_init(void)
 {
-	SPI_Flash_Init();
-	FONTINFOADDR = (1024 * 2) * 1024;			//W25Q64,2M以后	 
+	FONTINFOADDR=(1024*25)*1024;
 	ftinfo.ugbkaddr = FONTINFOADDR + 41;		//UNICODEGBK 表存放首地址固定地址
 	SPI_Flash_Read((u8*)&ftinfo, FONTINFOADDR, sizeof(ftinfo));//读出ftinfo结构体数据
 	if (ftinfo.fontok != 0XAA)return 1;		//字库错误. 

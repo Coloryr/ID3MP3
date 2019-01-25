@@ -367,8 +367,8 @@ ARM Macro Assembler    Page 6
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
-ork --depend=..\obj\os_cpu_a.d -o..\obj\os_cpu_a.o -I.\RTE\_Template -ID:\Keil_
-v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include -ID:\Keil_v5\ARM\PACK\Keil\STM32F1xx_
+ork --depend=..\obj\os_cpu_a.d -o..\obj\os_cpu_a.o -I.\RTE\_Template -IC:\Keil_
+v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include -IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_
 DFP\2.3.0\Device\Include --predefine="__UVISION_VERSION SETA 524" --predefine="
 _RTE_ SETA 1" --predefine="STM32F10X_HD SETA 1" --list=.\os_cpu_a.lst ..\UCOSII
 I\uCOS-III\Ports\ARM-Cortex-M3\Generic\RealView\os_cpu_a.s

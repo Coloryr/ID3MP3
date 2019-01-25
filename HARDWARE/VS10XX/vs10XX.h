@@ -74,7 +74,6 @@ void VS_Sine_Test(void);            	//正弦测试
 u8 	 VS_SPI_ReadWriteByte(u8 data);
 void VS_SPI_SpeedLow(void);
 void VS_SPI_SpeedHigh(void);
-void VS_Init(void);						//初始化VS10XX	 
 void VS_Set_Speed(u8 t);				//设置播放速度
 u16  VS_Get_HeadInfo(void);     		//得到比特率
 u32 VS_Get_ByteRate(void);				//得到字节速率

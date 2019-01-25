@@ -49,6 +49,16 @@ typedef struct
 
 #define DFT_SCAN_DIR  L2R_U2D  //默认的扫描方向
 
+#define	LCD_CS_SET  GPIO_SetBits(GPIOD,GPIO_Pin_7)    	//片选端口  	PD7
+#define	LCD_RS_SET	GPIO_SetBits(GPIOD,GPIO_Pin_11)     //数据/命令 	PD11	   
+#define	LCD_WR_SET	GPIO_SetBits(GPIOD,GPIO_Pin_5)   		//写数据			PD5
+#define	LCD_RD_SET	GPIO_SetBits(GPIOD,GPIO_Pin_4)   		//读数据			PD4
+								    
+#define	LCD_CS_CLR  GPIO_ResetBits(GPIOD,GPIO_Pin_7)    //片选端口  	PD7
+#define	LCD_RS_CLR	GPIO_ResetBits(GPIOD,GPIO_Pin_11)   //数据/命令 	PD11   
+#define	LCD_WR_CLR	GPIO_ResetBits(GPIOD,GPIO_Pin_5)    //写数据			PD5
+#define	LCD_RD_CLR	GPIO_ResetBits(GPIOD,GPIO_Pin_4)    //读数据			PD4  
+
 //画笔颜色
 #define WHITE         	 0xFFFF
 #define BLACK         	 0x0000	  

@@ -78,6 +78,7 @@
 #include  <bsp.h>
 //#include  <bsp_int.h>
 
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -85,37 +86,6 @@
 #include <stdarg.h>
 #include "os_cpu.h"
 #include "os_cfg.h"
-#include <stm32f10x.h>	 
-
-#include  <APP_start.h>
-#include  <bit.h>
-#include  <data.h>
-#include  <fontupd.h>
-#include  <guix.h>
-#include  <integer.h>
-#include  <sys.h>
-#include  <lunar.h>
-#include  <mp3id3.h>
-#include  <mp3player.h>
-#include  <piclib.h>
-#include  <show.h>
-#include  <text.h>
-#include  <tjpgd.h>
-#include  <diskio.h>
-#include  <exfuns.h>
-#include  <ff.h>
-#include  <ffconf.h>
-#include  <flash.h>
-#include  <image2lcd.h>
-#include  <key.h>
-#include  <lcd.h>
-#include  <malloc.h>
-#include  <rtc.h>
-#include  <sdio_sdcard.h>
-#include  <spi.h>
-#include  <vs10XX.h>
-#include  <delay.h>
-
-
+#include <stm32f10x.h>	
 
 #endif

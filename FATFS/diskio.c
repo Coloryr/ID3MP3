@@ -7,15 +7,18 @@
 /* storage control module to the FatFs module with a defined API.        */
 /*-----------------------------------------------------------------------*/
 
-#include "includes.h" 		/* FatFs lower layer API */
+#include "diskio.h"			/* FatFs lower layer API */
+#include "sdio_sdcard.h"
+#include "flash.h"
+#include "malloc.h"	
+#include "rtc.h"	
 
 #define SD_CARD	 0  //SD卡,卷标为0
 #define EX_FLASH 1	//外部flash,卷标为1
 
 #define FLASH_SECTOR_SIZE 	512			  
-//对于W25Q64 
-//前4.8M字节给fatfs用,4.8M字节后~4.8M+100K给用户用,4.9M以后,用于存放字库,字库占用3.09M.		 			    
-u16	    FLASH_SECTOR_COUNT= 9832;	//4.8M字节,默认为W25Q64
+//字库占用6.01M.		 			    
+u16	    FLASH_SECTOR_COUNT = 22528;	//4.8M字节,默认为W25Q64
 #define FLASH_BLOCK_SIZE   	8     	//每个BLOCK有8个扇区
 
 //初始化磁盘
@@ -30,8 +33,7 @@ DSTATUS disk_initialize (
 			res = SD_Init();//SD_Init() 
   			break;
 		case EX_FLASH://外部flash
-			SPI_Flash_Init();
-			if(SPI_FLASH_TYPE==W25Q128)FLASH_SECTOR_COUNT=9832;	//W25Q64
+			if(SPI_FLASH_TYPE==W25Q128)FLASH_SECTOR_COUNT=22528;	//W25Q128
 			else FLASH_SECTOR_COUNT=0;							//其他
  			break;
 		default:

@@ -18,7 +18,13 @@
 / Sep 03,'12 R0.01b Added JD_TBLCLIP option.
 /----------------------------------------------------------------------------*/
 
-#include "includes.h" 
+#include "sys.h"
+#include "tjpgd.h"
+#include "ff.h"
+#include "includes.h"
+#include "lcd.h"
+#include "guix.h"
+#include "piclib.h"
 
 u8 write_bit;
 

@@ -138,7 +138,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -274,7 +274,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <Size>0x800000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\APP;..\FATFS;..\HARDWARE\FLASH;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\LED;..\HARDWARE\RTC;..\HARDWARE\SD;..\HARDWARE\SPI;..\HARDWARE\VS10XX;..\HARDWARE\IMAGE2LCD;..\HARDWARE\MALLOC;..\HARDWARE\LCD;..\UCOSIII\uC-CPU;..\UCOSIII\uC-LIB;..\UCOSIII\UCOS_BSP;..\UCOSIII\uCOS_CONFIG;..\UCOSIII\uCOS-III\Source;..\UCOSIII\uC-CPU\ARM-Cortex-M3\RealView;..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M3\RealView;..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M3\Generic\RealView</IncludePath>
+              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\APP;..\FATFS;..\HARDWARE\FLASH;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\LED;..\HARDWARE\RTC;..\HARDWARE\SD;..\HARDWARE\SPI;..\HARDWARE\VS10XX;..\HARDWARE\TOUCH;..\HARDWARE\MALLOC;..\HARDWARE\LCD;..\UCOSIII\uC-CPU;..\UCOSIII\uC-LIB;..\UCOSIII\UCOS_BSP;..\UCOSIII\uCOS_CONFIG;..\UCOSIII\uCOS-III\Source;..\UCOSIII\uC-CPU\ARM-Cortex-M3\RealView;..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M3\RealView;..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M3\Generic\RealView</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -394,6 +394,121 @@
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\system_stm32f10x.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>APP</GroupName>
+          <Files>
+            <File>
+              <FileName>mp3player.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\mp3player.c</FilePath>
+            </File>
+            <File>
+              <FileName>fontupd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\fontupd.c</FilePath>
+            </File>
+            <File>
+              <FileName>LUNAR.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\LUNAR.c</FilePath>
+            </File>
+            <File>
+              <FileName>SHOW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\SHOW.c</FilePath>
+            </File>
+            <File>
+              <FileName>mp3id3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\mp3id3.c</FilePath>
+            </File>
+            <File>
+              <FileName>data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\data.c</FilePath>
+            </File>
+            <File>
+              <FileName>APP_start.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\APP_start.c</FilePath>
+            </File>
+            <File>
+              <FileName>init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\init.c</FilePath>
+            </File>
+            <File>
+              <FileName>text.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\text.c</FilePath>
+            </File>
+            <File>
+              <FileName>piclib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\piclib.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\gui.c</FilePath>
+            </File>
+            <File>
+              <FileName>tjpgd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\tjpgd.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>HARDWARE</GroupName>
+          <Files>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\FLASH\flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\KEY\key.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\RTC\rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdio_sdcard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\SD\sdio_sdcard.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\SPI\spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>VS10XX.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\VS10XX\VS10XX.c</FilePath>
+            </File>
+            <File>
+              <FileName>malloc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\MALLOC\malloc.c</FilePath>
+            </File>
+            <File>
+              <FileName>ILI93xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\LCD\ILI93xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>touch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\TOUCH\touch.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -484,116 +599,6 @@
               <FileName>sys.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\SYSTEM\sys\sys.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>APP</GroupName>
-          <Files>
-            <File>
-              <FileName>mp3player.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\mp3player.c</FilePath>
-            </File>
-            <File>
-              <FileName>fontupd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\fontupd.c</FilePath>
-            </File>
-            <File>
-              <FileName>LUNAR.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\LUNAR.c</FilePath>
-            </File>
-            <File>
-              <FileName>SHOW.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\SHOW.c</FilePath>
-            </File>
-            <File>
-              <FileName>text.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\text.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\gui.c</FilePath>
-            </File>
-            <File>
-              <FileName>mp3id3.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\mp3id3.c</FilePath>
-            </File>
-            <File>
-              <FileName>piclib.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\piclib.c</FilePath>
-            </File>
-            <File>
-              <FileName>tjpgd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\tjpgd.c</FilePath>
-            </File>
-            <File>
-              <FileName>data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\data.c</FilePath>
-            </File>
-            <File>
-              <FileName>APP_start.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\APP_start.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>HARDWARE</GroupName>
-          <Files>
-            <File>
-              <FileName>flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\FLASH\flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>key.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\KEY\key.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\RTC\rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdio_sdcard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SD\sdio_sdcard.c</FilePath>
-            </File>
-            <File>
-              <FileName>spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SPI\spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>VS10XX.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\VS10XX\VS10XX.c</FilePath>
-            </File>
-            <File>
-              <FileName>image2lcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\IMAGE2LCD\image2lcd.c</FilePath>
-            </File>
-            <File>
-              <FileName>malloc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\MALLOC\malloc.c</FilePath>
-            </File>
-            <File>
-              <FileName>ILI93xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\LCD\ILI93xx.c</FilePath>
             </File>
           </Files>
         </Group>

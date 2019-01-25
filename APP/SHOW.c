@@ -1,5 +1,16 @@
 #include "includes.h" 
-#include "image1.h"
+#include "show.h"
+#include "lcd.h"
+#include "lunar.h"
+#include "ff.h"
+#include "rtc.h"
+#include "mp3player.h"
+#include "text.h"
+#include "vs10xx.h"
+#include "string.h"
+#include "guix.h"
+#include "tjpgd.h"
+#include "piclib.h"
 
 u8 lcd_bit=0;
 FIL* fmp3 = 0;
@@ -156,7 +167,7 @@ void displayjieqi(void)
 
 void timeplay(void)
 {
-	static u8 h = 0, m = 0;
+	//static u8 h = 0, m = 0;
 	Show_Str(58, 0, 24, 24, "Äê", 24, 0);
 	Show_Str(114, 0, 24, 24, "ÔÂ", 24, 0);
 	Show_Str(170, 0, 24, 24, "ÈÕ", 24, 0);
@@ -190,6 +201,7 @@ void timeplay(void)
 		break;
 	}
 
+	/*
 	if (h != calendar.hour)
 	{
 		if (calendar.hour / 10 != 0)
@@ -218,6 +230,7 @@ void timeplay(void)
 		image_display(200, 30, (u8*)gImage[calendar.min % 10]);
 		m = calendar.min;
 	}
+	*/
 	LCD_ShowChar(250, 86, ':', 24, 0);
 	LCD_ShowxNum(262, 86, calendar.sec, 2, 24, 0x80);
 }

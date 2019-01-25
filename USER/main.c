@@ -1,48 +1,60 @@
-#include "includes.h" 
+#include "sys.h" 
+#include "lcd.h"
+#include "sdio_sdcard.h" 
+#include "ff.h" 
+#include "flash.h"
+#include "diskio.h"
+#include "malloc.h"
+#include "exfuns.h"
+#include "rtc.h"
+#include "app_start.h"
+#include "includes.h"
+#include "touch.h"
+#include "delay.h"
+#include "init.h"
+#include "spi.h"
+#include "key.h"
+#include "fontupd.h"
+#include "text.h"
+#include "guix.h"
+#include "piclib.h" 
 
 int main(void)
 {
 	delay_init(72);	    			//延时函数初始化	  
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//中断分组配置
-
-	KEY_Init();								//按键初始化
+	init();										//GPIO等初始化
 	LCD_Init();								//LCD初始化	
 	POINT_COLOR = RED;
 	BACK_COLOR = BLACK;
-	Show_Str(30, 20, 320, 16, "LCD -> OK!", 16, 0);
 	mem_init();								//初始化内存池	 
-	piclib_init();						//PIC初始化
-	gui_init();								//LCD-gui初始化
-	SPI1_Init();			 				//初始化SPI1总线
+	piclib_init();
+	gui_init();
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_2);//设置为18M时钟,高速模式		
-	VS1053_Init();						//VS1053初始化
-
+	TP_Init();								//触摸屏初始化
+	LCD_Clear(BLACK);//清屏  
 	while (exfuns_init())			//为fatfs相关变量申请内存 					
 	{
-		Show_Str(30, 40, 320, 16, "fatfs -> ERROR!", 16, 0);
+		LCD_ShowString(30, 40, 320, 16, 16,"Fatfs -> ERROR!");
 		delay_ms(200);
 		LCD_Fill(30, 40, 320, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
-	Show_Str(30, 40, 320, 16, "fatfs -> OK!", 16, 0);
-
 	while (SD_Init())					//SD卡初始化				
 	{
-		Show_Str(30, 60, 320, 16, "TFcard -> ERROR!", 16, 0);
+		LCD_ShowString(30, 40, 320, 16, 16,"TFcard -> ERROR!");
 		delay_ms(200);
-		LCD_Fill(30, 60, 320, 226, BLACK);//清除显示	     
+		LCD_Fill(30, 40, 320, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
-	Show_Str(30, 60, 320, 16, "TFcard -> OK!", 16, 0);
 
 	while (RTC_Init())					//RTC初始化			
 	{
-		Show_Str(30, 80, 320, 16, "RTC -> ERROR!", 16, 0);
+		LCD_ShowString(30, 40, 320, 16, 16,"RTC -> ERROR!   ");
 		delay_ms(200);
-		LCD_Fill(30, 80, 320, 226, BLACK);//清除显示	     
+		LCD_Fill(30, 40, 320, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
-	Show_Str(30, 80, 320, 16, "RTC -> OK!", 16, 0);
 
 	f_mount(fs[0], "0:", 1); 	//挂载SD卡 
 	f_mount(fs[1], "1:", 1); 	//挂载FLASH.
@@ -56,8 +68,6 @@ int main(void)
 			goto a;
 		}
 	}
-	show_mode = 1;
-	Show_Str(30, 100, 320, 16, "中文字库 -> OK!", 16, 0);
 	APP_start();
 }
 

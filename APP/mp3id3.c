@@ -1,4 +1,13 @@
-#include "includes.h" 
+#include "mp3id3.h" 
+#include "ff.h" 
+#include "fontupd.h"
+#include "flash.h"  
+#include "malloc.h"  
+#include "mp3player.h" 
+#include "lcd.h" 
+#include "show.h" 
+#include "text.h" 
+#include "delay.h" 
 
 u16 UNICODEtoGBK(u16 unicode)  //???????
 {

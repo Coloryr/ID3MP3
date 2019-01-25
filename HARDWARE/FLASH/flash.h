@@ -36,7 +36,6 @@ extern u16 SPI_FLASH_TYPE;		//定义我们使用的flash芯片型号
 #define W25X_ManufactDeviceID	0x90 
 #define W25X_JedecDeviceID		0x9F 
 
-void SPI_Flash_Init(void);
 u16  SPI_Flash_ReadID(void);  	    //读取FLASH ID
 u8	 SPI_Flash_ReadSR(void);        //读取状态寄存器 
 void SPI_FLASH_Write_SR(u8 sr);  	//写状态寄存器

@@ -1,5 +1,6 @@
-#include "includes.h" 
-#include "font.h" 
+#include "lcd.h" 
+#include "font.h"
+#include "delay.h"
 
 //LCD的画笔颜色和背景色	   
 u16 POINT_COLOR=0x0000;	//画笔颜色
@@ -232,96 +233,6 @@ void LCD_Set_Window(u16 sx, u16 sy, u16 width, u16 height)
 //在其他型号的驱动芯片上没有测试! 
 void LCD_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure;
-	FSMC_NORSRAMTimingInitTypeDef  readWriteTiming;
-	FSMC_NORSRAMTimingInitTypeDef  writeTiming;
-
-
-	/* Enable the FSMC AND GPIO Clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;         //LCD 背光控制
-	GPIO_Init(GPIOE, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;      //LCD-RST
-	GPIO_Init(GPIOE, &GPIO_InitStructure);
-
-	/* Set PD.00(D2), PD.01(D3), PD.04(NOE/RD), PD.05(NWE/WR), PD.08(D13), PD.09(D14),
-	  PD.10(D15), PD.14(D0), PD.15(D1) as alternate function push pull */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5 |
-		GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_14 |
-		GPIO_Pin_15;
-
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-	/* Set PE.07(D4), PE.08(D5), PE.09(D6), PE.10(D7), PE.11(D8), PE.12(D9), PE.13(D10),
-	   PE.14(D11), PE.15(D12) as alternate function push pull */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 |
-		GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 |
-		GPIO_Pin_15;
-	GPIO_Init(GPIOE, &GPIO_InitStructure);
-
-	/* CS 为FSMC_NE1(PD7) */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-	/* RS 为FSMC_A16(PD11)*/
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-	GPIO_SetBits(GPIOD, GPIO_Pin_7);            //CS=1 
-	GPIO_SetBits(GPIOD, GPIO_Pin_11);           //RS=1
-	GPIO_SetBits(GPIOD, GPIO_Pin_14 | GPIO_Pin_15 | GPIO_Pin_0 | GPIO_Pin_1);
-	GPIO_SetBits(GPIOE, GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10);
-	GPIO_SetBits(GPIOE, GPIO_Pin_0);            //LIGHT关
-	GPIO_SetBits(GPIOE, GPIO_Pin_1);            //RESET=1
-	GPIO_SetBits(GPIOD, GPIO_Pin_4);            //RD=1
-	GPIO_SetBits(GPIOD, GPIO_Pin_5);            //WR=1
-
-	readWriteTiming.FSMC_AddressSetupTime = 0x01;	 //地址建立时间（ADDSET）为2个HCLK 1/36M=27ns
-	readWriteTiming.FSMC_AddressHoldTime = 0x00;	 //地址保持时间（ADDHLD）模式A未用到	
-	readWriteTiming.FSMC_DataSetupTime = 0x0f;		 // 数据保存时间为16个HCLK,因为液晶驱动IC的读数据的时候，速度不能太快，尤其对1289这个IC。
-	readWriteTiming.FSMC_BusTurnAroundDuration = 0x00;
-	readWriteTiming.FSMC_CLKDivision = 0x00;
-	readWriteTiming.FSMC_DataLatency = 0x00;
-	readWriteTiming.FSMC_AccessMode = FSMC_AccessMode_A;	 //模式B
-
-
-	writeTiming.FSMC_AddressSetupTime = 0x00;	 //地址建立时间（ADDSET）为1个HCLK  
-	writeTiming.FSMC_AddressHoldTime = 0x00;	 //地址保持时间（A		
-	writeTiming.FSMC_DataSetupTime = 0x03;		 ////数据保存时间为4个HCLK	
-	writeTiming.FSMC_BusTurnAroundDuration = 0x00;
-	writeTiming.FSMC_CLKDivision = 0x00;
-	writeTiming.FSMC_DataLatency = 0x00;
-	writeTiming.FSMC_AccessMode = FSMC_AccessMode_A;	 //模式A 
-
-
-	FSMC_NORSRAMInitStructure.FSMC_Bank = FSMC_Bank1_NORSRAM1;//  这里我们使用NE1。
-	FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable; // 不复用数据地址
-	FSMC_NORSRAMInitStructure.FSMC_MemoryType = FSMC_MemoryType_NOR;// FSMC_MemoryType_NOR;  //NOR  
-	FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;//存储器数据宽度为16bit   
-	FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;// FSMC_BurstAccessMode_Disable; 
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
-	FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
-	FSMC_NORSRAMInitStructure.FSMC_WriteOperation = FSMC_WriteOperation_Enable;	//  存储器写使能
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_ExtendedMode = FSMC_ExtendedMode_Enable; // 读写使用不同的时序
-	FSMC_NORSRAMInitStructure.FSMC_WriteBurst = FSMC_WriteBurst_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &readWriteTiming; //读写时序
-	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct = &writeTiming;  //写时序
-
-	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);  //初始化FSMC配置
-
-	FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM1, ENABLE);  // 使能BANK1 
-
-
-	delay_ms(50); 					// delay 50 ms 
 	lcddev.id = LCD_ReadReg(0x0000);	//读ID（9320/9325/9328/4531/4535等IC）   
 	if (lcddev.id == 0x9328)//ILI9328   OK  
 	{
@@ -402,7 +313,7 @@ void LCD_Init(void)
 		//开启显示设置    
 		LCD_WriteReg(0x0007, 0x0133);
 	}
-	LCD_Display_Dir(1);		//EMWIN实验默认设置为横屏
+	LCD_Display_Dir(0);	//EMWIN实验默认设置为横屏
 	LCD_LED = 1;				//点亮背光
 	LCD_Clear(BLACK);
 }
@@ -548,7 +459,7 @@ void LCD_Draw_Circle(u16 x0, u16 y0, u8 r)
 //在指定位置显示一个字符
 //x,y:起始坐标
 //num:要显示的字符:" "--->"~"
-//size:字体大小 12/16/24
+//size:字体大小 12/16/24/32
 //mode:叠加方式(1)还是非叠加方式(0)
 void LCD_ShowChar(u16 x, u16 y, u8 num, u8 size, u8 mode)
 {
@@ -561,6 +472,7 @@ void LCD_ShowChar(u16 x, u16 y, u8 num, u8 size, u8 mode)
 		if (size == 12)temp = asc2_1206[num][t]; 	 	//调用1206字体
 		else if (size == 16)temp = asc2_1608[num][t];	//调用1608字体
 		else if (size == 24)temp = asc2_2412[num][t];	//调用2412字体
+		else if (size == 32)temp = asc2_3216[num][t];	//调用3216字体
 		else return;								//没有的字库
 		for (t1 = 0; t1 < 8; t1++)
 		{

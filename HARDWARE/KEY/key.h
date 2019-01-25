@@ -12,10 +12,7 @@
 #define KEY2  PCin(2)	 	//PA15 
 #define KEY3 PCin(3)	 	//PA0  WK_UP
 	 
-void KEY_Init(void);		//IO初始化
 u8 KEY_Scan(u8 mode);		//按键扫描函数
 u8 KEY0_Scan(void);			//单独扫描KEY0按键
-
-extern u8 key_now;
 
 #endif

@@ -1,5 +1,18 @@
-#include "includes.h" 
+#include "mp3player.h" 
+#include "malloc.h" 
+#include "lcd.h" 
+#include "ff.h" 
 #include "vs_path.h"
+#include "show.h"
+#include "vs10xx.h"
+#include "exfuns.h"
+#include "text.h"
+#include "data.h"
+#include "includes.h"
+#include "string.h"
+#include "mp3id3.h"
+#include "key.h"
+#include "tjpgd.h"
 
 mp3_info info;	//定义fft变量管理结构体
 
