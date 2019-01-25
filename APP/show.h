@@ -19,7 +19,7 @@ extern u8 show_mode;
 
 #define pic_show_x   0						//图片显示的位置_x
 #define pic_show_y   16						//图片显示的位置_y
-#define pic_show_size   224				//图片显示的大小
+#define pic_show_size   240				//图片显示的大小
 
 
 #endif

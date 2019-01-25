@@ -67,8 +67,8 @@ void init_fft(void)
 	for (i = 0; i < FFT_BANDS; i++)	//初始化频谱管理数据
 	{
 		info.fft_cur[i] = 0;
-		info.fft_top[i] = 80;
-		info.fft_time[i] = 30;
+		info.fft_top[i] = 63;
+		info.fft_time[i] = 1;
 	}
 }
 
@@ -83,20 +83,20 @@ void FFT_post(u16 *pbuf)
 	for (i = 0; i < FFT_BANDS; i++)	//显示各个频谱	   循环显示14个段
 	{
 
-		temp = (pbuf[i] & 0X3E) * 3; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
+		temp = (pbuf[i] & 0X3C) * 3; 			//得到当前值,并乘2倍 主要为增加显示效果	因为输出的频率都相对较低
 
 		if (info.fft_cur[i] < temp) 	  //当前值小于temp
 			info.fft_cur[i] = temp;
 		else							  //当前值大于等于temp	 开始往下降 一次降1
 		{
-			if (info.fft_cur[i] > 1)info.fft_cur[i] -= 1;
+			if (info.fft_cur[i] > 1)info.fft_cur[i] -= 2;
 			else info.fft_cur[i] = 0;
 		}
 
 		if (info.fft_cur[i] > info.fft_top[i])//当前值大于峰值时 更新峰值
 		{
 			info.fft_top[i] = info.fft_cur[i];
-			info.fft_time[i] = 30;               //重设峰值停顿时间
+			info.fft_time[i] = 1;               //重设峰值停顿时间
 		}
 
 		if (info.fft_time[i])info.fft_time[i]--;   //如果停顿时间大于1 即未减完
@@ -106,10 +106,10 @@ void FFT_post(u16 *pbuf)
 		}
 
 
-		if (info.fft_cur[i] > 79)info.fft_cur[i] = 79;	  //保证在范围内 因为前面有增倍效果
-		if (info.fft_top[i] > 79)info.fft_top[i] = 79;
+		if (info.fft_cur[i] > 63)info.fft_cur[i] = 63;	  //保证在范围内 因为前面有增倍效果
+		if (info.fft_top[i] > 63)info.fft_top[i] = 63;
 
-		fft_show_oneband(224 + i * 6, 130, 6, 80, info.fft_cur[i], info.fft_top[i]);//显示柱子	   
+		fft_show_oneband(140 + i * 6, 256, 6, 64, info.fft_cur[i], info.fft_top[i]);//显示柱子	   
 	}
 }
 
@@ -140,7 +140,7 @@ void mp3_play_ready()
 	info.totmp3num = mp3_get_tnum("0:/MUSIC"); //得到总有效文件数
 	while (info.totmp3num == NULL)//音乐文件总数为0		
 	{
-		Show_Str(30, 20, 240, 16, "没有音乐文件!", 16, 0);
+		Show_Str(30, 20, 240, 16, "没有文件!", 16, 0);
 		delay_ms(200);
 		LCD_Fill(30, 20, 240, 226, BLACK);//清除显示	     
 		delay_ms(200);
@@ -195,7 +195,7 @@ void mp3_play(void *pdata)
 	static u8 pause = 0;		//暂停标志   
 	CPU_SR_ALLOC();
 
-	databuf = (u8*)mymalloc(1024);		//开辟4096字节的内存区域
+	databuf = (u8*)mymalloc(MP3_BUFF_SIZE);		//开辟4096字节的内存区域
 	if (databuf == NULL)rval = 0XFF;//内存申请失败.
 
 	OS_CRITICAL_ENTER();	//进入临界区
@@ -226,7 +226,7 @@ void mp3_play(void *pdata)
 		if (res != FR_OK)
 			while (1)
 			{
-				Show_Str(30, 120, 240, 16, "MUSIC文件夹错误!", 16, 0);
+				Show_Str(30, 120, 240, 16, "文件夹错误!", 16, 0);
 				delay_ms(200);
 				LCD_Fill(30, 120, 240, 226, BLACK);//清除显示	     
 				delay_ms(200);
@@ -238,7 +238,7 @@ void mp3_play(void *pdata)
 		while (rval == 0)
 		{
 			OS_CRITICAL_ENTER();	//进入临界区
-			res = f_read(info.fmp3, databuf, 1024, (UINT*)&br);//读出4096个字节 			
+			res = f_read(info.fmp3, databuf, MP3_BUFF_SIZE, (UINT*)&br);//读出4096个字节 			
 			OS_CRITICAL_EXIT();
 			i = 0;
 			do//主播放循环
@@ -269,7 +269,7 @@ void mp3_play(void *pdata)
 						write_data();
 						break;
 					case KEY3_PRES:	   //暂停/播放
-						/*if (lcd_bit == 0)
+						if (lcd_bit == 0)
 						{
 							lcd_bit = 1;
 							LCD_LED = 1;
@@ -278,7 +278,7 @@ void mp3_play(void *pdata)
 						{
 							lcd_bit = 0;
 							LCD_LED = 0;
-						}*/
+						}
 						LCD_Clear(BLACK);
 						if (show_mode == 0)
 							show_mode = 1;
@@ -290,8 +290,8 @@ void mp3_play(void *pdata)
 					}
 					show_all();
 				}
-			} while (i < 1024);//循环发送4096个字节 
-			if (br != 1024 || res != 0)
+			} while (i < MP3_BUFF_SIZE);//循环发送4096个字节 
+			if (br != MP3_BUFF_SIZE || res != 0)
 			{
 				rval = KEY0_PRES;
 			}

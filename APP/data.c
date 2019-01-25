@@ -20,9 +20,9 @@ void read_data(void)
 	{
 		info.curindex = 0;
 		vsset.mvol = 160;
-		save_bit[0] = (info.curindex >> 8) & 0xff;
-		save_bit[3] = info.curindex & 0xff;
-		save_bit[4] = vsset.mvol;
+		save_bit[3] = (info.curindex >> 8) & 0xff;
+		save_bit[4] = info.curindex & 0xff;
+		save_bit[2] = vsset.mvol;
 		SPI_Flash_Write(save_bit, save_bit_local, 5);
 	}
 }

@@ -1,6 +1,7 @@
 #include "flash.h" 
 #include "spi.h" 
 #include "delay.h" 
+#include "malloc.h" 
 
 u16 SPI_FLASH_TYPE=W25Q128;//默认就是25Q64
 
@@ -136,22 +137,15 @@ void SPI_Flash_Write_NoCheck(u8* pBuffer, u32 WriteAddr, u16 NumByteToWrite)
 //pBuffer:数据存储区
 //WriteAddr:开始写入的地址(24bit)
 //NumByteToWrite:要写入的字节数(最大65535)  		   
-#ifndef MEM_ALLOC_TABLE_SIZE
-u8 SPI_FLASH_BUFFER[4096];
-#endif 
 void SPI_Flash_Write(u8* pBuffer, u32 WriteAddr, u16 NumByteToWrite)
 {
 	u32 secpos;
 	u16 secoff;
 	u16 secremain;
 	u16 i;
-	u8 * SPI_FLASH_BUF;
-#ifdef MEM_ALLOC_TABLE_SIZE			
+	u8 * SPI_FLASH_BUF;	
 	SPI_FLASH_BUF = mymalloc(4096);	//使用内存管理 
-	if (SPI_FLASH_BUF == NULL)return;	//申请失败
-#else
-	SPI_FLASH_BUF = SPI_FLASH_BUFFER;	//不使用内存管理
-#endif	 
+	if (SPI_FLASH_BUF == NULL)return;	//申请失败 
 	secpos = WriteAddr / 4096;//扇区地址 0~511 for w25x16
 	secoff = WriteAddr % 4096;//在扇区内的偏移
 	secremain = 4096 - secoff;//扇区剩余空间大小    
@@ -187,9 +181,7 @@ void SPI_Flash_Write(u8* pBuffer, u32 WriteAddr, u16 NumByteToWrite)
 			else secremain = NumByteToWrite;			//下一个扇区可以写完了
 		}
 	};
-#ifdef MEM_ALLOC_TABLE_SIZE			
 	myfree(SPI_FLASH_BUF);		//释放内存	 	 
-#endif
 }
 //擦除整个芯片
 //整片擦除时间:

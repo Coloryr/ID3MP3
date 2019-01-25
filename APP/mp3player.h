@@ -8,6 +8,8 @@
 
 #define FFT_BANDS			14			//14个频段
 
+#define MP3_BUFF_SIZE			512			
+
 //mp3变量管理
 typedef struct
 {

@@ -24,9 +24,9 @@ void start_task(void *pdata);
  			   
 //MP3任务
 //设置任务优先级
-#define MUSIC_PLAY_TASK_PRIO       	3 
+#define MUSIC_PLAY_TASK_PRIO       	1
 //设置任务堆栈大小
-#define MUSIC_PLAY_STK_SIZE  		    64
+#define MUSIC_PLAY_STK_SIZE  		    128
 //任务控制块
 OS_TCB MUSICTaskTCB;
 //任务堆栈	
@@ -36,9 +36,9 @@ void mp3_play(void *pdata);
 
 //图片显示任务
 //设置任务优先级
-#define PIC_SHOW_TASK_PRIO       		3
+#define PIC_SHOW_TASK_PRIO       		1
 //设置任务堆栈大小
-#define PIC_SHOW_STK_SIZE  		    64
+#define PIC_SHOW_STK_SIZE  		    128
 //任务控制块
 OS_TCB PICTaskTCB;
 //任务堆栈	
@@ -57,18 +57,6 @@ OS_TCB SHOWTaskTCB;
 CPU_STK SHOW_TASK_STK[SHOW_STK_SIZE];
 //任务函数
 //void show_all(void *pdata);
-
-//EMWINDEMO任务
-//设置任务优先级
-#define EMWINDEMO_TASK_PRIO			6
-//任务堆栈大小
-#define EMWINDEMO_STK_SIZE			64
-//任务控制块
-OS_TCB EmwindemoTaskTCB;
-//任务堆栈
-CPU_STK EMWINDEMO_TASK_STK[EMWINDEMO_STK_SIZE];
-//emwindemo_task任务
-void emwindemo_task(void *p_arg);
 
 //TOUCH任务
 //设置任务优先级
@@ -119,6 +107,7 @@ OS_ERR err;
 	pdata = pdata;
 
 	CPU_Init();
+	/*
 #if OS_CFG_STAT_TASK_EN > 0u
    OSStatTaskCPUUsageInit(&err);  	//统计任务                
 #endif
@@ -131,9 +120,12 @@ OS_ERR err;
 	 //使能时间片轮转调度功能,时间片长度为1个系统时钟节拍，既1*5=5ms
 	OSSchedRoundRobinCfg(DEF_ENABLED,1,&err);  
 #endif		
+	*/
+	OSSchedRoundRobinCfg(DEF_ENABLED,1,&err);
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC,ENABLE);//开启CRC时钟
 	
 	OS_CRITICAL_ENTER();	//进入临界区
+	/*
 	//触摸屏任务
 	OSTaskCreate((OS_TCB*     )&TouchTaskTCB,		
 				 (CPU_CHAR*   )"Touch task", 		
@@ -147,7 +139,8 @@ OS_ERR err;
                  (OS_TICK	  )0,  					
                  (void*       )0,					
                  (OS_OPT      )OS_OPT_TASK_STK_CHK|OS_OPT_TASK_STK_CLR,
-                 (OS_ERR*     )&err);			 
+                 (OS_ERR*     )&err);		
+*/								 
 	//创建MP3任务
 	OSTaskCreate((OS_TCB 	*)&MUSICTaskTCB,
 		(CPU_CHAR	*)"mp3 task",
@@ -190,6 +183,7 @@ OS_ERR err;
 		(OS_OPT)OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
 		(OS_ERR 	*)&err);*/
 	//字库更新任务
+		/*
 	OSTaskCreate((OS_TCB*     )&FontupdataTaskTCB,		
 				 (CPU_CHAR*   )"Fontupdata task", 		
                  (OS_TASK_PTR )fontupdata_task, 			
@@ -203,6 +197,7 @@ OS_ERR err;
                  (void*       )0,					
                  (OS_OPT      )OS_OPT_TASK_STK_CHK|OS_OPT_TASK_STK_CLR,
                  (OS_ERR*     )&err);
+								 */
 	OS_TaskSuspend((OS_TCB*)&StartTaskTCB, &err);		//挂起开始任务			 
 	OS_CRITICAL_EXIT();	//进入临界区
 }

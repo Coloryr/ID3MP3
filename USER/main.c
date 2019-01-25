@@ -18,6 +18,7 @@
 #include "text.h"
 #include "guix.h"
 #include "piclib.h" 
+#include "show.h" 
 
 int main(void)
 {
@@ -25,34 +26,34 @@ int main(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//中断分组配置
 	init();										//GPIO等初始化
 	LCD_Init();								//LCD初始化	
-	POINT_COLOR = RED;
-	BACK_COLOR = BLACK;
 	mem_init();								//初始化内存池	 
 	piclib_init();
 	gui_init();
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_2);//设置为18M时钟,高速模式		
 	TP_Init();								//触摸屏初始化
+	POINT_COLOR = RED;
+	BACK_COLOR = BLACK;
 	LCD_Clear(BLACK);//清屏  
 	while (exfuns_init())			//为fatfs相关变量申请内存 					
 	{
-		LCD_ShowString(30, 40, 320, 16, 16,"Fatfs -> ERROR!");
+		LCD_ShowString(30, 20, 320, 16, 16,"Fatfs -> ERROR!");
 		delay_ms(200);
-		LCD_Fill(30, 40, 320, 226, BLACK);//清除显示	     
+		LCD_Fill(30, 20, 320, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
 	while (SD_Init())					//SD卡初始化				
 	{
-		LCD_ShowString(30, 40, 320, 16, 16,"TFcard -> ERROR!");
+		LCD_ShowString(30, 20, 320, 16, 16,"TFcard -> ERROR!");
 		delay_ms(200);
-		LCD_Fill(30, 40, 320, 226, BLACK);//清除显示	     
+		LCD_Fill(30, 20, 320, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
-
+	LCD_ShowString(30, 20, 320, 16, 16,"RTC Reading.......");
 	while (RTC_Init())					//RTC初始化			
 	{
-		LCD_ShowString(30, 40, 320, 16, 16,"RTC -> ERROR!   ");
+		LCD_ShowString(30, 20, 320, 16, 16,"RTC -> ERROR!   ");
 		delay_ms(200);
-		LCD_Fill(30, 40, 320, 226, BLACK);//清除显示	     
+		LCD_Fill(30, 20, 320, 226, BLACK);//清除显示	     
 		delay_ms(200);
 	}
 
@@ -62,12 +63,13 @@ int main(void)
 	if (font_init() == 1 || KEY_Scan(0) == 1)
 	{
 	a:
-		update_font(30, 100, 16, 0);
+		update_font(30, 20, 16, 0);
 		if (font_init() != 0)
 		{
 			goto a;
 		}
 	}
+	show_mode = 1;
 	APP_start();
 }
 
