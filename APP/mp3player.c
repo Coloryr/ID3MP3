@@ -202,7 +202,6 @@ void mp3_play(void *pdata)
 							lcd_bit = 0;
 							LCD_LED = 0;
 						}
-						LCD_Clear(BLACK);
 						key_now = 0;
 						break;
 					case 5:
@@ -265,6 +264,7 @@ void mp3_play(void *pdata)
 		{
 			LCD_Clear(BLACK);//清屏  
 			Show_Str(0, 0, 240, 16, "发生错误，请复位", 16, 0);
+			HardFault_Handler();
 			while(1);
 		}
 	}

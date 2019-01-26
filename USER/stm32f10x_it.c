@@ -24,6 +24,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h" 
 
+#include "core_cm3.h" 
 #include "lcd.h" 
 #include "text.h" 
  
@@ -35,9 +36,12 @@ void HardFault_Handler(void)
 {
   /* Go to infinite loop when Hard Fault exception occurs */
 	LCD_Clear(BLACK);//清屏  
-	Show_Str(0, 0, 240, 16, "发生错误，请复位", 16, 0);
+	
   while (1)
   {
+		Show_Str(0, 0, 240, 16, "发生错误，尝试复位", 16, 0);
+		__set_FAULTMASK(1); // ??????
+    NVIC_SystemReset(); // ??
   }
 }
  
