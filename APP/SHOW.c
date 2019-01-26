@@ -15,8 +15,6 @@
 u8 lcd_bit=0;
 FIL* fmp3 = 0;
 
-u8 name_show = 0;
-
 _lunar_obj moon;
 
 /*显示生肖-----------------------------------------------------*/
@@ -280,7 +278,8 @@ void show_mp3_pic(void *pdata)
 		if (info.pic_show == 1)
 		{
 			OS_CRITICAL_ENTER();	//进入临界区
-			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
+			LCD_Fill(0, 0, 240,   (240 + 16 * 3) - 1, BLACK);
+			show_all(1);					//显示一次歌名
 			//得到显示方框大小	  	 
 			picinfo.S_Height = pic_show_size;
 			picinfo.S_Width = pic_show_size;
@@ -311,8 +310,8 @@ void show_mp3_pic(void *pdata)
 						if (scale == 4)//错误
 						{
 							scale = 0;
-							Show_Str(0,0,240,16,"图片错误",16,0);
-						}						
+							Show_Str(0, 0, 240, 16, "图片错误", 16, 0);
+						}
 						picinfo.ImgHeight = jpeg_dev->height >> scale;	//缩放后的图片尺寸
 						picinfo.ImgWidth = jpeg_dev->width >> scale;	//缩放后的图片尺寸 
 						ai_draw_init();								//初始化智能画图 
@@ -335,32 +334,36 @@ void show_mp3_pic(void *pdata)
 			}
 			OS_CRITICAL_EXIT();	//进入临界区			
 		}
-		else if(info.pic_show == 2)
+		else if (info.pic_show == 2)
 		{
 			OS_CRITICAL_ENTER();	//进入临界区
-			Show_Str(0,0,240,16,"PNG格式图片不支持",16,0);
+			LCD_Fill(0, 0, 240,  (240 + 16 * 3) - 1, BLACK);
+			show_all(1);					//显示一次歌名
+			Show_Str(0, 0, 240, 16, "PNG格式图片不支持", 16, 0);
 			info.pic_show = 0;
 			OS_CRITICAL_EXIT();	//进入临界区			
 		}
-		else if(info.pic_show == 3)
+		else if (info.pic_show == 3)
 		{
 			OS_CRITICAL_ENTER();	//进入临界区
-			Show_Str(0,0,240,16,"没有图片",16,0);
+			LCD_Fill(0, 0, 240, (240 + 16 * 3) - 1, BLACK);
+			show_all(1);					//显示一次歌名
+			Show_Str(0, 0, 240, 16, "没有图片", 16, 0);
 			info.pic_show = 0;
 			OS_CRITICAL_EXIT();	//进入临界区			
 		}
 	}
 }
 
-void show_all(void)
+void show_all(u8 mode)
 {
 	u8 *fn;
 	u16 temp = 0;
 	RTC_Get();
 	info.time = VS_Get_DecodeTime(); //得到解码时间
-	if (info.pic_show == 0 && lcd_bit == 1)
+	if (mode == 1 && lcd_bit == 1)
 	{
-		if (info.size != 0 && name_show == 0)
+		if (info.size != 0)
 		{
 			if (info.TIT2[0] != 0)
 				Show_Str(0, 240, 240, 16, info.TIT2, 16, 0);				//显示歌曲名字 
@@ -370,19 +373,17 @@ void show_all(void)
 				Show_Str(0, 240 + 34, 240, 16, info.TALB, 16, 0);		//显示歌曲专辑
 			if (info.TIT2[0] == 0 && info.TPE1[0] == 0 && info.TALB[0] == 0)
 				Show_Str(0, 240, 240, 16, fn, 16, 0);				//显示歌曲名字 
-			name_show = 1;
-			goto b;
 		}
-		else if (name_show == 0)
+		else
 		{
 			Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
-			name_show = 1;
-			goto b;
 		}
+	}
+	if (info.pic_show == 0 && mode == 0 && lcd_bit == 1)
+	{
 		if (info.playtime == 0)info.playtime = info.time;
 		else if ((info.time != info.playtime) && (info.time != 0))//1s时间到,更新显示数据
 		{
-b:
 			info.playtime = info.time;//更新时间 	 			
 			temp = VS_Get_HeadInfo(); //获得比特率	   				 
 			if (temp != info.kbps)
@@ -390,25 +391,25 @@ b:
 				info.kbps = temp;//更新KBPS	  				     
 			}
 			//显示播放时间			 
-			LCD_ShowxNum(0, 290, info.time / 60, 2, 16, 0X80);		//分钟
-			LCD_ShowChar(16, 290, ':', 16, 0);
-			LCD_ShowxNum(24, 290, info.time % 60, 2, 16, 0X80);	//秒钟		
-			LCD_ShowChar(40, 290, '/', 16, 0);
+			LCD_ShowxNum(0, 289, info.time / 60, 2, 16, 0X80);		//分钟
+			LCD_ShowChar(16, 289, ':', 16, 0);
+			LCD_ShowxNum(24, 289, info.time % 60, 2, 16, 0X80);	//秒钟		
+			LCD_ShowChar(40, 289, '/', 16, 0);
 			//显示总时间
-			if (info.kbps)info.time = (info.fmp3->fsize / info.kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
+			if (info.kbps)info.time = ((info.fmp3->fsize - info.size) / info.kbps) / 125;//得到秒钟数   (文件长度(字节)/(1000/8)/比特率=持续秒钟数    	  
 			else info.time = 0;//非法位率	  
-			LCD_ShowxNum(48, 290, info.time / 60, 2, 16, 0X80);	//分钟
-			LCD_ShowChar(64, 290, ':', 16, 0);
-			LCD_ShowxNum(72, 290, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
+			LCD_ShowxNum(48, 289, info.time / 60, 2, 16, 0X80);	//分钟
+			LCD_ShowChar(64, 289, ':', 16, 0);
+			LCD_ShowxNum(72, 289, info.time % 60, 2, 16, 0X80);	//秒钟	  		    
 			//显示位率			   
-			LCD_ShowxNum(146, 290, info.kbps, 3, 16, 0X80); 	//显示位率	 
-			LCD_ShowString(146 + 24, 290, 200, 16, 16, "Kbps");
+			LCD_ShowxNum(170, 289, info.kbps, 3, 16, 0X80); 	//显示位率	 
+			LCD_ShowString(170 + 24, 289, 200, 16, 16, "Kbps");
 		}
-		LCD_ShowString(170, 307, 32, 16, 16, "VOL:");
-		LCD_ShowxNum(170 + 32, 307, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量	 
-		LCD_ShowxNum(89, 290, info.curindex + 1, 3, 16, 0X80);		//索引
-		LCD_ShowChar(89 + 24, 290, '/', 16, 0);
-		LCD_ShowxNum(89 + 32, 290, info.totmp3num, 3, 16, 0X80); 	//总曲目	
+		LCD_ShowString(0, 303, 32, 16, 16, "VOL:");
+		LCD_ShowxNum(0 + 32, 303, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量	 
+		LCD_ShowxNum(95, 289, info.curindex + 1, 3, 16, 0X80);		//索引
+		LCD_ShowChar(95 + 24, 289, '/', 16, 0);
+		LCD_ShowxNum(95 + 32, 289, info.totmp3num, 3, 16, 0X80); 	//总曲目	
 	}
 }
 

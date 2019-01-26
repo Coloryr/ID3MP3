@@ -66,7 +66,6 @@ void mp3_play_ready()
 	VS_SPI_SpeedHigh();	//高速			
 
 	lcd_bit = 1;
-	name_show = 0;
 	info.pic_show = 0;
 
 	Show_Str(30, 20, 240, 16, "正在读取文件", 16, 0);
@@ -219,7 +218,7 @@ void mp3_play(void *pdata)
 					default:
 						break;
 					}
-					show_all();
+					show_all(0);
 				}
 			} while (i < MP3_BUFF_SIZE);//循环发送4096个字节 
 			if (br != MP3_BUFF_SIZE || res != 0)
@@ -234,7 +233,6 @@ void mp3_play(void *pdata)
 			if (info.curindex)info.curindex--;
 			else info.curindex = info.totmp3num - 1;
 			write_data();
-			name_show = 0;
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
 		else if (rval == KEY0_PRES)//下一曲
@@ -242,14 +240,12 @@ void mp3_play(void *pdata)
 			info.curindex++;
 			if (info.curindex >= info.totmp3num)info.curindex = 0;//到末尾的时候,自动从头开始
 			write_data();
-			name_show = 0;
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
 		else if(rval == 5)
 		{
 			info.curindex = app_get_rand(info.totmp3num - 1);	
 			write_data();
-			name_show = 0;
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
 		else 
