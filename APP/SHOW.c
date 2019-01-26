@@ -364,7 +364,7 @@ void show_all(u8 mode)
 	u16 temp = 0;
 	RTC_Get();
 	info.time = VS_Get_DecodeTime(); //得到解码时间
-	if (mode == 1 && lcd_bit == 1)
+	if (mode == 1)
 	{
 		if (info.size != 0)
 		{
@@ -382,7 +382,7 @@ void show_all(u8 mode)
 			Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
 		}
 	}
-	if (((info.pic_show == 0 && mode == 0) || mode == 3) && lcd_bit == 1)
+	if (((info.pic_show == 0 && mode == 0 && lcd_bit == 1) || mode == 3))
 	{
 		if (info.playtime == 0)info.playtime = info.time;
 		else if (((info.time != info.playtime) && (info.time != 0)) || mode == 3)//1s时间到,更新显示数据

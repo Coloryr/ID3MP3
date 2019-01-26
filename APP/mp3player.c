@@ -14,6 +14,7 @@
 #include "tjpgd.h"
 #include "app_start.h" 
 #include "stdlib.h"
+#include "stm32f10x_it.h"
 
 mp3_info info;	//定义变量管理结构体
 
@@ -136,7 +137,7 @@ void mp3_play(void *pdata)
 	{
 		OS_CRITICAL_ENTER();	//进入临界区
 		LCD_Fill(0, 0, pic_show_size,
-				16 + pic_show_size, BACK_COLOR);
+			16 + pic_show_size, BACK_COLOR);
 		dir_sdi(&mp3dir, info.mp3indextbl[info.curindex]);			//改变当前目录索引	   
 		res = f_readdir(&mp3dir, &info.mp3fileinfo);       		//读取目录下的一个文件
 		if (res != FR_OK || info.mp3fileinfo.fname[0] == 0)break;	//错误了/到末尾了,退出
@@ -170,65 +171,65 @@ void mp3_play(void *pdata)
 			i = 0;
 			do//主播放循环
 			{
+				button_check();
+				switch (key_now)
+				{
+				case KEY0_PRES:
+					rval = KEY0_PRES;		//下一曲
+					key_now = 0;
+					break;
+				case KEY1_PRES:
+					rval = KEY1_PRES;		//上一曲
+					key_now = 0;
+					break;
+				case KEY2_PRES:
+					rval = 5;						//随机					
+					key_now = 0;
+					break;
+				case KEY3_PRES:	   //暂停/播放
+					if (lcd_bit == 0)
+					{
+						lcd_bit = 1;
+						LCD_LED = 1;
+					}
+					else if (lcd_bit == 1)
+					{
+						lcd_bit = 0;
+						LCD_LED = 0;
+					}
+					key_now = 0;
+					break;
+				case 5:
+					vsset.mvol = vsset.mvol + 10;
+					if (vsset.mvol >= 200)
+					{
+						vsset.mvol = 100;
+					}
+					VS_Set_Vol(vsset.mvol);
+					save_bit[2] = vsset.mvol;
+					write_data();
+					key_now = 0;
+					break;
+				case 6:
+					vsset.mvol = vsset.mvol - 10;
+					if (vsset.mvol < 100)
+					{
+						vsset.mvol = 200;
+					}
+					VS_Set_Vol(vsset.mvol);
+					save_bit[2] = vsset.mvol;
+					write_data();
+					key_now = 0;
+					break;
+				default:
+					break;
+				}
 				if ((VS_Send_MusicData(databuf + i) == 0) && (pause == 0))//给VS10XX发送音频数据
 				{
 					i += 32;
 				}
 				else
 				{
-					button_check();
-					switch (key_now)
-					{
-					case KEY0_PRES:
-						rval = KEY0_PRES;		//下一曲
-						key_now = 0;
-						break;
-					case KEY1_PRES:
-						rval = KEY1_PRES;		//上一曲
-						key_now = 0;
-						break;
-					case KEY2_PRES:
-						rval = 5;						//随机					
-						key_now = 0;
-						break;
-					case KEY3_PRES:	   //暂停/播放
-						if (lcd_bit == 0)
-						{
-							lcd_bit = 1;
-							LCD_LED = 1;
-						}
-						else if (lcd_bit == 1)
-						{
-							lcd_bit = 0;
-							LCD_LED = 0;
-						}
-						key_now = 0;
-						break;
-					case 5:
-						vsset.mvol = vsset.mvol + 10;
-						if (vsset.mvol >= 200)
-						{
-							vsset.mvol = 100;
-						}
-						VS_Set_Vol(vsset.mvol);
-						save_bit[2] = vsset.mvol;
-						write_data();
-						key_now = 0;
-						break;
-					case 6:
-						vsset.mvol = vsset.mvol - 10;
-						if (vsset.mvol < 100)
-						{
-							vsset.mvol = 200;
-						}
-						VS_Set_Vol(vsset.mvol);
-						save_bit[2] = vsset.mvol;
-						write_data();
-						key_now = 0;
-						break;
-					default:
-						break;
-					}
 					show_all(0);
 				}
 			} while (i < MP3_BUFF_SIZE);//循环发送4096个字节 
@@ -253,19 +254,19 @@ void mp3_play(void *pdata)
 			write_data();
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
-		else if(rval == 5)
+		else if (rval == 5)
 		{
 			srand(app_get_rand(info.curindex));
-			info.curindex = rand() % (info.totmp3num - 1); 
+			info.curindex = rand() % (info.totmp3num - 1);
 			write_data();
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
-		else 
+		else
 		{
 			LCD_Clear(BLACK);//清屏  
 			Show_Str(0, 0, 240, 16, "发生错误，请复位", 16, 0);
 			HardFault_Handler();
-			while(1);
+			while (1);
 		}
 	}
 	myfree(info.mp3fileinfo.lfname);	//释放内存			    

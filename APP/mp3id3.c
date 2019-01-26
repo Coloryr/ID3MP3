@@ -322,17 +322,17 @@ void mp3id3(void)
 				img = 0;
 			}
 		}
-		if (lcd_bit == 1 && code_type == 0)
+		if (code_type == 0)
 		{
 			i += 14 + 20;
 			info.pic_local = i;
 			info.pic_show = 1;
 		}
-		else if (code_type == 1 && lcd_bit == 1)
+		else if (code_type == 1)
 		{
 			info.pic_show = 2;
 		}
-		else if (code_type == 2 && lcd_bit == 1)
+		else if (code_type == 2)
 		{
 			info.pic_show = 3;
 		}
