@@ -13,6 +13,7 @@
 #include "key.h"
 #include "tjpgd.h"
 #include "app_start.h" 
+#include "stdlib.h"
 
 mp3_info info;	//定义变量管理结构体
 
@@ -187,17 +188,6 @@ void mp3_play(void *pdata)
 						key_now = 0;
 						break;
 					case KEY2_PRES:
-						/*
-						vsset.mvol = vsset.mvol + 10;
-						if (vsset.mvol >= 200)
-						{
-							vsset.mvol = 100;
-						}
-						VS_Set_Vol(vsset.mvol);
-						save_bit[2] = vsset.mvol;
-						write_data();
-						key_now = 0;
-					*/
 						rval = 5;						//随机					
 						key_now = 0;
 						break;
@@ -213,6 +203,28 @@ void mp3_play(void *pdata)
 							LCD_LED = 0;
 						}
 						LCD_Clear(BLACK);
+						key_now = 0;
+						break;
+					case 5:
+						vsset.mvol = vsset.mvol + 10;
+						if (vsset.mvol >= 200)
+						{
+							vsset.mvol = 100;
+						}
+						VS_Set_Vol(vsset.mvol);
+						save_bit[2] = vsset.mvol;
+						write_data();
+						key_now = 0;
+						break;
+					case 6:
+						vsset.mvol = vsset.mvol - 10;
+						if (vsset.mvol < 100)
+						{
+							vsset.mvol = 200;
+						}
+						VS_Set_Vol(vsset.mvol);
+						save_bit[2] = vsset.mvol;
+						write_data();
 						key_now = 0;
 						break;
 					default:
@@ -244,7 +256,8 @@ void mp3_play(void *pdata)
 		}
 		else if(rval == 5)
 		{
-			info.curindex = app_get_rand(info.totmp3num - 1);	
+			srand(app_get_rand(info.curindex));
+			info.curindex = rand() % (info.totmp3num - 1); 
 			write_data();
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}

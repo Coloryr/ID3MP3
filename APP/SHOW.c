@@ -280,6 +280,7 @@ void show_mp3_pic(void *pdata)
 			OS_CRITICAL_ENTER();	//进入临界区
 			LCD_Fill(0, 0, 240,   (240 + 16 * 3) - 1, BLACK);
 			show_all(1);					//显示一次歌名
+			show_all(3);					//显示歌曲信息
 			//得到显示方框大小	  	 
 			picinfo.S_Height = pic_show_size;
 			picinfo.S_Width = pic_show_size;
@@ -339,6 +340,7 @@ void show_mp3_pic(void *pdata)
 			OS_CRITICAL_ENTER();	//进入临界区
 			LCD_Fill(0, 0, 240,  (240 + 16 * 3) - 1, BLACK);
 			show_all(1);					//显示一次歌名
+			show_all(3);					//显示歌曲信息
 			Show_Str(0, 0, 240, 16, "PNG格式图片不支持", 16, 0);
 			info.pic_show = 0;
 			OS_CRITICAL_EXIT();	//进入临界区			
@@ -348,6 +350,7 @@ void show_mp3_pic(void *pdata)
 			OS_CRITICAL_ENTER();	//进入临界区
 			LCD_Fill(0, 0, 240, (240 + 16 * 3) - 1, BLACK);
 			show_all(1);					//显示一次歌名
+			show_all(3);					//显示歌曲信息
 			Show_Str(0, 0, 240, 16, "没有图片", 16, 0);
 			info.pic_show = 0;
 			OS_CRITICAL_EXIT();	//进入临界区			
@@ -379,10 +382,10 @@ void show_all(u8 mode)
 			Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
 		}
 	}
-	if (info.pic_show == 0 && mode == 0 && lcd_bit == 1)
+	if (((info.pic_show == 0 && mode == 0) || mode == 3) && lcd_bit == 1)
 	{
 		if (info.playtime == 0)info.playtime = info.time;
-		else if ((info.time != info.playtime) && (info.time != 0))//1s时间到,更新显示数据
+		else if (((info.time != info.playtime) && (info.time != 0)) || mode == 3)//1s时间到,更新显示数据
 		{
 			info.playtime = info.time;//更新时间 	 			
 			temp = VS_Get_HeadInfo(); //获得比特率	   				 

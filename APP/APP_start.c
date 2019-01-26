@@ -155,21 +155,17 @@ void button_check(void)
 		if (tp_dev.x[0] < lcddev.width&&tp_dev.y[0] < lcddev.height)
 		{
 			if (tp_dev.x[0] > 0 && tp_dev.x[0] <= 120 && tp_dev.y[0] > 0 & tp_dev.y[0] <= 120)
-			{
 				check = 1;
-			}
 			if (tp_dev.x[0] >= 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] > 0 && tp_dev.y[0] <= 120)
-			{
 				check = 2;
-			}
 			if (tp_dev.x[0] > 0 && tp_dev.x[0] <= 120 && tp_dev.y[0] >= 121 & tp_dev.y[0] <= 240)
-			{
 				check = 3;
-			}
 			if (tp_dev.x[0] >= 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 121 & tp_dev.y[0] <= 240)
-			{
 				check = 4;
-			}
+			if (tp_dev.x[0] > 0 && tp_dev.x[0] <= 120 && tp_dev.y[0] >= 240 & tp_dev.y[0] <= 320)
+				check = 5;
+			if (tp_dev.x[0] >= 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 240 & tp_dev.y[0] <= 320)
+				check = 6;
 		}
 	}
 	else
