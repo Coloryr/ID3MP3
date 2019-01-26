@@ -31,30 +31,22 @@ int main(void)
 	gui_init();
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_2);//设置为18M时钟,高速模式		
 	TP_Init();								//触摸屏初始化
+	tp_dev.init();
 	POINT_COLOR = RED;
 	BACK_COLOR = BLACK;
 	LCD_Clear(BLACK);//清屏  
 	while (exfuns_init())			//为fatfs相关变量申请内存 					
 	{
 		LCD_ShowString(30, 20, 320, 16, 16,"Fatfs -> ERROR!");
-		delay_ms(200);
-		LCD_Fill(30, 20, 320, 226, BLACK);//清除显示	     
-		delay_ms(200);
 	}
 	while (SD_Init())					//SD卡初始化				
 	{
 		LCD_ShowString(30, 20, 320, 16, 16,"TFcard -> ERROR!");
-		delay_ms(200);
-		LCD_Fill(30, 20, 320, 226, BLACK);//清除显示	     
-		delay_ms(200);
 	}
-	LCD_ShowString(30, 20, 320, 16, 16,"RTC Reading.......");
+	LCD_ShowString(30, 20, 320, 16, 16,"RTC Reading......");
 	while (RTC_Init())					//RTC初始化			
 	{
 		LCD_ShowString(30, 20, 320, 16, 16,"RTC -> ERROR!   ");
-		delay_ms(200);
-		LCD_Fill(30, 20, 320, 226, BLACK);//清除显示	     
-		delay_ms(200);
 	}
 
 	f_mount(fs[0], "0:", 1); 	//挂载SD卡 
@@ -69,7 +61,11 @@ int main(void)
 			goto a;
 		}
 	}
-	show_mode = 1;
+	if (KEY_Scan(0) == 2)
+	{
+		LCD_Clear(WHITE);//清屏
+		TP_Adjust();  	//屏幕校准
+	}
 	APP_start();
 }
 

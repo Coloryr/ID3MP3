@@ -24,7 +24,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h" 
 
-
+#include "lcd.h" 
+#include "text.h" 
  
 void NMI_Handler(void)
 {
@@ -33,6 +34,8 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* Go to infinite loop when Hard Fault exception occurs */
+	LCD_Clear(BLACK);//清屏  
+	Show_Str(0, 0, 240, 16, "发生错误，请复位", 16, 0);
   while (1)
   {
   }

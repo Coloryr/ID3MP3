@@ -176,7 +176,7 @@ u8 update_font(u16 x, u16 y, u8 size, u8 src)
 //		 其他,字库丢失
 u8 font_init(void)
 {
-	FONTINFOADDR=(1024*25)*1024;
+	FONTINFOADDR = (1024 * 25) * 1024;
 	ftinfo.ugbkaddr = FONTINFOADDR + 41;		//UNICODEGBK 表存放首地址固定地址
 	SPI_Flash_Read((u8*)&ftinfo, FONTINFOADDR, sizeof(ftinfo));//读出ftinfo结构体数据
 	if (ftinfo.fontok != 0XAA)return 1;		//字库错误. 

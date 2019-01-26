@@ -40,31 +40,32 @@ void write_data(void)
 //保存校准参数										    
 void TP_Save_Adjdata(void)
 {
-	u8 a[1]={0};
-	a[0]=0X0A;
-	SPI_Flash_Write((u8*)&tp_dev.xfac,SAVE_ADDR_BASE,14);	//强制保存&tp_dev.xfac地址开始的14个字节数据，即保存到tp_dev.touchtype
- 	SPI_Flash_Write(a,SAVE_ADDR_BASE+14,1);					//在最后，写0X0A标记校准过了
+	u8 a[1] = { 0 };
+	a[0] = 0X0A;
+	SPI_Flash_Write((u8*)&tp_dev.xfac, SAVE_ADDR_BASE, 14);	//强制保存&tp_dev.xfac地址开始的14个字节数据，即保存到tp_dev.touchtype
+	SPI_Flash_Write(a, SAVE_ADDR_BASE + 14, 1);					//在最后，写0X0A标记校准过了
 }
 //得到保存在EEPROM里面的校准值
 //返回值：1，成功获取数据
 //        0，获取失败，要重新校准
 u8 TP_Get_Adjdata(void)
-{					  
-	u8 read[1]={0};
-	SPI_Flash_Read(read,SAVE_ADDR_BASE+14,1);//读取标记字,看是否校准过！ 		 
-	if(read[0]==0X0A)//触摸屏已经校准过了			   
- 	{ 
-		SPI_Flash_Read((u8*)&tp_dev.xfac,SAVE_ADDR_BASE,14);//读取之前保存的校准数据 
-		if(tp_dev.touchtype)//X,Y方向与屏幕相反
+{
+	u8 read[1] = { 0 };
+	SPI_Flash_Read(read, SAVE_ADDR_BASE + 14, 1);//读取标记字,看是否校准过！ 		 
+	if (read[0] == 0X0A)//触摸屏已经校准过了			   
+	{
+		SPI_Flash_Read((u8*)&tp_dev.xfac, SAVE_ADDR_BASE, 14);//读取之前保存的校准数据 
+		if (tp_dev.touchtype)//X,Y方向与屏幕相反
 		{
-			CMD_RDX=0X90;
-			CMD_RDY=0XD0;	 
-		}else				   //X,Y方向与屏幕相同
+			CMD_RDX = 0X90;
+			CMD_RDY = 0XD0;
+		}
+		else				   //X,Y方向与屏幕相同
 		{
-			CMD_RDX=0XD0;
-			CMD_RDY=0X90;	 
-		}		 
-		return 1;	 
+			CMD_RDX = 0XD0;
+			CMD_RDY = 0X90;
+		}
+		return 1;
 	}
 	return 0;
-}	 
+}

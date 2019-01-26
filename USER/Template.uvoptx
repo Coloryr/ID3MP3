@@ -150,9 +150,25 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>36</LineNumber>
+          <LineNumber>343</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134218714</Address>
+          <Address>134228432</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\APP\SHOW.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Template\../APP/SHOW.c\343</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>39</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134218676</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -161,7 +177,23 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\stm32f10x_it.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\Template\stm32f10x_it.c\36</Expression>
+          <Expression>\\Template\stm32f10x_it.c\39</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>336</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134228260</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\APP\SHOW.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Template\../APP/SHOW.c\336</Expression>
         </Bp>
       </Breakpoint>
       <MemoryWindow1>

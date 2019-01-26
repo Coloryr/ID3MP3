@@ -338,31 +338,12 @@ void LCD_Fill(u16 sx, u16 sy, u16 ex, u16 ey, u16 color)
 {
 	u16 i, j;
 	u16 xlen = 0;
-	u16 temp;
-	if ((lcddev.id == 0X6804) && (lcddev.dir == 1))	//6804横屏的时候特殊处理  
+	xlen = ex - sx + 1;
+	for (i = sy; i <= ey; i++)
 	{
-		temp = sx;
-		sx = sy;
-		sy = lcddev.width - ex - 1;
-		ex = ey;
-		ey = lcddev.width - temp - 1;
-		lcddev.dir = 0;
-		lcddev.setxcmd = 0X2A;
-		lcddev.setycmd = 0X2B;
-		LCD_Fill(sx, sy, ex, ey, color);
-		lcddev.dir = 1;
-		lcddev.setxcmd = 0X2B;
-		lcddev.setycmd = 0X2A;
-	}
-	else
-	{
-		xlen = ex - sx + 1;
-		for (i = sy; i <= ey; i++)
-		{
-			LCD_SetCursor(sx, i);      				//设置光标位置 
-			LCD_WriteRAM_Prepare();     			//开始写入GRAM	  
-			for (j = 0; j < xlen; j++)LCD->LCD_RAM = color;	//显示颜色 	    
-		}
+		LCD_SetCursor(sx, i);      				//设置光标位置 
+		LCD_WriteRAM_Prepare();     			//开始写入GRAM	  
+		for (j = 0; j < xlen; j++)LCD->LCD_RAM = color;	//显示颜色 	    
 	}
 }
 //在指定区域内填充指定颜色块			 

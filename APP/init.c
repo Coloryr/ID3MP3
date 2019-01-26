@@ -9,17 +9,17 @@ void init(void)
 	FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure;
 	FSMC_NORSRAMTimingInitTypeDef  readWriteTiming;
 	FSMC_NORSRAMTimingInitTypeDef  writeTiming;
-	
+
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);	//关闭jtag，使能SWD，可以用SWD模式调试
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|
-													RCC_APB2Periph_GPIOC|
-													RCC_APB2Periph_GPIOD|
-													RCC_APB2Periph_GPIOE|
-													RCC_APB2Periph_SPI1, ENABLE);//使能时钟
-	
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |
+		RCC_APB2Periph_GPIOC |
+		RCC_APB2Periph_GPIOD |
+		RCC_APB2Periph_GPIOE |
+		RCC_APB2Periph_SPI1, ENABLE);//使能时钟
+
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	
+
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
@@ -27,7 +27,7 @@ void init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;  
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
@@ -38,9 +38,9 @@ void init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
-	
+
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5 |
-		GPIO_Pin_7 |GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_14 |
+		GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_14 |
 		GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
@@ -50,15 +50,15 @@ void init(void)
 		GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 |
 		GPIO_Pin_15;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
-	
+
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
-	
+
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 |  GPIO_Pin_1|  GPIO_Pin_4| GPIO_Pin_5| GPIO_Pin_6 ;         
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
-	
+
 	GPIO_SetBits(GPIOA, GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7);  //PB13/14/15上拉
 	GPIO_SetBits(GPIOC, GPIO_Pin_13);
 	GPIO_SetBits(GPIOD, GPIO_Pin_7);            //CS=1 
@@ -105,7 +105,7 @@ void init(void)
 	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);  //初始化FSMC配置
 
 	FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM1, ENABLE);  // 使能BANK1 
-	
+
 	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;  //设置SPI单向或者双向的数据模式:SPI设置为双线双向全双工
 	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;		//设置SPI工作模式:设置为主SPI
 	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;		//设置SPI的数据大小:SPI发送接收8位帧结构
@@ -120,9 +120,9 @@ void init(void)
 	SPI_Cmd(SPI1, ENABLE); //使能SPI外设
 
 	SPI1_ReadWriteByte(0xff);//启动传输		 
-	
+
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_4);	//设置为18M时钟,高速模式
-	
+
 	SPI_FLASH_TYPE = SPI_Flash_ReadID();//读取FLASH ID.
 }
 

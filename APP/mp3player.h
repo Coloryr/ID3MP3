@@ -3,12 +3,7 @@
 #include "sys.h"
 #include "ff.h"
 
-#define FFT_TOP_COLOR				0XF800		//柱子顶部的颜色
-#define FFT_BANDS_COLOR			0X07FF		//柱子的颜色	    
-
-#define FFT_BANDS			14			//14个频段
-
-#define MP3_BUFF_SIZE			512			
+#define MP3_BUFF_SIZE			256			
 
 //mp3变量管理
 typedef struct
@@ -30,12 +25,6 @@ typedef struct
 	u8 *TIT2;						//歌名
 	u8 *TPE1;						//作者
 	u8 *TALB;           //专辑
-
-	u8 fft_top[FFT_BANDS];	 //频谱顶值表
-	u8 fft_cur[FFT_BANDS];	 //频谱当前值表
-	u8 fft_time[FFT_BANDS];	 //顶值停留时间表
-
-	u16 FFTbuf[15];    //频谱数组
 
 	u8 pic_show;
 

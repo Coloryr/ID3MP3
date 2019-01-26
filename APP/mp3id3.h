@@ -3,7 +3,7 @@
 #include "sys.h"  
 #include "exfuns.h"
  	 	 
-#define READ_buff_size   8192			//读文件的缓存大小
+#define READ_buff_size   4096			//读文件的缓存大小
 
 void mp3id3(void);
 

@@ -39,6 +39,93 @@ u16 UNICODEtoGBK(u16 unicode)  //???????
 	return c;
 }
 
+void ID3_UTF8(u8 *databuf, u16 tag_size, u16 i, u8 *INFO)
+{
+	u8 temp;
+	u16 a = 0;
+	for (temp = 0; temp < tag_size;)
+	{
+		a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
+		if (a < 0x80) {				/* 7-bit */
+			info.TIT2[temp++] = (BYTE)a;
+		}
+		else {
+			if (a < 0x800) {		/* 11-bit */
+				INFO[temp++] = (BYTE)(0xC0 | a >> 6);
+			}
+			else {				/* 16-bit */
+				INFO[temp++] = (BYTE)(0xE0 | a >> 12);
+				INFO[temp++] = (BYTE)(0x80 | (a >> 6 & 0x3F));
+			}
+			INFO[temp++] = (BYTE)(0x80 | (a & 0x3F));
+		}
+	}
+}
+
+void ID3_UTF16BE(u8 *databuf, u16 tag_size, u16 i, u8 *INFO)
+{
+	u8	temp2 = 0;
+	u8 temp = 0;
+	u8 temp1 = 0;
+	u16 a = 0;
+	for (temp = 0; temp < tag_size;)
+	{
+		a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
+		a = UNICODEtoGBK(a);
+		temp1 = (a >> 8) & 0xff;
+		if (temp1 != 0x00)
+		{
+			INFO[temp2] = temp1;
+			temp2++;
+		}
+		temp1 = a & 0xff;
+		if (temp1 != 0x00)
+		{
+			INFO[temp2] = temp1;
+			temp2++;
+		}
+		temp += 2;
+	}
+}
+
+void ID3_UTF16LE(u8 *databuf, u16 tag_size, u16 i, u8 *INFO)
+{
+	u8 temp2 = 0;
+	u8 temp, temp1;
+	u16 a;
+	for (temp = 0; temp < tag_size;)
+	{
+		a = (databuf[i + temp + 1] << 8) | databuf[i + temp];
+		a = UNICODEtoGBK(a);
+		temp1 = (a >> 8) & 0xff;
+		if (temp1 != 0x00)
+		{
+			INFO[temp2] = temp1;
+			temp2++;
+		}
+		temp1 = a & 0xff;
+		if (temp1 != 0x00)
+		{
+			INFO[temp2] = temp1;
+			temp2++;
+		}
+		temp += 2;
+	}
+}
+
+void ID3_iso_8859_1(u8 *databuf, u16 tag_size, u16 i, u8 *INFO)
+{
+	u8 temp, temp1;
+	for (temp = 0; temp < tag_size;)
+	{
+		temp1 = databuf[i + temp];
+		if (temp1 != 0x00)
+			INFO[temp++] = temp1;
+		else
+			temp++;
+	}
+}
+
 void mp3id3(void)
 {
 	u16 i = 0;
@@ -48,8 +135,6 @@ void mp3id3(void)
 	u8 temp;
 	u16 tag_size;
 	u8 code_type;
-	u16 a = 0;
-	u8 temp1, temp2;
 
 	databuf = (u8*)mymalloc(READ_buff_size);
 
@@ -94,103 +179,28 @@ void mp3id3(void)
 					| databuf[i + 6] << 8
 					| databuf[i + 7];
 				if (databuf[i + 11] == 0xFE && databuf[i + 12] == 0xFF && databuf[i + 10] == 0x01)
-				{
-					code_type = 2;							//UTF-16BE
+				{																					//UTF-16BE								
 					i += 13;
 					tag_size -= 3;
+					ID3_UTF16BE(databuf, tag_size, i, info.TIT2);
 				}
 				else if (databuf[i + 11] == 0xFF && databuf[i + 12] == 0xFE && databuf[i + 10] == 0x01)
-				{
-					code_type = 1;							//UTF-16LE
+				{																					//UTF-16LE					
 					i += 13;
 					tag_size -= 3;
+					ID3_UTF16LE(databuf, tag_size, i, info.TIT2);
 				}
-				else if (databuf[i + 10] == 0x00)
+				else if (databuf[i + 10] == 0x00)					//iso-8859-1
 				{
-					code_type = 0;							//iso-8859-1
 					i += 11;
 					tag_size -= 1;
+					ID3_iso_8859_1(databuf, tag_size, i, info.TIT2);
 				}
-				else if (databuf[i + 10] == 0x03)
+				else if (databuf[i + 10] == 0x03)					//UTF-8
 				{
-					code_type = 3;							//UTF-8
 					i += 11;
 					tag_size -= 1;
-				}
-				if (code_type == 3)			//UTF-8
-				{
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
-						if (a < 0x80) {				/* 7-bit */
-							info.TIT2[temp++] = (BYTE)a;
-						}
-						else {
-							if (a < 0x800) {		/* 11-bit */
-								info.TIT2[temp++] = (BYTE)(0xC0 | a >> 6);
-							}
-							else {				/* 16-bit */
-								info.TIT2[temp++] = (BYTE)(0xE0 | a >> 12);
-								info.TIT2[temp++] = (BYTE)(0x80 | (a >> 6 & 0x3F));
-							}
-							info.TIT2[temp++] = (BYTE)(0x80 | (a & 0x3F));
-						}
-					}
-				}
-				else if (code_type == 2)			//UTF-16BE
-				{
-					temp2 = 0;
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
-						a = UNICODEtoGBK(a);
-						temp1 = (a >> 8) & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TIT2[temp2] = temp1;
-							temp2++;
-						}
-						temp1 = a & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TIT2[temp2] = temp1;
-							temp2++;
-						}
-						temp += 2;
-					}
-				}
-				else if (code_type == 1)			//UTF-16LE
-				{
-					temp2 = 0;
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp + 1] << 8) | databuf[i + temp];
-						a = UNICODEtoGBK(a);
-						temp1 = (a >> 8) & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TIT2[temp2] = temp1;
-							temp2++;
-						}
-						temp1 = a & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TIT2[temp2] = temp1;
-							temp2++;
-						}
-						temp += 2;
-					}
-				}
-				else if (code_type == 0)			//iso-8859-1
-				{
-					for (temp = 0; temp < tag_size;)
-					{
-						temp1 = databuf[i + temp];
-						if (temp1 != 0x00)
-							info.TIT2[temp++] = temp1;
-						else
-							temp++;
-					}
+					ID3_UTF8(databuf, tag_size, i, info.TIT2);
 				}
 				img = 0;
 			}
@@ -199,7 +209,6 @@ void mp3id3(void)
 			if (i >= READ_buff_size - 6)								//找不到位置
 			{
 				img = 0;
-				code_type = 4;
 			}
 		}
 		img = 1;
@@ -213,107 +222,28 @@ void mp3id3(void)
 					| databuf[i + 6] << 8
 					| databuf[i + 7];
 				if (databuf[i + 11] == 0xFE && databuf[i + 12] == 0xFF && databuf[i + 10] == 0x01)
-				{
-					code_type = 2;							//UTF-16BE
+				{																					//UTF-16BE						
 					i += 13;
 					tag_size -= 3;
+					ID3_UTF16BE(databuf, tag_size, i, info.TPE1);
 				}
 				else if (databuf[i + 11] == 0xFF && databuf[i + 12] == 0xFE && databuf[i + 10] == 0x01)
-				{
-					code_type = 1;							//UTF-16LE
+				{																					//UTF-16LE							
 					i += 13;
 					tag_size -= 3;
+					ID3_UTF16LE(databuf, tag_size, i, info.TPE1);
 				}
-				else if (databuf[i + 10] == 0x00)
+				else if (databuf[i + 10] == 0x00)					//iso-8859-1
 				{
-					code_type = 0;							//iso-8859-1
 					i += 11;
 					tag_size -= 1;
+					ID3_iso_8859_1(databuf, tag_size, i, info.TPE1);
 				}
-				else if (databuf[i + 10] == 0x03)
+				else if (databuf[i + 10] == 0x03)					//UTF-8
 				{
-					code_type = 3;							//UTF-8
 					i += 11;
 					tag_size -= 1;
-				}
-
-				if (code_type == 3)			//UTF-8
-				{
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
-						if (a < 0x80) {				/* 7-bit */
-							info.TPE1[temp++] = (BYTE)a;
-						}
-						else {
-							if (a < 0x800) {		/* 11-bit */
-								info.TPE1[temp++] = (BYTE)(0xC0 | a >> 6);
-							}
-							else {				/* 16-bit */
-								info.TPE1[temp++] = (BYTE)(0xE0 | a >> 12);
-								info.TPE1[temp++] = (BYTE)(0x80 | (a >> 6 & 0x3F));
-							}
-							info.TPE1[temp++] = (BYTE)(0x80 | (a & 0x3F));
-						}
-					}
-				}
-				else if (code_type == 2)			//UTF-16BE
-				{
-					temp2 = 0;
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
-						a = UNICODEtoGBK(a);
-						temp1 = (a >> 8) & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TPE1[temp2] = temp1;
-							temp2++;
-						}
-						temp1 = a & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TPE1[temp2] = temp1;
-							temp2++;
-						}
-						temp += 2;
-					}
-				}
-				else if (code_type == 1)			//UTF-16LE
-				{
-					temp2 = 0;
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp + 1] << 8) | databuf[i + temp];
-						a = UNICODEtoGBK(a);
-						temp1 = (a >> 8) & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TPE1[temp2] = temp1;
-							temp2++;
-						}
-						temp1 = a & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TPE1[temp2] = temp1;
-							temp2++;
-						}
-						temp += 2;
-					}
-				}
-				else if (code_type == 0)			//iso-8859-1
-				{
-					for (temp = 0; temp < tag_size;)
-					{
-						temp1 = databuf[i + temp];
-						if (temp1 != 0x00)
-						{
-							info.TPE1[temp] = temp1;
-							temp++;
-						}
-						else
-							temp++;
-					}
+					ID3_UTF8(databuf, tag_size, i, info.TPE1);
 				}
 				img = 0;
 			}
@@ -321,7 +251,6 @@ void mp3id3(void)
 				i++;
 			if (i >= READ_buff_size - 6)								//找不到位置
 			{
-				code_type = 4;
 				img = 0;
 			}
 		}
@@ -336,107 +265,28 @@ void mp3id3(void)
 					| databuf[i + 6] << 8
 					| databuf[i + 7];
 				if (databuf[i + 11] == 0xFE && databuf[i + 12] == 0xFF && databuf[i + 10] == 0x01)
-				{
-					code_type = 2;							//UTF-16BE
+				{																					//UTF-16BE						
 					i += 13;
 					tag_size -= 3;
+					ID3_UTF16BE(databuf, tag_size, i, info.TALB);
 				}
 				else if (databuf[i + 11] == 0xFF && databuf[i + 12] == 0xFE && databuf[i + 10] == 0x01)
-				{
-					code_type = 1;							//UTF-16LE
+				{																					//UTF-16LE							
 					i += 13;
 					tag_size -= 3;
+					ID3_UTF16LE(databuf, tag_size, i, info.TALB);
 				}
-				else if (databuf[i + 10] == 0x00)
+				else if (databuf[i + 10] == 0x00)					//iso-8859-1
 				{
-					code_type = 0;							//iso-8859-1
 					i += 11;
 					tag_size -= 1;
+					ID3_iso_8859_1(databuf, tag_size, i, info.TALB);
 				}
-				else if (databuf[i + 10] == 0x03)
+				else if (databuf[i + 10] == 0x03)					//UTF-8
 				{
-					code_type = 3;							//UTF-8
 					i += 11;
 					tag_size -= 1;
-				}
-
-				if (code_type == 3)			//UTF-8
-				{
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
-						if (a < 0x80) {				/* 7-bit */
-							info.TALB[temp++] = (BYTE)a;
-						}
-						else {
-							if (a < 0x800) {		/* 11-bit */
-								info.TALB[temp++] = (BYTE)(0xC0 | a >> 6);
-							}
-							else {				/* 16-bit */
-								info.TALB[temp++] = (BYTE)(0xE0 | a >> 12);
-								info.TALB[temp++] = (BYTE)(0x80 | (a >> 6 & 0x3F));
-							}
-							info.TALB[temp++] = (BYTE)(0x80 | (a & 0x3F));
-						}
-					}
-				}
-				else if (code_type == 2)			//UTF-16BE
-				{
-					temp2 = 0;
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp] << 8) | databuf[i + temp + 1];
-						a = UNICODEtoGBK(a);
-						temp1 = (a >> 8) & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TALB[temp2] = temp1;
-							temp2++;
-						}
-						temp1 = a & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TALB[temp2] = temp1;
-							temp2++;
-						}
-						temp += 2;
-					}
-				}
-				else if (code_type == 1)			//UTF-16LE
-				{
-					temp2 = 0;
-					for (temp = 0; temp < tag_size;)
-					{
-						a = (databuf[i + temp + 1] << 8) | databuf[i + temp];
-						a = UNICODEtoGBK(a);
-						temp1 = (a >> 8) & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TALB[temp2] = temp1;
-							temp2++;
-						}
-						temp1 = a & 0xff;
-						if (temp1 != 0x00)
-						{
-							info.TALB[temp2] = temp1;
-							temp2++;
-						}
-						temp += 2;
-					}
-				}
-				else if (code_type == 0)			//iso-8859-1
-				{
-					for (temp = 0; temp < tag_size;)
-					{
-						temp1 = databuf[i + temp];
-						if (temp1 != 0x00)
-						{
-							info.TALB[temp] = temp1;
-							temp++;
-						}
-						else
-							temp++;
-					}
+					ID3_UTF8(databuf, tag_size, i, info.TALB);
 				}
 				img = 0;
 			}
@@ -469,7 +319,6 @@ void mp3id3(void)
 			if (i >= READ_buff_size - 4)								//找不到位置
 			{
 				code_type = 2;
-				code_type = 2;
 				img = 0;
 			}
 		}
@@ -481,11 +330,11 @@ void mp3id3(void)
 		}
 		else if (code_type == 1 && lcd_bit == 1)
 		{
-			info.pic_show = 0;
+			info.pic_show = 2;
 		}
 		else if (code_type == 2 && lcd_bit == 1)
 		{
-			info.pic_show = 0;
+			info.pic_show = 3;
 		}
 	}
 	myfree(databuf);						//释放内存	

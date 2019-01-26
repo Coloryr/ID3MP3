@@ -13,10 +13,10 @@ void show_all(void);
 extern u8 time_k;
 extern u8 lcd_bit;
 extern FIL* fmp3;
-extern u8 show_mode;
+extern u8 name_show;
 
 #define pic_show_x   0						//图片显示的位置_x
-#define pic_show_y   16						//图片显示的位置_y
+#define pic_show_y   0						//图片显示的位置_y
 #define pic_show_size   240				//图片显示的大小
 
 
