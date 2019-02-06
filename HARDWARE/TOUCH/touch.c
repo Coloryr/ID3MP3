@@ -23,7 +23,12 @@ _m_tp_dev tp_dev=
 //默认为touchtype=0的数据.
 u8 CMD_RDX=0XD0;
 u8 CMD_RDY=0X90;
- 	 			    					   
+ 	 	
+void delay(u32 time)
+{
+  while(time--);
+}
+
 //SPI写数据
 //向触摸屏IC写入1byte数据    
 //num:要写入的数据
@@ -36,7 +41,7 @@ void TP_Write_Byte(u8 num)
 		else TDIN=0;   
 		num<<=1;    
 		TCLK=0; 
-		delay_us(1);
+		delay(5);
 		TCLK=1;		//上升沿有效	        
 	}		 			    
 } 		 
@@ -52,17 +57,15 @@ u16 TP_Read_AD(u8 CMD)
 	TDIN=0; 	//拉低数据线
 	TCS=0; 		//选中触摸屏IC
 	TP_Write_Byte(CMD);//发送命令字
-	delay_us(6);//ADS7846的转换时间最长为6us
-	TCLK=0; 	     	    
-	delay_us(1);    	   
+	TCLK=0; 	     	       	   
 	TCLK=1;		//给1个时钟，清除BUSY
-	delay_us(1);    
+	delay(5);    
 	TCLK=0; 	     	    
 	for(count=0;count<16;count++)//读出16位数据,只有高12位有效 
 	{ 				  
 		Num<<=1; 	 
 		TCLK=0;	//下降沿有效  	    	   
-		delay_us(1);    
+		delay(5);    
  		TCLK=1;
  		if(DOUT)Num++; 		 
 	}  	

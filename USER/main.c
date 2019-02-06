@@ -43,10 +43,10 @@ int main(void)
 	{
 		LCD_ShowString(30, 20, 320, 16, 16,"TFcard -> ERROR!");
 	}
-	LCD_ShowString(30, 20, 320, 16, 16,"RTC Reading......");
+	LCD_ShowString(30, 20, 320, 16, 16,"RTC Loading...");
 	while (RTC_Init())					//RTC初始化			
 	{
-		LCD_ShowString(30, 20, 320, 16, 16,"RTC -> ERROR!   ");
+		LCD_ShowString(30, 20, 320, 16, 16,"RTC Waiting...");
 	}
 
 	f_mount(fs[0], "0:", 1); 	//挂载SD卡 
@@ -60,6 +60,10 @@ int main(void)
 		{
 			goto a;
 		}
+		LCD_Clear(WHITE);//清屏
+		TP_Adjust();  	//屏幕校准
+		POINT_COLOR = RED;
+		BACK_COLOR = BLACK;
 	}
 	if (KEY_Scan(0) == 2)
 	{
