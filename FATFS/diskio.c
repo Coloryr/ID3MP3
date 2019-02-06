@@ -11,7 +11,6 @@
 #include "sdio_sdcard.h"
 #include "flash.h"
 #include "malloc.h"	
-#include "rtc.h"	
 
 #define SD_CARD	 0  //SD卡,卷标为0
 #define EX_FLASH 1	//外部flash,卷标为1
@@ -193,23 +192,8 @@ DRESULT disk_ioctl (
 //31-25: Year(0-127 org.1980), 24-21: Month(1-12), 20-16: Day(1-31) */                                                                                                                                                                                                                                          
 //15-11: Hour(0-23), 10-5: Minute(0-59), 4-0: Second(0-29 *2) */                                                                                                                                                                                                                                                
 DWORD get_fattime (void)
-{				 
-	    u32 ttime;
-	u32 date=0;
-    
-    RTC_Get();		//得到当前时间
-    ttime=calendar.w_year-1980;	//得到偏移后的年份
- 	date|=ttime<<25;
-    ttime=calendar.w_month;		//得到月份
- 	date|=ttime<<21;
-	ttime=calendar.w_date;		//得到日期
- 	date|=ttime<<16;
-	ttime=calendar.hour;		//得到时钟
- 	date|=ttime<<11;
-	ttime=calendar.min;			//得到分钟
- 	date|=ttime<<5;
- 	date|=calendar.min>>1;  	//得到秒钟	   			    
-    return date;   
+{				 	    
+    return 0;   
 }			 
 //动态分配内存
 void *ff_memalloc (UINT size)			

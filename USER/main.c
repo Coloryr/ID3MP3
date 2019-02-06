@@ -6,7 +6,6 @@
 #include "diskio.h"
 #include "malloc.h"
 #include "exfuns.h"
-#include "rtc.h"
 #include "app_start.h"
 #include "includes.h"
 #include "touch.h"
@@ -34,7 +33,8 @@ int main(void)
 	tp_dev.init();
 	POINT_COLOR = RED;
 	BACK_COLOR = BLACK;
-	LCD_Clear(BLACK);//清屏  
+	LCD_Clear(BLACK);//清屏 
+	
 	while (exfuns_init())			//为fatfs相关变量申请内存 					
 	{
 		LCD_ShowString(30, 20, 320, 16, 16,"Fatfs -> ERROR!");
@@ -43,12 +43,7 @@ int main(void)
 	{
 		LCD_ShowString(30, 20, 320, 16, 16,"TFcard -> ERROR!");
 	}
-	LCD_ShowString(30, 20, 320, 16, 16,"RTC Loading...");
-	while (RTC_Init())					//RTC初始化			
-	{
-		LCD_ShowString(30, 20, 320, 16, 16,"RTC Waiting...");
-	}
-
+	
 	f_mount(fs[0], "0:", 1); 	//挂载SD卡 
 	f_mount(fs[1], "1:", 1); 	//挂载FLASH.
 

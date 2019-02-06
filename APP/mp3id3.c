@@ -164,8 +164,10 @@ void mp3id3(void)
 	if (databuf[0] == 0x49 && databuf[1] == 0x44 && databuf[2] == 0x33)
 	{
 		//计算大小
-		info.size = databuf[6] & 0x7f | ((databuf[7] & 0x7f) << 7)
-			| ((databuf[8] & 0x7f) << 14) | ((databuf[9] & 0x7f) << 21);
+		info.size = databuf[6] <<21 
+			| databuf[7] << 14
+			| databuf[8] << 7
+			| databuf[9];
 		res = f_read(info.fmp3, databuf, READ_buff_size, (UINT*)&br);
 		if (res != FR_OK)
 			return;
@@ -304,6 +306,10 @@ void mp3id3(void)
 		{
 			if (databuf[i] == 0x41 && databuf[i + 1] == 0x50 && databuf[i + 2] == 0x49 && databuf[i + 3] == 0x43)
 			{	//找到位置
+				info.pic_size = databuf[i + 4] << 24
+					| databuf[i + 5] << 16
+					| databuf[i + 6] << 8
+					| databuf[i + 7];
 				if (databuf[i + 24] == 0xff && databuf[i + 25] == 0xd8 && databuf[i + 26] == 0xff && databuf[i + 27] == 0xe0)
 				{
 					code_type = 0; //JPG
@@ -327,10 +333,14 @@ void mp3id3(void)
 			i += 14 + 20;
 			info.pic_local = i;
 			info.pic_show = 1;
+			f_lseek(fmp3, info.pic_local);				//跳过头
 		}
 		else if (code_type == 1)
 		{
+			i += 14 + 20;
+			info.pic_local = i;
 			info.pic_show = 2;
+			f_lseek(fmp3, info.pic_local);				//跳过头
 		}
 		else if (code_type == 2)
 		{

@@ -15,14 +15,14 @@
 #include "app_start.h" 
 #include "stdlib.h"
 #include "stm32f10x_it.h"
+#include "touch_check.h"
 
 mp3_info info;	//定义变量管理结构体
 
 void vs_reset(void)
 {
 	VS_Restart_Play();  					//重启播放 
-	VS_Set_All();        					//设置音量等信息 			 
-	VS_Reset_DecodeTime();					//复位解码时间 	 
+	VS_Reset_DecodeTime();				//复位解码时间 	 
 }
 	
 //得到path路径下,目标文件的总个数
@@ -62,11 +62,7 @@ void mp3_play_ready()
 	DIR mp3dir;	 		//目录
 	u8 *fn;   			//长文件名 
 	u16 temp;
-
-	VS_Sine_Test();
-	vs_reset();
-	VS_SPI_SpeedHigh();	//高速			
-
+	
 	lcd_bit = 1;
 	info.pic_show = 0;
 
@@ -110,7 +106,11 @@ void mp3_play_ready()
 			}
 		}
 	}
+	VS_HD_Reset();
+	VS_Soft_Reset();
+	vs_reset();
 	read_data();
+	VS_SPI_SpeedHigh();	//高速		
 	LCD_Clear(BLACK);
 }
 
@@ -130,7 +130,6 @@ void mp3_play(void *pdata)
 	if (databuf == NULL)rval = 0XFF;//内存申请失败.
 	OS_CRITICAL_ENTER();	//进入临界区
 	mp3_play_ready();
-	VS_Set_Vol(vsset.mvol);
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
 	OS_CRITICAL_EXIT();
 	while (res == FR_OK)//打开成功
@@ -146,6 +145,7 @@ void mp3_play(void *pdata)
 		strcat((char*)info.pname, (const char*)fn);  			//将文件名接在后面	
 		info.size = 1;
 		res = f_open(info.fmp3, (const TCHAR*)info.pname, FA_READ);
+		f_open(fmp3, (const TCHAR*)info.pname, FA_READ);
 		if (write_bit == 0x10)
 		{
 			write_bit = 0x20;
@@ -153,7 +153,7 @@ void mp3_play(void *pdata)
 			while (write_bit == 0x20);
 			OS_CRITICAL_ENTER();
 		}
-		f_open(fmp3, (const TCHAR*)info.pname, FA_READ);
+		
 		if (res != FR_OK)
 			while (1)
 			{
@@ -206,7 +206,6 @@ void mp3_play(void *pdata)
 						vsset.mvol = 100;
 					}
 					VS_Set_Vol(vsset.mvol);
-					save_bit[2] = vsset.mvol;
 					write_data();
 					key_now = 0;
 					break;
@@ -217,7 +216,6 @@ void mp3_play(void *pdata)
 						vsset.mvol = 200;
 					}
 					VS_Set_Vol(vsset.mvol);
-					save_bit[2] = vsset.mvol;
 					write_data();
 					key_now = 0;
 					break;
@@ -230,7 +228,9 @@ void mp3_play(void *pdata)
 				}
 				else
 				{
-					show_all(0);
+					OS_CRITICAL_ENTER();
+					show_all(3);
+					OS_CRITICAL_EXIT();
 				}
 			} while (i < MP3_BUFF_SIZE);//循环发送4096个字节 
 			if (br != MP3_BUFF_SIZE || res != 0)

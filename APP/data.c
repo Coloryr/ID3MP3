@@ -4,8 +4,16 @@
 #include "mp3player.h" 
 #include "touch.h" 
 #include "includes.h"
+#include "vs10xx.h"
 
-u8 save_bit[5]={0,0,0,0,0};
+u8 save_bit[8]={0,0,
+	160,	//音量:160
+	15,		//低音上线 150Hz
+	15,		//低音提升 15dB	
+	10,		//高音下限 10Khz	
+	0,		//高音提升 0dB
+	0,		//空间效果	
+};
 
 //保存在EEPROM里面的地址区间基址,占用14个字节(RANGE:SAVE_ADDR_BASE~SAVE_ADDR_BASE+13)
 #define SAVE_ADDR_BASE (1024*23)*1024 + 20//触摸保存的位置
@@ -13,27 +21,54 @@ u8 save_bit[5]={0,0,0,0,0};
 
 void read_data(void)
 {
-	SPI_Flash_Read(save_bit, save_bit_local, 5);
-	info.curindex = (save_bit[3] << 8) | save_bit[4];
-	vsset.mvol = save_bit[2];
-	if (info.curindex > info.totmp3num || save_bit[2] > 200 || save_bit[2] == 0x00)
+	u8 buff[8];
+	SPI_Flash_Read(buff, save_bit_local, 8);
+	if (info.curindex > info.totmp3num 
+		|| buff[2] > 200 || buff[3] > 15 || buff[4] > 15
+		|| buff[5] > 15 || buff[6] > 15 || buff[7] > 3)
 	{
 		info.curindex = 0;
-		vsset.mvol = 160;
-		save_bit[3] = (info.curindex >> 8) & 0xff;
-		save_bit[4] = info.curindex & 0xff;
-		save_bit[2] = vsset.mvol;
-		SPI_Flash_Write(save_bit, save_bit_local, 5);
+		buff[0] = save_bit[0] = (info.curindex >> 8) & 0xff;
+		buff[1] = save_bit[1] = info.curindex & 0xff;
+		buff[2] = vsset.mvol = save_bit[2];
+		buff[3] = vsset.bflimit = save_bit[3];
+		buff[4] = vsset.bass = save_bit[4];
+		buff[5] = vsset.tflimit = save_bit[5];
+		buff[6] = vsset.treble= save_bit[6];
+		buff[7] = vsset.effect = save_bit[7];
+
+		SPI_Flash_Write(buff, save_bit_local, 8);
 	}
+	else
+	{
+		info.curindex = (buff[0] << 8) | buff[1];
+		save_bit[0] = buff[0];
+		save_bit[1] = buff[1];
+		save_bit[2] = vsset.mvol = buff[2];
+		save_bit[3] = vsset.bflimit = buff[3];
+		save_bit[4] = vsset.bass = buff[4];
+		save_bit[5] = vsset.tflimit = buff[5];
+		save_bit[6] = vsset.treble= buff[6];
+		save_bit[7] = vsset.effect = buff[7];
+	}
+	VS_Set_All();
 }
 
 void write_data(void)
 {
 	CPU_SR_ALLOC();
-	save_bit[3] = (info.curindex >> 8) & 0xff;
-	save_bit[4] = info.curindex & 0xff;
+	u8 buff[8];
+	buff[0] = save_bit[0] = (info.curindex >> 8) & 0xff;
+	buff[1] = save_bit[1] = info.curindex & 0xff;
+	buff[2] = vsset.mvol = save_bit[2];
+	buff[3] = vsset.bflimit = save_bit[3];
+	buff[4] = vsset.bass = save_bit[4];
+	buff[5] = vsset.tflimit = save_bit[5];
+	buff[6] = vsset.treble= save_bit[6];
+	buff[7] = vsset.effect = save_bit[7];
+	VS_Set_All();
 	OS_CRITICAL_ENTER();	//进入临界区
-	SPI_Flash_Write(save_bit, save_bit_local, 5);
+	SPI_Flash_Write(buff, save_bit_local, 8);
 	OS_CRITICAL_EXIT();
 }
 

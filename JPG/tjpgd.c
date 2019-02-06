@@ -952,7 +952,7 @@ JRESULT jd_decomp(
 	UINT x, y, mx, my;
 	WORD rst, rsc;
 	JRESULT rc;
-
+	CPU_SR_ALLOC();
 
 	if (scale > (JD_USE_SCALE ? 3 : 0)) return JDR_PAR;
 	jd->scale = scale;
@@ -973,7 +973,9 @@ JRESULT jd_decomp(
 			}
 			rc = mcu_load(jd);					/* Load an MCU (decompress huffman coded stream and apply IDCT) */
 			if (rc != JDR_OK) return rc;
+			OS_CRITICAL_ENTER();	//进入临界区
 			rc = mcu_output(jd, outfunc, x, y);	/* Output the MCU (color space conversion, scaling and output) */
+			OS_CRITICAL_EXIT();
 			if (rc != JDR_OK) return rc;
 			if (write_bit == 0x20)
 			{
@@ -1054,99 +1056,6 @@ u32 jpeg_out_func_point(JDEC* jd, void* rgbbuf, JRECT* rect)
 	}
 	return 0;    //返回0,使得解码工作继续执行 
 }
-/*
-//解码jpeg/jpg文件s
-//filename:jpeg/jpg路径+文件名
-//fast:使能小图片(图片尺寸小于等于液晶分辨率)快速解码,0,不使能;1,使能.
-//返回值:0,解码成功;其他,解码失败.
-u8 jpg_decode(const u8 *filename,u8 fast)
-{  
-	u8 res=0;	//返回值 
-	u8 scale;	//图像输出比例 0,1/2,1/4,1/8  
-	UINT (*outfun)(JDEC*, void*, JRECT*);
-	
-#if JPEG_USE_MALLOC == 1	//使用malloc
-	res=jpeg_mallocall(); 
-#endif
-	if(res==0)
-	{
-		//得到JPEG/JPG图片的开始信息		 
-		res=f_open(f_jpeg,(const TCHAR*)filename,FA_READ);//打开文件
-		if(res==FR_OK)//打开文件成功
-		{ 
-			res=jd_prepare(jpeg_dev,jpeg_in_func,jpg_buffer,JPEG_WBUF_SIZE,f_jpeg);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
-			outfun=jpeg_out_func_point;//默认采用画点的方式显示
-			if(res==JDR_OK)//准备解码成功 
-			{ 	
-				for(scale=0;scale<4;scale++)//确定输出图像的比例因子
-				{ 
-					if((jpeg_dev->width>>scale)<=picinfo.S_Width&&(jpeg_dev->height>>scale)<=picinfo.S_Height)//在目标区域内
-					{	
-						if(((jpeg_dev->width>>scale)!=picinfo.S_Width)&&((jpeg_dev->height>>scale)!=picinfo.S_Height&&scale))scale=0;//不能贴边,则不缩放
-						else outfun=jpeg_out_func_fill;	//在显示尺寸以内,可以采用填充的方式显示 
-						break; 							
-					} 
-				} 
-				if(scale==4)scale=0;//错误
-				if(fast==0)//不需要快速解码
-				{ 
-					outfun=jpeg_out_func_point;//默认采用画点的方式显示
-				}
-				picinfo.ImgHeight=jpeg_dev->height>>scale;	//缩放后的图片尺寸
-				picinfo.ImgWidth=jpeg_dev->width>>scale;	//缩放后的图片尺寸 
-				ai_draw_init();								//初始化智能画图 
-				//执行解码工作，调用TjpgDec模块的jd_decomp函数
-				res=jd_decomp(jpeg_dev,outfun,scale); 
-			}
-		} 
-		f_close(f_jpeg); //解码工作执行成功，返回0
-	}
-#if JPEG_USE_MALLOC == 1//使用malloc
-	jpeg_freeall();		//释放内存
-#endif
-	return res;	 
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -2,16 +2,7 @@
 #include "includes.h"
 #include "spi.h" 
 
-//VS10XX默认设置参数
-_vs10xx_obj vsset =
-{
-	140,	//音量:220
-	15,		//低音上线 100Hz
-	15,		//低音提升 15dB	
-	10,		//高音下限 10Khz	
-	10,		//高音提升 10.5dB
-	0,		//空间效果	
-};
+_vs10xx_obj vsset;
 
 ////////////////////////////////////////////////////////////////////////////////
 //移植时候的接口
@@ -32,24 +23,6 @@ void VS_SPI_SpeedHigh(void)
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_8);//设置到高速模式		 
 }
 
-/*
-//VS10XX数据保存在:SYSTEM_PARA_SAVE_BASE+sizeof(_system_setings)之后
-//读取VS10XX数据
-//vs10xxdev:VS10XX数据
-void vs10xx_read_para(_vs10xx_obj * vs10xxdev)
-{
-	AT24CXX_Read(SYSTEM_PARA_SAVE_BASE+sizeof(_system_setings),(u8*)vs10xxdev,sizeof(_vs10xx_obj));
-}
-//写入VS10XX数据
-//vs10xxdev:VS10XX数据
-void vs10xx_save_para(_vs10xx_obj * vs10xxdev)
-{										   
-    OS_CPU_SR cpu_sr=0;
-	OS_ENTER_CRITICAL();	//进入临界区(无法被中断打断) 
-	AT24CXX_Write(SYSTEM_PARA_SAVE_BASE+sizeof(_system_setings),(u8*)vs10xxdev,sizeof(_vs10xx_obj));
-	OS_EXIT_CRITICAL();		//退出临界区(可以被中断打断)
-}		
-*/
 ////////////////////////////////////////////////////////////////////////////////	 	  
 //软复位VS10XX
 void VS_Soft_Reset(void)
@@ -100,7 +73,6 @@ void VS_Sine_Test(void)
 	VS_Set_Vol(100);
 	VS_WR_Cmd(SPI_MODE, 0x0820);//进入VS10XX的测试模式     
 	while (VS_DQ == 0);     //等待DREQ为高
-	//printf("mode sin:%x\n",VS_RD_Reg(SPI_MODE));
 	//向VS10XX发送正弦测试命令：0x53 0xef 0x6e n 0x00 0x00 0x00 0x00
 	//其中n = 0x24, 设定VS10XX所产生的正弦波的频率值，具体计算方法见VS10XX的datasheet
 	VS_SPI_SpeedLow();//低速 

@@ -6,9 +6,6 @@
 #include "key.h"
 #include "lcd.h"
 #include "fontupd.h"
-#include "touch.h"
-
-u8 key_now = 0;
 
 /////////////////////////UCOSII任务设置///////////////////////////////////
 //START 任务
@@ -144,36 +141,4 @@ void APP_start(void)
 	OS_CRITICAL_EXIT();	//退出临界区	 
 	OSStart(&err);  //开启UCOSIII
 	while (1);
-}
-
-void button_check(void)
-{
-	static u8 check = 0;
-	tp_dev.scan(0);
-	if (tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
-	{
-		if (tp_dev.x[0] < lcddev.width&&tp_dev.y[0] < lcddev.height)
-		{
-			if (tp_dev.x[0] > 0 && tp_dev.x[0] <= 120 && tp_dev.y[0] > 0 & tp_dev.y[0] <= 120)
-				check = 1;
-			if (tp_dev.x[0] >= 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] > 0 && tp_dev.y[0] <= 120)
-				check = 2;
-			if (tp_dev.x[0] > 0 && tp_dev.x[0] <= 120 && tp_dev.y[0] >= 121 & tp_dev.y[0] <= 240)
-				check = 3;
-			if (tp_dev.x[0] >= 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 121 & tp_dev.y[0] <= 240)
-				check = 4;
-			if (tp_dev.x[0] > 0 && tp_dev.x[0] <= 120 && tp_dev.y[0] >= 240 & tp_dev.y[0] <= 320)
-				check = 5;
-			if (tp_dev.x[0] >= 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 240 & tp_dev.y[0] <= 320)
-				check = 6;
-		}
-	}
-	else
-	{
-		if (check != 0)
-		{
-			key_now = check;
-			check = 0;
-		}
-	}
 }

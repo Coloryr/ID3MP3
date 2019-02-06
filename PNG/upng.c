@@ -30,6 +30,7 @@ freely, subject to the following restrictions:
 #include <limits.h>
 
 #include "upng.h"
+#include "malloc.h"
 
 #define MAKE_BYTE(b) ((b) & 0xFF)
 #define MAKE_DWORD(a,b,c,d) ((MAKE_BYTE(a) << 24) | (MAKE_BYTE(b) << 16) | (MAKE_BYTE(c) << 8) | MAKE_BYTE(d))
@@ -1041,7 +1042,6 @@ upng_error upng_decode(upng_t* upng)
 
 	/* allocate enough space for the (compressed and filtered) image data */
 	compressed = (unsigned char*)malloc(compressed_size);
-    printf("compressed_size = %d\n", compressed_size);
 	if (compressed == NULL) {
 		SET_ERROR(upng, UPNG_ENOMEM);
 		return upng->error;
@@ -1071,7 +1071,6 @@ upng_error upng_decode(upng_t* upng)
 	/* allocate space to store inflated (but still filtered) data */
 	inflated_size = ((upng->width * (upng->height * upng_get_bpp(upng) + 7)) / 8) + upng->height;
 	inflated = (unsigned char*)malloc(inflated_size);
-    printf("inflated_size = %d\n", inflated_size);
 	if (inflated == NULL) {
 		free(compressed);
 		SET_ERROR(upng, UPNG_ENOMEM);
@@ -1093,7 +1092,6 @@ upng_error upng_decode(upng_t* upng)
 	upng->size = (upng->height * upng->width * upng_get_bpp(upng) + 7) / 8;
 	upng->buffer = (unsigned char*)malloc(upng->size);
 	upng->output_owning = 1;
-    printf("upng->size = %d\n", upng->size);
 	if (upng->buffer == NULL) {
 		free(inflated);
 		upng->size = 0;
@@ -1207,9 +1205,7 @@ upng_error upng_decode_to_buffer(upng_t* upng, unsigned char* buffer, unsigned l
 //	compressed = (unsigned char*)malloc(compressed_size);
     compressed = &buffer[buffer_use];
     buffer_use += compressed_size;
-    printf("compressed_size = %d\n", compressed_size);
 	if (buffer_use > buffer_size) {
-        printf("compressed buffer_use = %d\n", buffer_use);
 		SET_ERROR(upng, UPNG_ENOMEM);
 		return upng->error;
 	}
@@ -1238,12 +1234,10 @@ upng_error upng_decode_to_buffer(upng_t* upng, unsigned char* buffer, unsigned l
 	/* allocate space to store inflated (but still filtered) data */
 	inflated_size = ((upng->width * (upng->height * upng_get_bpp(upng) + 7)) / 8) + upng->height;
 //	inflated = (unsigned char*)malloc(inflated_size);
-    printf("inflated_size = %d\n", inflated_size);
     inflated = &buffer[buffer_use];
     buffer_use += inflated_size;
 	if (buffer_use > buffer_size) {
 //		free(compressed);
-        printf("inflated buffer_use = %d\n", buffer_use);
 		SET_ERROR(upng, UPNG_ENOMEM);
 		return upng->error;
 	}
@@ -1265,10 +1259,8 @@ upng_error upng_decode_to_buffer(upng_t* upng, unsigned char* buffer, unsigned l
     upng->buffer = &buffer[buffer_use];
     upng->output_owning = 0;
     buffer_use += upng->size;
-    printf("upng->size = %d\n", upng->size);
 	if (buffer_use > buffer_size) {
 //		free(inflated);
-        printf("upng->size buffer_use = %d\n", buffer_use);
 		upng->size = 0;
 		SET_ERROR(upng, UPNG_ENOMEM);
 		return upng->error;
@@ -1289,7 +1281,6 @@ upng_error upng_decode_to_buffer(upng_t* upng, unsigned char* buffer, unsigned l
 	/* we are done with our input buffer; free it if we own it */
 	upng_free_source(upng);
 
-    printf("buffer_use = %d\n", buffer_use);
 	return upng->error;
 }
 
@@ -1298,7 +1289,7 @@ static upng_t* upng_new(void)
 {
 	upng_t* upng;
 
-	upng = (upng_t*)malloc(sizeof(upng_t));
+	upng = (upng_t*)mymalloc(sizeof(upng_t));
 	if (upng == NULL) {
 		return NULL;
 	}
@@ -1340,11 +1331,10 @@ upng_t* upng_new_from_bytes(const unsigned char* buffer, unsigned long size)
 	return upng;
 }
 
-upng_t* upng_new_from_file(const char *filename)
+upng_t* upng_new_from_file(FIL* file, int head)
 {
 	upng_t* upng;
 	unsigned char *buffer;
-	FILE *file;
 	long size;
 
 	upng = upng_new();
@@ -1352,14 +1342,7 @@ upng_t* upng_new_from_file(const char *filename)
 		return NULL;
 	}
 
-	file = fopen(filename, "rb");
-	if (file == NULL) {
-		SET_ERROR(upng, UPNG_ENOTFOUND);
-		return upng;
-	}
-
 	/* get filesize */
-	fseek(file, 0, SEEK_END);
 	size = ftell(file);
 	rewind(file);
 

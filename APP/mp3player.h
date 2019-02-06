@@ -13,14 +13,15 @@ typedef struct
 	u16 curindex;				//音乐当前索引
 	FILINFO mp3fileinfo;//文件信息
 	u16 *mp3indextbl;		//音乐索引表 
-	u16 size;						//MP3ID3大小
+	u32 size;						//MP3ID3大小
 	FIL* fmp3;					//MP3文件
 
 	u16 playtime;				//播放时间标记
 	u16 time;						//时间变量
 	u16 kbps;						//音乐的比特率
 
-	u16 pic_local;			//PIC位置
+	u32 pic_local;			//PIC位置
+	u32 pic_size;			  //PIC大小
 
 	u8 *TIT2;						//歌名
 	u8 *TPE1;						//作者
