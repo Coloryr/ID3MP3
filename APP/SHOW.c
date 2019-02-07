@@ -12,7 +12,6 @@
 
 u8 lcd_bit=0;
 FIL* fmp3 = 0;
-u16 pwmval = 300;
 
 JDEC *jpeg_dev;   		//待解码对象结构体指针  
 u8  *jpg_buffer;    	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐

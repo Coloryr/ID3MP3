@@ -12,7 +12,6 @@ void show_all(u8 mode);
 
 extern u8 lcd_bit;
 extern FIL* fmp3;
-extern u16 pwmval;
 
 #define pic_show_x   0						//图片显示的位置_x
 #define pic_show_y   0						//图片显示的位置_y

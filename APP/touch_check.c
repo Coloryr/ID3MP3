@@ -12,6 +12,7 @@
 u8 button_check(void)
 {
 	static u8 check = 0;
+	static u16 pwmval = 300;
 	u8 temp;
 
 	tp_dev.scan(0);
