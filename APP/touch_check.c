@@ -63,20 +63,18 @@ u8 button_check(void)
 				}
 				break;
 			case 5:
-				vsset.mvol = vsset.mvol + 10;
 				if (vsset.mvol >= 200)
-				{
 					vsset.mvol = 100;
-				}
+				else
+					vsset.mvol = vsset.mvol + 10;
 				VS_Set_Vol(vsset.mvol);
 				write_data();
 				break;
 			case 6:
-				vsset.mvol = vsset.mvol - 10;
-				if (vsset.mvol < 100)
-				{
+				if (vsset.mvol <= 100)
 					vsset.mvol = 200;
-				}
+				else
+					vsset.mvol = vsset.mvol - 10;	
 				VS_Set_Vol(vsset.mvol);
 				write_data();
 				break;
@@ -135,7 +133,7 @@ void button_check1(void)
 			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 164 & tp_dev.y[0] <= 184)
 				check = 11;
 			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 196 & tp_dev.y[0] <= 216)
-				check = 2;
+				check = 12;
 			if (tp_dev.x[0] >= 161 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 240 & tp_dev.y[0] <= 320)
 				check = 13;
 		}
@@ -148,7 +146,7 @@ void button_check1(void)
 			{
 			case 1:
 				vsset.mvol = vsset.mvol - 10;
-				if (vsset.mvol < 100)
+				if (vsset.mvol <= 100)
 					vsset.mvol = 200;
 				break;
 			case 2:
@@ -183,7 +181,7 @@ void button_check1(void)
 				break;
 			case 7:
 				vsset.mvol = vsset.mvol + 10;
-				if (vsset.mvol > 200)
+				if (vsset.mvol >= 200)
 					vsset.mvol = 100;
 				break;
 			case 8:
@@ -226,14 +224,15 @@ void button_check1(void)
 				else if (info.pic_type == 1)					//PNG
 					info.pic_show = 2;
 				info.mode = 0;
+				show_all(1);
+				write_data();
+				VS_Set_All();
 				break;
 			default:
 				break;
 			}
 			if (check != 13)
-				show_all(2);
-			write_data();
-			VS_Set_All();
+				show_all(2);		
 			check = 0;
 		}
 	}

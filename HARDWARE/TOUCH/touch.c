@@ -41,7 +41,7 @@ void TP_Write_Byte(u8 num)
 		else TDIN=0;   
 		num<<=1;    
 		TCLK=0; 
-		delay(30);
+		delay(1);
 		TCLK=1;		//上升沿有效	        
 	}		 			    
 } 		 
@@ -59,13 +59,13 @@ u16 TP_Read_AD(u8 CMD)
 	TP_Write_Byte(CMD);//发送命令字
 	TCLK=0; 	     	       	   
 	TCLK=1;		//给1个时钟，清除BUSY
-	delay(30);    
+	delay(1);    
 	TCLK=0; 	     	    
 	for(count=0;count<16;count++)//读出16位数据,只有高12位有效 
 	{ 				  
 		Num<<=1; 	 
 		TCLK=0;	//下降沿有效  	    	   
-		delay(30);    
+		delay(1);    
  		TCLK=1;
  		if(DOUT)Num++; 		 
 	}  	

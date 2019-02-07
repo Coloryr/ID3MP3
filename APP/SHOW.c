@@ -150,9 +150,7 @@ void show_all(u8 mode)
 			info.playtime = info.time;//更新时间 	 			
 			temp = VS_Get_HeadInfo(); //获得比特率	   				 
 			if (temp != info.kbps)
-			{
 				info.kbps = temp;//更新KBPS	  				     
-			}
 			//显示播放时间			 
 			LCD_ShowxNum(0, 289, info.time / 60, 2, 16, 0X80);		//分钟
 			LCD_ShowChar(16, 289, ':', 16, 0);
