@@ -12,7 +12,6 @@ u8 button_check(void)
 {
 	static u8 check = 0;
 	u8 temp;
-	CPU_SR_ALLOC();
 
 	tp_dev.scan(0);
 	if (tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
@@ -42,10 +41,10 @@ u8 button_check(void)
 			switch (check)
 			{
 			case 1:
-				temp = 1;		//上一曲
+				temp = 2;		//上一曲
 				break;
 			case 2:
-				temp = 0;		//下一曲
+				temp = 1;		//下一曲
 				break;
 			case 3:
 				temp = 5;		//随机					
@@ -68,7 +67,6 @@ u8 button_check(void)
 				else
 					vsset.mvol = vsset.mvol + 10;
 				VS_Set_Vol(vsset.mvol);
-				write_data();
 				break;
 			case 6:
 				if (vsset.mvol <= 100)
@@ -76,7 +74,6 @@ u8 button_check(void)
 				else
 					vsset.mvol = vsset.mvol - 10;	
 				VS_Set_Vol(vsset.mvol);
-				write_data();
 				break;
 			case 7:
 				if (write_bit == 0x10)
@@ -84,16 +81,15 @@ u8 button_check(void)
 					write_bit = 0x20;
 					while (write_bit == 0x20);
 				}
-				OS_CRITICAL_ENTER();
 				LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size, pic_show_y + pic_show_size, BACK_COLOR);
 				show_all(2);
-				OS_CRITICAL_EXIT();
 				info.mode = 1;
 				break;
 			default:
 				break;
 			}
 			check = 0;
+			data_save_bit =1;
 			return temp;
 		}
 	}
@@ -103,7 +99,6 @@ u8 button_check(void)
 void button_check1(void)
 {
 	static u8 check = 0;
-	CPU_SR_ALLOC();
 
 	tp_dev.scan(0);
 	if (tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
@@ -145,9 +140,10 @@ void button_check1(void)
 			switch (check)
 			{
 			case 1:
-				vsset.mvol = vsset.mvol - 10;
 				if (vsset.mvol <= 100)
 					vsset.mvol = 200;
+				else
+					vsset.mvol = vsset.mvol - 10;
 				break;
 			case 2:
 				if (vsset.bflimit == 0)
@@ -180,9 +176,10 @@ void button_check1(void)
 					vsset.effect--;
 				break;
 			case 7:
-				vsset.mvol = vsset.mvol + 10;
 				if (vsset.mvol >= 200)
 					vsset.mvol = 100;
+				else
+					vsset.mvol = vsset.mvol + 10;	
 				break;
 			case 8:
 				if (vsset.bflimit == 15)
@@ -215,9 +212,7 @@ void button_check1(void)
 					vsset.effect++;
 				break;
 			case 13:
-				OS_CRITICAL_ENTER();
 				LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size, pic_show_y + pic_show_size, BACK_COLOR);
-				OS_CRITICAL_EXIT();
 				f_lseek(fmp3, info.pic_local);				//还原指针
 				if (info.pic_type == 0)								//JPG
 					info.pic_show = 1;
@@ -225,8 +220,7 @@ void button_check1(void)
 					info.pic_show = 2;
 				info.mode = 0;
 				show_all(1);
-				write_data();
-				VS_Set_All();
+				data_save_bit = 1;
 				break;
 			default:
 				break;
@@ -234,6 +228,7 @@ void button_check1(void)
 			if (check != 13)
 				show_all(2);		
 			check = 0;
+			VS_Set_All();
 		}
 	}
 }

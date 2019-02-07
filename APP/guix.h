@@ -27,18 +27,6 @@ extern volatile  INT32U  OSTime;
 #define IN_TYPE_MOUSE	0X03
 #define IN_TYPE_ERR	 	0XFF
 
-//gui输入接口
-__packed typedef struct
-{
-	void(*get_key)(void*, u8);	//获取键值参数
-	u16 x;						//坐标
-	u16 y;
-	u32 keyval;					//按键键值
-	u8  intype;					//输入类型
-	u8 	ksta;					//输入设备(按键)的状态 [7:1],保留;[0],0,松开;1,按下.
-}_in_obj;
-extern _in_obj in_obj;
-
 //gui底层接口
 //也就是外部需要实现的函数!
 //这里我们需要外部提供4个函数
@@ -48,20 +36,6 @@ extern _in_obj in_obj;
 //4,彩色填充函数
 __packed typedef struct
 {
-	u8 language;							//GUI当前语言,取值范围0~GUI_LANGUAGE_NUM-1;
-	u16 memdevflag;							//存储设备状态;
-											//bit7:0,存储设备7~0在位状态;0,不在位;1,在位;
-											//bit15:8,存储设备7~0使用状态;0,不在使用中;1,正在使用中
-											//本例中,存储设备0表示:SD卡
-											//              1表示:SPI FLASH
-											//              2表示:U盘
-											//其他,未用到
-	//这四个参数,会控制listbox/filelistbox等控件的具体效果
-	u8 tbfsize;								//filelistbox/listbox时,顶部/底部横条字体大小
-	u8 tbheight;							//filelistbox/listbox时,顶部/底部横条高度
-	u8 listfsize;							//list字体大小
-	u8 listheight;							//list条目高度
-
 	u16 back_color;							//背景色		   
 	u16(*read_point)(u16, u16);				//读点函数
 	void(*draw_point)(u16, u16, u16);			//画点函数

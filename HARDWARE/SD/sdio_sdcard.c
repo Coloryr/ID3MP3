@@ -27,11 +27,6 @@ __IO uint32_t StopCondition = 0;							//ÊÇ·ñ·¢ËÍÍ£Ö¹ÃüÁî²Ù×÷±êÖ¾£¬¶à¿é¶ÁĞ´Ê±ºòÓ
 __IO uint32_t TransferEnd = 0;								//´«Êä½áÊø±êÖ¾
 SD_CardInfo SDCardInfo;										//SD¿¨ĞÅÏ¢½á¹¹¶¨Òå
 
-SDIO_InitTypeDef SDIO_InitStructure;
-SDIO_CmdInitTypeDef SDIO_CmdInitStructure;
-SDIO_DataInitTypeDef SDIO_DataInitStructure;
-GPIO_InitTypeDef GPIO_InitStructure;
-
 /**********************************************************
                         ¹¦ÄÜº¯Êı
 **********************************************************/
@@ -79,19 +74,6 @@ void STM32_Flash_Capacity(uint8_t *STMCapa)
 	STMCapa[12] = 0x62;	//b
 }
 /**********************************************************
-* º¯Êı¹¦ÄÜ ---> ¶ÁÈ¡CPUID
-* Èë¿Ú²ÎÊı ---> none
-* ·µ»ØÊıÖµ ---> CPUID£¨Ê®Áù½øÖÆ£©
-* ¹¦ÄÜËµÃ÷ ---> none
-**********************************************************/
-/*
-void STM32_CPUID(uint8_t *IDbuff)
-{
-	uint32_t CPUID;
-	CPUID = *((uint32_t*)0xe000ed00);
-}
-*/
-/**********************************************************
 * º¯Êı¹¦ÄÜ ---> ÉèÖÃÏòÁ¿±íÆ«ÒÆµØÖ·
 * Èë¿Ú²ÎÊı ---> NVIC_VectTab£º»ùÖ·
 *              Offset£ºÆ«ÒÆÁ¿	
@@ -112,16 +94,6 @@ void MY_NVIC_SetVectorTable(uint32_t NVIC_VectTab, uint32_t Offset)
 void MY_NVIC_PriorityGroup_Config(uint32_t NVIC_PriorityGroup)
 {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup);	//ÉèÖÃÖĞ¶Ï·Ö×é
-
-//	uint32_t temp,temp1;
-//	
-//	temp1 = (~NVIC_PriorityGroup) & 0x00000007;//È¡ºóÈıÎ»
-//	temp1 <<= 8;
-//	temp = SCB->AIRCR;  //¶ÁÈ¡ÏÈÇ°µÄÉèÖÃ
-//	temp &= 0x0000f8ff; //Çå¿ÕÏÈÇ°·Ö×é
-//	temp |= 0x05fa0000; //Ğ´ÈëÔ¿³×
-//	temp |= temp1;	   
-//	SCB->AIRCR = temp;  //ÉèÖÃ·Ö×é
 }
 /**********************************************************
 * º¯Êı¹¦ÄÜ ---> ÉèÖÃÖĞ¶Ï·Ö×éÓÅÏÈ¼¶
@@ -150,23 +122,6 @@ void MY_NVIC_Init(uint8_t NVIC_PreemptionPriority, uint8_t NVIC_Subpriority, uin
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;									//Ê¹ÄÜÖĞ¶Ï
 
 	NVIC_Init(&NVIC_InitStructure);	//³õÊ¼»¯ÖĞ¶Ï
-
-//	uint32_t temp;	
-//	uint8_t IPRADDR=NVIC_Channel/4;  //Ã¿×éÖ»ÄÜ´æ4¸ö,µÃµ½×éµØÖ· 
-//	uint8_t IPROFFSET=NVIC_Channel%4;//ÔÚ×éÄÚµÄÆ«ÒÆ
-//	
-//	IPROFFSET = IPROFFSET*8 + 4;    //µÃµ½Æ«ÒÆµÄÈ·ÇĞÎ»ÖÃ
-//	
-//	MY_NVIC_PriorityGroup_Config(NVIC_Group);//ÉèÖÃ·Ö×é
-//	
-//	temp  = NVIC_PreemptionPriority << (4 - NVIC_Group);	//ÇÀÏÈÓÅÏÈ¼¶	  
-//	temp |= NVIC_Subpriority & (0x0f >> NVIC_Group);	//ÏàÓ¦ÓÅÏÈ¼¶
-//	temp &= 0xf;//È¡µÍËÄÎ»
-
-//	if(NVIC_Channel < 32)	NVIC->ISER[0] |= 1 << NVIC_Channel;//Ê¹ÄÜÖĞ¶ÏÎ»(ÒªÇå³ıµÄ»°,Ïà·´²Ù×÷¾ÍOK)
-//	else	NVIC->ISER[1]| |= 1 << (NVIC_Channel - 32); 
-//	
-//	NVIC->IPR[IPRADDR] |= temp << IPROFFSET;//ÉèÖÃÏìÓ¦ÓÅÏÈ¼¶ºÍÇÀ¶ÏÓÅÏÈ¼¶  
 }
 
 /**********************************************************
@@ -314,61 +269,6 @@ uint16_t HX_to_DX(uint16_t HX_Data)
 	return((HX_Data >> 12) * 1000 + ((HX_Data & 0x0f00) >> 8) * 100 + ((HX_Data & 0x00f0) >> 4) * 10 + (HX_Data & 0x000f));
 }
 
-///**********************************************************
-//* º¯Êı¹¦ÄÜ ---> ³õÊ¼»¯Êı¾İÁĞ±í
-//* Èë¿Ú²ÎÊı ---> *LIST£ºÁĞ±íÖ¸Õë
-//* ·µ»ØÊıÖµ ---> none
-//* ¹¦ÄÜËµÃ÷ ---> none
-//**********************************************************/
-//void Sqlist_Init(Sqlist *LIST)
-//{
-//	LIST->elem = (uint16_t*)malloc(MaxSize * sizeof(ElemType));
-//	//·ÖÅäÒ»¸ö³¤¶ÈÎªMaxSize * sizeof(ElemType)´óĞ¡µÄÄÚ´æ¿Õ¼ä
-//	if(!LIST->elem)	return;	//Ã»ÓĞÉú³ÉÊı¾İÁĞ±í£¬Ö±½ÓÍË³ö
-//	//·ÖÅä³É¹¦
-//	LIST->length = 0;	//ÁĞ±íÖĞÃ»ÄÚÈİ
-//	LIST->listsize = MaxSize;	//¸ÃÊı¾İ±íÕ¼ÓÃÄÚ´æ´óĞ¡ÎªMaxSize£¨ÒÔsizeof(ElemType)Îªµ¥Î»£©
-//}
-///**********************************************************
-//* º¯Êı¹¦ÄÜ ---> ¸´Î»Êı¾İÁĞ±í
-//* Èë¿Ú²ÎÊı ---> none
-//* ·µ»ØÊıÖµ ---> none
-//* ¹¦ÄÜËµÃ÷ ---> none
-//**********************************************************/
-//void Sqlist_DeInit(void)
-//{
-//	Sqlist *list;
-//
-//	list->elem = 0;	//Ê×µØÖ·ÇåÁã
-//	list->length = 0;	//³¤¶ÈÇåÁã
-//	list->listsize = 0;	//ÁĞ±í´óĞ¡Îª0
-//}
-///**********************************************************
-//* º¯Êı¹¦ÄÜ ---> ÏòÒ»¸ö¶¯Ì¬µÄÊı¾İÁĞ±í²åÈëÒ»¸öÔªËØ
-//* Èë¿Ú²ÎÊı ---> *L£ºÁĞ±íÖ¸Õë
-//*               i£ºÁĞ±íÖĞµÚi¸öÎ»ÖÃ²åÈëÔªËØ
-//*               item£ºÔÚµÚi¸öÎ»ÖÃËù²åÈëµÄÔªËØ
-//* ·µ»ØÊıÖµ ---> none
-//* ¹¦ÄÜËµÃ÷ ---> none
-//**********************************************************/
-//void InsertElem(Sqlist *L,uint16_t i,ElemType item)
-//{	/* ÏòË³ĞòÁĞ±í*LµÄµÚi¸öÎ»ÖÃ²åÈëÔªËØitem */
-//	ElemType *base, *insertPtr, *p;
-//
-//	if(i < 1 || i > L->length + 1)	return;	//·Ç·¨²åÈë
-//	if(L->length >= L->listsize)	//ÔÚÊı¾İÁĞ±í×îºóÒ»¸öÎ»ÖÃ²åÈëÔªËØ
-//	{	//×·¼ÓÄÚ´æ¿Õ¼ä
-//		base = (ElemType*)realloc(L->elem,(L->listsize + 10) * sizeof(ElemType));
-//		L->elem = base;	//¸üĞÂÄÚ´æ»ùµØÖ·
-//		L->listsize = L->listsize + 100;	//´æ´¢¿Õ¼äÔö¼Ó100¸öµ¥Ôª
-//	}
-//	insertPtr = &(L->Elem[i - 1]);	//insertPtrÎª²åÈëÎ»ÖÃ
-//	for(p = &(L->elem[L->length - 1]);p >= insertPtr;p--)
-//		*(p + 1) = *p;	//½«i - 1ÒÔºóµÄÔªËØË³ĞòÏòºóÒÆÒ»¸öÔªËØÎ»ÖÃ
-//	*insertPtr = item;	//ÔÚµÚi¸öÎ»ÖÃÉÏ²åÈëÔªËØitem
-//	L->length++;	//±í³¤¼Ó1
-//}
-
 /**********************************************************
 * º¯Êı¹¦ÄÜ ---> DMA2´«Êä×´Ì¬
 * Èë¿Ú²ÎÊı ---> none
@@ -395,7 +295,6 @@ static void SDIO_DMA_SendData(uint32_t *DMABuffer, uint32_t BufferSize, uint8_t 
 
 	DMA2_Channel4->CCR &= !(1 << 0);		//Í¨µÀ²»¹¤×÷£¬¹Ø±ÕDMA2
 	DMA2_Channel4->CCR &= 0x00000000;		//Çå³ıÖ®Ç°µÄÉèÖÃ£¬MEM2_MEM¡¢PL¡¢MSIZE¡¢PSIZE¡¢MINC¡¢PINC¡¢CIRC¡¢DIR
-//	DMA2_Channel4->CCR &= 0xffff800f;		//Çå³ıÖ®Ç°µÄÉèÖÃ£¬MEM2_MEM¡¢PL¡¢MSIZE¡¢PSIZE¡¢MINC¡¢PINC¡¢CIRC¡¢DIR
 	DMA2_Channel4->CCR |= 0 << 14;			//·Ç´æ´¢Æ÷µ½´æ´¢Æ÷Ä£Ê½
 	DMA2_Channel4->CCR |= 2 << 12;			//Í¨µÀÓÅÏÈ¼¶¸ß
 	DMA2_Channel4->CCR |= 2 << 10;			//´æ´¢Æ÷Êı¾İ¿í¶È32bits
@@ -463,32 +362,6 @@ static void SDIO_SetCLKDIV(uint8_t clkdiv)
 	SDIO->CLKCR |= clkdiv;		//ÉèÖÃĞÂµÄ·ÖÆµÏµÊı
 }
 /**********************************************************
-* º¯Êı¹¦ÄÜ ---> SDIO³õÊ¼»¯
-* Èë¿Ú²ÎÊı ---> none
-* ·µ»ØÊıÖµ ---> none
-* ¹¦ÄÜËµÃ÷ ---> none
-**********************************************************/
-void SDIO_GPIOInit(void)
-{
-	RCC->APB2ENR |= 1 << 5;	//Ê¹ÄÜGPIODÊ±ÖÓ
-	RCC->APB2ENR |= 1 << 4;	//Ê¹ÄÜGPIOCÊ±ÖÓ
-
-	RCC->AHBENR |= 1 << 10;	//Ê¹ÄÜSDIOÊ±ÖÓ
-	RCC->AHBENR |= 1 << 1;	//Ê¹ÄÜDMA2Ê±ÖÓ
-
-	//PC.8 --> SDIO_D0
-	//PC.9 --> SDIO_D1
-	//PC.10 --> SDIO_D2
-	//PC.11 --> SDIO_D3
-	//PC.12 --> SDIO_CLK
-	GPIOC->CRH &= 0xfff00000;	//¸´Î»PC.8 ~ PC.12
-	GPIOC->CRH |= 0x000bbbbb;	//ÉèÖÃÎª¸´ÓÃÍÆÍìÊä³ö
-
-	//PD.2 --> SDIO_CMD
-	GPIOD->CRL &= 0xfffff0ff;	//¸´Î»PD.2
-	GPIOD->CRL |= 0x00000b00;	//ÉèÖÃPD.2Îª¸´ÓÃÍÆÍìÊä³ö
-}
-/**********************************************************
 * º¯Êı¹¦ÄÜ ---> SD¿¨³õÊ¼»¯
 * Èë¿Ú²ÎÊı ---> none
 * ·µ»ØÊıÖµ ---> ·µ»Ø¿¨Ó¦´ğ
@@ -498,20 +371,7 @@ SD_Error SD_Init(void)
 {
 	SD_Error errorstatus = SD_OK;
 
-	SDIO_GPIOInit();	//³õÊ¼»¯SDIO¶Ë¿ÚÄ£Ê½
-
 	MY_NVIC_Init(2, 2, SDIO_IRQn, NVIC_PriorityGroup_2);	//SDIOÖĞ¶ÏÅäÖÃ
-
-	//¸´Î»SDIO¼Ä´æÆ÷Öµ
-	SDIO->POWER = 0x00000000;
-	SDIO->CLKCR = 0x00000000;
-	SDIO->ARG = 0x00000000;
-	SDIO->CMD = 0x00000000;
-	SDIO->DTIMER = 0x00000000;
-	SDIO->DLEN = 0x00000000;
-	SDIO->DCTRL = 0x00000000;
-	SDIO->ICR = 0x00C007ff;
-	SDIO->MASK = 0x00000000;
 
 	//¿¨µÄÉÏµç¹ı³Ì
 	errorstatus = SD_PowerON();

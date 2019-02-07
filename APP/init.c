@@ -10,7 +10,9 @@ void init(void)
 	FSMC_NORSRAMTimingInitTypeDef  readWriteTiming;
 	FSMC_NORSRAMTimingInitTypeDef  writeTiming;
 
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC |
+	RCC_AHBPeriph_SDIO | RCC_AHBPeriph_DMA2, ENABLE);
+	
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);	//关闭jtag，使能SWD，可以用SWD模式调试
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |
 		RCC_APB2Periph_GPIOC |
@@ -30,6 +32,8 @@ void init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	
+	
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_2 | GPIO_Pin_1 | GPIO_Pin_0;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
@@ -38,17 +42,19 @@ void init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 |GPIO_Pin_9|GPIO_Pin_10|GPIO_Pin_11|GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5 |
-		GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_14 |
-		GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_4 |
+		GPIO_Pin_5 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 |
+		GPIO_Pin_14 | GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 |
-		GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 |
-		GPIO_Pin_15;
+		GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
@@ -69,6 +75,16 @@ void init(void)
 	GPIO_SetBits(GPIOE, GPIO_Pin_1);            //RESET=1
 	GPIO_SetBits(GPIOD, GPIO_Pin_4);            //RD=1
 	GPIO_SetBits(GPIOD, GPIO_Pin_5);            //WR=1
+
+	SDIO->POWER = 0x00000000;
+	SDIO->CLKCR = 0x00000000;
+	SDIO->ARG = 0x00000000;
+	SDIO->CMD = 0x00000000;
+	SDIO->DTIMER = 0x00000000;
+	SDIO->DLEN = 0x00000000;
+	SDIO->DCTRL = 0x00000000;
+	SDIO->ICR = 0x00C007ff;
+	SDIO->MASK = 0x00000000;
 
 	readWriteTiming.FSMC_AddressSetupTime = 0x01;	 //地址建立时间（ADDSET）为2个HCLK 1/36M=27ns
 	readWriteTiming.FSMC_AddressHoldTime = 0x00;	 //地址保持时间（ADDHLD）模式A未用到	
@@ -123,6 +139,5 @@ void init(void)
 
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_4);	//设置为18M时钟,高速模式
 
-	SPI_FLASH_TYPE = SPI_Flash_ReadID();//读取FLASH ID.
 }
 

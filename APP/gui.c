@@ -3,28 +3,12 @@
 #include "text.h"						 
 
 //此处必须在外部申明asc2_1206和asc2_1608;
-//#include "font.h" 
 extern const unsigned char asc2_1206[95][12];
 extern const unsigned char asc2_1608[95][16];
 extern const unsigned char asc2_2412[95][36];
 extern const unsigned char asc2_3216[95][64];
-/*
-extern u8* asc2_2814;	//普通字体28*14大字体点阵集
-extern u8* asc2_3618;	//普通字体36*18大字体点阵集
-extern u8* asc2_5427;	//普通字体54*27大字体点阵集
-extern u8* asc2_s6030;	//数码管字体60*30大字体点阵集
-*/
 ///////////////////////////////////////////////////////////////////////////
 
-//输入接口
-_in_obj in_obj =
-{
-	gui_get_key,		//获取键值参数
-	0,					//坐标
-	0,
-	0,					//按键键值
-	IN_TYPE_ERR,		//输入类型,默认就是错误的状态
-};
 _gui_phy gui_phy;		//gui物理层接口
 //////////////////////////统一标准函数//////////////////////////////
 //画点函数
@@ -50,50 +34,6 @@ void gui_init(void)
 	gui_phy.lcdwidth = lcddev.width;
 	gui_phy.lcdheight = lcddev.height;
 	//设置listbox/filelistbox参数
-	if (lcddev.width == 240)
-	{
-		gui_phy.tbfsize = 16;
-		gui_phy.tbheight = 20;
-		gui_phy.listfsize = 12;
-		gui_phy.listheight = 20;
-	}
-	else if (lcddev.width == 320)
-	{
-		gui_phy.tbfsize = 16;
-		gui_phy.tbheight = 24;
-		gui_phy.listfsize = 16;
-		gui_phy.listheight = 24;
-	}
-}
-//获取键值参数
-void gui_get_key(void* obj, u8 type)
-{
-	_m_tp_dev * tp_dev;
-	switch (type)
-	{
-	case IN_TYPE_TOUCH:
-		in_obj.intype = IN_TYPE_TOUCH;
-		tp_dev = (_m_tp_dev*)obj;
-		in_obj.x = tp_dev->x[0];		 			//得到触屏坐标
-		in_obj.y = tp_dev->y[0];
-		if (tp_dev->sta & 0X80)in_obj.ksta |= 0X01;	//触摸被按下
-		else in_obj.ksta &= ~(0X01);				//触摸松开了 
-		break;
-	case IN_TYPE_KEY:
-		in_obj.keyval = (u32)obj;
-		in_obj.intype = IN_TYPE_KEY;
-		break;
-	case IN_TYPE_JOYPAD:
-		in_obj.intype = IN_TYPE_JOYPAD;
-		//break;
-	case IN_TYPE_MOUSE:
-		in_obj.intype = IN_TYPE_MOUSE;
-		//break;
-	default:
-		in_obj.intype = IN_TYPE_ERR;
-		break;
-
-	}
 }
 //颜色转换
 //rgb:32位颜色
@@ -429,60 +369,7 @@ void gui_draw_arcrectangle(u16 x, u16 y, u16 width, u16 height, u8 r, u8 mode, u
 	gui_draw_arc(x + width - r, y, x + width, y + r, x + width - r - 1, y + r, r, upcolor, mode);	 //右上
 	gui_draw_arc(x + width - r, y + btnxh - r, x + width, y + btnxh - 1, x + width - r - 1, y + btnxh - r - 1, r, downcolor, mode);//右下
 }
-/*
-//画ico
-//x0,y0:矩形的左上角坐标
-//size:ico图片尺寸(16/20/28)
-//index:icos编号
-void gui_draw_icos(u16 x, u16 y, u8 size, u8 index)
-{
-	u16 *colorbuf;
-	u16 i = 0;
-	u16 icosize;
-	u8* pico;
-	icosize = size * size;
-	colorbuf = gui_memin_malloc(2 * icosize);//申请内存
-	if (colorbuf == NULL)return;
-	if (size == 16)pico = (u8*)icostbl_16[index];
-	else if (size == 20)pico = (u8*)icostbl_20[index];
-	else if (size == 28)pico = (u8*)icostbl_28[index];
-	if (colorbuf)
-	{
-		for (i = 0; i < icosize; i++)colorbuf[i] = gui_rgb332torgb565(pico[i]);//RGB332转换为RGB565;
-		gui_phy.colorfill(x, y, x + size - 1, y + size - 1, colorbuf);//画出ICOS
-	}
-	gui_memin_free(colorbuf);//释放内存  	 
 
-}
-//画背景透明的ICO,仅限16*16大小的.
-//x0,y0:矩形的左上角坐标
-//size:ico图片尺寸(16/20/28)
-//index:icos编号
-void gui_draw_icosalpha(u16 x, u16 y, u8 size, u8 index)
-{
-	u16 i, j;
-	u8 *pico;
-	u16 color;
-	u8 alphabend;
-	if (size == 16)pico = (u8*)pathico_16[index];
-	else if (size == 20)pico = (u8*)pathico_20[index];
-	else if (size == 28)pico = (u8*)pathico_28[index];
-	for (i = y; i < y + size; i++)
-	{
-		for (j = x; j < x + size; j++)
-		{
-			color = (*pico++) >> 3;		   		 	//B
-			color += ((u16)(*pico++) << 3) & 0X07E0;	//G
-			color += (((u16)*pico++) << 8) & 0XF800;	//R
-			alphabend = *pico++;					//ALPHA通道
-			if (alphabend == 0)//只对透明的颜色进行画图
-			{
-				if (color)gui_phy.draw_point(j, i, color);
-			}
-		}
-	}
-}
-*/
 //填充矩形
 //x0,y0:矩形的左上角坐标
 //width,height:矩形的尺寸
@@ -705,24 +592,9 @@ void gui_show_ptchar(u16 x, u16 y, u16 xend, u16 yend, u16 offset, u16 color, u1
 		case 24:
 			temp = asc2_2412[chr][t];		//调用2412字体
 			break;
-		/*
 		case 28:
-			if (asc2_2814 == NULL)return;		//非法的数组
-			temp = asc2_2814[chr*csize + t];	//调用2814字体
+			temp = asc2_3216[chr][t];	//调用2814字体
 			break;
-		case 36:
-			if (asc2_3618 == NULL)return;		//非法的数组
-			temp = asc2_3618[chr*csize + t];	//调用3618字体
-			break;
-		case 54:
-			if (asc2_5427 == NULL)return;		//非法的数组
-			temp = asc2_5427[chr*csize + t];	//调用5427字体
-			break;
-		case 60:
-			if (asc2_s6030 == NULL)return;		//非法的数组
-			temp = asc2_s6030[chr*csize + t];	//调用6030字体
-			break;
-		*/
 		default://不支持的字体
 			return;
 		}

@@ -6,6 +6,7 @@
 #include "vs10xx.h"
 
 u8 save_bit[2]={0,0};
+u8 data_save_bit=0;
 
 //保存在EEPROM里面的地址区间基址,占用14个字节(RANGE:SAVE_ADDR_BASE~SAVE_ADDR_BASE+13)
 #define SAVE_ADDR_BASE (1024*23)*1024 + 20//触摸保存的位置
@@ -56,7 +57,6 @@ void write_data(void)
 	buff[5] = vsset.tflimit;
 	buff[6] = vsset.treble;
 	buff[7] = vsset.effect;
-	VS_Set_All();
 	SPI_Flash_Write(buff, save_bit_local, 8);
 	SPI_Flash_Read(buff, save_bit_local, 8);
 	if (buff[0] != (info.curindex >> 8) & 0xff || buff[1] != info.curindex & 0xff
@@ -64,6 +64,8 @@ void write_data(void)
 		|| buff[5] != vsset.tflimit || buff[6] != vsset.treble || buff[7] != vsset.effect)
 		//再写一次
 		SPI_Flash_Write(buff, save_bit_local, 8);
+	VS_Set_All();
+	data_save_bit=0;
 }
 
 //保存校准参数										    

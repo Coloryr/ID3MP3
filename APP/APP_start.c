@@ -6,13 +6,14 @@
 #include "key.h"
 #include "lcd.h"
 #include "fontupd.h"
+#include "data.h"
 
 /////////////////////////UCOSII任务设置///////////////////////////////////
 //START 任务
 //任务优先级
 #define START_TASK_PRIO		3
 //任务堆栈大小	
-#define START_STK_SIZE 		128
+#define START_STK_SIZE 		64
 //任务控制块
 OS_TCB StartTaskTCB;
 //任务堆栈	
@@ -36,30 +37,13 @@ void mp3_play(void *pdata);
 //设置任务优先级
 #define PIC_SHOW_TASK_PRIO       		1
 //设置任务堆栈大小
-#define PIC_SHOW_STK_SIZE  		    128
+#define PIC_SHOW_STK_SIZE  		      128
 //任务控制块
 OS_TCB PICTaskTCB;
 //任务堆栈	
 CPU_STK PIC_SHOW_TASK_STK[PIC_SHOW_STK_SIZE];
 //任务函数
 void show_mp3_pic(void *pdata);
-
-////////////////////////////////伪随机数产生办法////////////////////////////////
-u32 random_seed=1;
-void app_srand(u32 seed)
-{
-	random_seed = seed;
-}
-//获取伪随机数
-//可以产生0~RANDOM_MAX-1的随机数
-//seed:种子
-//max:最大值	  		  
-//返回值:0~(max-1)中的一个值 		
-u32 app_get_rand(u32 max)
-{
-	random_seed = random_seed * 22695477 + 1;
-	return (random_seed) % max;
-}
 
 //开始任务
 void start_task(void *pdata)

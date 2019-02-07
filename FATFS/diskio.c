@@ -32,8 +32,7 @@ DSTATUS disk_initialize (
 			res = SD_Init();//SD_Init() 
   			break;
 		case EX_FLASH://外部flash
-			if(SPI_FLASH_TYPE==W25Q128)FLASH_SECTOR_COUNT=22528;	//W25Q128
-			else FLASH_SECTOR_COUNT=0;							//其他
+			FLASH_SECTOR_COUNT=22528;	//W25Q128
  			break;
 		default:
 			res=1; 

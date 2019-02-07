@@ -3,15 +3,8 @@
 #include "malloc.h"
 
  //文件类型列表
-const u8 *FILE_TYPE_TBL[6][13]=
-{
-{"BIN"},			//BIN文件
-{"LRC"},			//LRC文件
-{"NES"},			//NES文件
-{"TXT","C","H"},	//文本文件
-{"MP1","MP2","MP3","MP4","M4A","3GP","3G2","OGG","ACC","WMA","WAV","MID"},//音乐文件
-{"BMP","JPG","JPEG","GIF","PNG"},//图片文件
-};
+const u8 *FILE_TYPE_TBL[13]=
+{"MP1","MP2","MP3","MP4","M4A","3GP","3G2","OGG","ACC","WMA","WAV","MID"};//音乐文件
 ///////////////////////////////公共文件区,使用malloc的时候////////////////////////////////////////////
 FATFS *fs[2];  		//逻辑磁盘工作区.	 
 FIL *file;	  		//文件1
@@ -71,16 +64,13 @@ u8 f_typetell(u8 *fname)
   	}
 	strcpy((char *)tbuf,(const char*)attr);//copy
  	for(i=0;i<4;i++)tbuf[i]=char_upper(tbuf[i]);//全部变为大写 
-	for(i=0;i<6;i++)
-	{
 		for(j=0;j<13;j++)
 		{
-			if(*FILE_TYPE_TBL[i][j]==0)break;//此组已经没有可对比的成员了.
-			if(strcmp((const char *)FILE_TYPE_TBL[i][j],(const char *)tbuf)==0)//找到了
+			if(*FILE_TYPE_TBL[j]==0)break;//此组已经没有可对比的成员了.
+			if(strcmp((const char *)FILE_TYPE_TBL[j],(const char *)tbuf)==0)//找到了
 			{
 				return (i<<4)|j;
 			}
-		}
 	}
 	return 0XFF;//没找到		 			   
 }	 

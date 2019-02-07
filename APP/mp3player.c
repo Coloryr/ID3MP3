@@ -106,8 +106,7 @@ void mp3_play_ready()
 			}
 		}
 	}
-	VS_HD_Reset();
-	VS_Soft_Reset();
+	VS_Sine_Test();
 	vs_reset();
 	read_data();
 	VS_SPI_SpeedHigh();	//高速		
@@ -169,7 +168,7 @@ void mp3_play(void *pdata)
 		while (rval == 0)
 		{
 			OS_CRITICAL_ENTER();	//进入临界区
-			res = f_read(info.fmp3, databuf, MP3_BUFF_SIZE, (UINT*)&br);//读出4096个字节 			
+			res = f_read(info.fmp3, databuf, MP3_BUFF_SIZE, (UINT*)&br);//读出数据流
 			OS_CRITICAL_EXIT();
 			i = 0;
 			do//主播放循环
@@ -177,26 +176,26 @@ void mp3_play(void *pdata)
 				if (info.mode == 0)
 				{
 					rval = button_check();
+					if(rval != 0)
+						break;
 				}
 				else if (info.mode == 1)
 				{
 					button_check1();
-				}
+				};
 				if ((VS_Send_MusicData(databuf + i) == 0) && (pause == 0))//给VS10XX发送音频数据
-				{
 					i += 32;
-				}
 				else
 				{
 					OS_CRITICAL_ENTER();
 					show_all(3);
 					OS_CRITICAL_EXIT();
+					if(data_save_bit == 1)
+						write_data();
 				}
 			} while (i < MP3_BUFF_SIZE);//循环发送4096个字节 
 			if (br != MP3_BUFF_SIZE || res != 0)
-			{
 				rval = KEY0_PRES;
-			}
 		}
 		f_close(info.fmp3);
 		vs_reset();
@@ -204,21 +203,18 @@ void mp3_play(void *pdata)
 		{
 			if (info.curindex)info.curindex--;
 			else info.curindex = info.totmp3num - 1;
-			write_data();
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
 		else if (rval == KEY0_PRES)//下一曲
 		{
 			info.curindex++;
 			if (info.curindex >= info.totmp3num)info.curindex = 0;//到末尾的时候,自动从头开始
-			write_data();
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
 		else if (rval == 5)
 		{
-			srand(app_get_rand(info.curindex));
+			srand(rand());
 			info.curindex = rand() % (info.totmp3num - 1);
-			write_data();
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
 		else
@@ -228,6 +224,7 @@ void mp3_play(void *pdata)
 			HardFault_Handler();
 			while (1);
 		}
+		write_data();
 	}
 	myfree(info.mp3fileinfo.lfname);	//释放内存			    
 	myfree(info.pname);								//释放内存			    
