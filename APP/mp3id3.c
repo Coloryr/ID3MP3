@@ -134,7 +134,6 @@ void mp3id3(void)
 	u8 img = 1;
 	u8 temp;
 	u16 tag_size;
-	u8 code_type;
 
 	databuf = (u8*)mymalloc(READ_buff_size);
 
@@ -164,7 +163,7 @@ void mp3id3(void)
 	if (databuf[0] == 0x49 && databuf[1] == 0x44 && databuf[2] == 0x33)
 	{
 		//计算大小
-		info.size = databuf[6] <<21 
+		info.size = databuf[6] << 21
 			| databuf[7] << 14
 			| databuf[8] << 7
 			| databuf[9];
@@ -296,7 +295,6 @@ void mp3id3(void)
 				i++;
 			if (i >= READ_buff_size - 6)								//找不到位置
 			{
-				code_type = 4;
 				img = 0;
 			}
 		}
@@ -312,11 +310,11 @@ void mp3id3(void)
 					| databuf[i + 7];
 				if (databuf[i + 24] == 0xff && databuf[i + 25] == 0xd8 && databuf[i + 26] == 0xff && databuf[i + 27] == 0xe0)
 				{
-					code_type = 0; //JPG
+					info.pic_type = 0; //JPG
 				}
 				if (databuf[i + 24] == 0x89 && databuf[i + 25] == 0x50 && databuf[i + 26] == 0x4e && databuf[i + 27] == 0x47)
 				{
-					code_type = 1; //PNG
+					info.pic_type = 1; //PNG
 				}
 				img = 0;
 			}
@@ -324,28 +322,28 @@ void mp3id3(void)
 				i++;
 			if (i >= READ_buff_size - 4)								//找不到位置
 			{
-				code_type = 2;
+				info.pic_type = 2;
 				img = 0;
 			}
 		}
-		if (code_type == 0)
+		if (info.pic_type == 0 && info.mode == 0)
 		{
 			i += 14 + 20;
 			info.pic_local = i;
 			info.pic_show = 1;
-			f_lseek(fmp3, info.pic_local);				//跳过头
 		}
-		else if (code_type == 1)
+		else if (info.pic_type == 1 && info.mode == 0)
 		{
 			i += 14 + 20;
 			info.pic_local = i;
 			info.pic_show = 2;
-			f_lseek(fmp3, info.pic_local);				//跳过头
 		}
-		else if (code_type == 2)
+		else if (info.pic_type == 2 && info.mode == 0)
 		{
+			info.pic_local = 0;
 			info.pic_show = 3;
 		}
+		f_lseek(fmp3, info.pic_local);				//跳过头
 	}
 	myfree(databuf);						//释放内存	
 }

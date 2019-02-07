@@ -1,12 +1,19 @@
 #include "touch.h"
 #include "lcd.h"
+#include "show.h"
+#include "data.h"
 #include "touch_check.h"
+#include "vs10xx.h"
+#include "mp3player.h"
+#include "tjpgd.h"
+#include "includes.h"
 
-u8 key_now = 0;
-
-void button_check(void)
+u8 button_check(void)
 {
 	static u8 check = 0;
+	u8 temp;
+	CPU_SR_ALLOC();
+
 	tp_dev.scan(0);
 	if (tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
 	{
@@ -32,7 +39,201 @@ void button_check(void)
 	{
 		if (check != 0)
 		{
-			key_now = check;
+			switch (check)
+			{
+			case 1:
+				temp = 1;		//上一曲
+				break;
+			case 2:
+				temp = 0;		//下一曲
+				break;
+			case 3:
+				temp = 5;		//随机					
+				break;
+			case 4:	   		//暂停/播放
+				if (lcd_bit == 0)
+				{
+					lcd_bit = 1;
+					LCD_LED = 1;
+				}
+				else if (lcd_bit == 1)
+				{
+					lcd_bit = 0;
+					LCD_LED = 0;
+				}
+				break;
+			case 5:
+				vsset.mvol = vsset.mvol + 10;
+				if (vsset.mvol >= 200)
+				{
+					vsset.mvol = 100;
+				}
+				VS_Set_Vol(vsset.mvol);
+				write_data();
+				break;
+			case 6:
+				vsset.mvol = vsset.mvol - 10;
+				if (vsset.mvol < 100)
+				{
+					vsset.mvol = 200;
+				}
+				VS_Set_Vol(vsset.mvol);
+				write_data();
+				break;
+			case 7:
+				if (write_bit == 0x10)
+				{
+					write_bit = 0x20;
+					while (write_bit == 0x20);
+				}
+				OS_CRITICAL_ENTER();
+				LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size, pic_show_y + pic_show_size, BACK_COLOR);
+				show_all(2);
+				OS_CRITICAL_EXIT();
+				info.mode = 1;
+				break;
+			default:
+				break;
+			}
+			check = 0;
+			return temp;
+		}
+	}
+	return 0;
+}
+
+void button_check1(void)
+{
+	static u8 check = 0;
+	CPU_SR_ALLOC();
+
+	tp_dev.scan(0);
+	if (tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
+	{
+		if (tp_dev.x[0] < lcddev.width&&tp_dev.y[0] < lcddev.height)
+		{
+			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] > 36 & tp_dev.y[0] <= 56)
+				check = 1;
+			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] > 72 && tp_dev.y[0] <= 92)
+				check = 2;
+			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] >= 100 & tp_dev.y[0] <= 120)
+				check = 3;
+			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] >= 132 & tp_dev.y[0] <= 142)
+				check = 4;
+			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] >= 164 & tp_dev.y[0] <= 184)
+				check = 5;
+			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] >= 196 & tp_dev.y[0] <= 216)
+				check = 6;
+			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] > 36 & tp_dev.y[0] <= 56)
+				check = 7;
+			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] > 72 && tp_dev.y[0] <= 92)
+				check = 8;
+			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 100 & tp_dev.y[0] <= 120)
+				check = 9;
+			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 132 & tp_dev.y[0] <= 142)
+				check = 10;
+			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 164 & tp_dev.y[0] <= 184)
+				check = 11;
+			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 196 & tp_dev.y[0] <= 216)
+				check = 2;
+			if (tp_dev.x[0] >= 161 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 240 & tp_dev.y[0] <= 320)
+				check = 13;
+		}
+	}
+	else
+	{
+		if (check != 0)
+		{
+			switch (check)
+			{
+			case 1:
+				vsset.mvol = vsset.mvol - 10;
+				if (vsset.mvol < 100)
+					vsset.mvol = 200;
+				break;
+			case 2:
+				if (vsset.bflimit == 0)
+					vsset.bflimit = 15;
+				else
+					vsset.bflimit--;
+				break;
+			case 3:
+				if (vsset.bass == 0)
+					vsset.bass = 15;
+				else
+					vsset.bass--;
+				break;
+			case 4:
+				if (vsset.tflimit == 0)
+					vsset.tflimit = 15;
+				else
+					vsset.tflimit--;
+				break;
+			case 5:
+				if (vsset.treble == 0)
+					vsset.treble = 15;
+				else
+					vsset.treble--;
+				break;
+			case 6:
+				if (vsset.effect == 0)
+					vsset.effect = 3;
+				else
+					vsset.effect--;
+				break;
+			case 7:
+				vsset.mvol = vsset.mvol + 10;
+				if (vsset.mvol > 200)
+					vsset.mvol = 100;
+				break;
+			case 8:
+				if (vsset.bflimit == 15)
+					vsset.bflimit = 0;
+				else
+					vsset.bflimit++;
+				break;
+			case 9:
+				if (vsset.bass == 15)
+					vsset.bass = 0;
+				else
+					vsset.bass++;
+				break;
+			case 10:
+				if (vsset.tflimit == 15)
+					vsset.tflimit = 0;
+				else
+					vsset.tflimit++;
+				break;
+			case 11:
+				if (vsset.treble == 15)
+					vsset.treble = 0;
+				else
+					vsset.treble++;
+				break;
+			case 12:
+				if (vsset.effect == 3)
+					vsset.effect = 0;
+				else
+					vsset.effect++;
+				break;
+			case 13:
+				OS_CRITICAL_ENTER();
+				LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size, pic_show_y + pic_show_size, BACK_COLOR);
+				OS_CRITICAL_EXIT();
+				f_lseek(fmp3, info.pic_local);				//还原指针
+				if (info.pic_type == 0)								//JPG
+					info.pic_show = 1;
+				else if (info.pic_type == 1)					//PNG
+					info.pic_show = 2;
+				info.mode = 0;
+				break;
+			default:
+				break;
+			}
+			if (check != 13)
+				show_all(2);
+			write_data();
+			VS_Set_All();
 			check = 0;
 		}
 	}

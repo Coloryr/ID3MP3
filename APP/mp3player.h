@@ -15,6 +15,7 @@ typedef struct
 	u16 *mp3indextbl;		//音乐索引表 
 	u32 size;						//MP3ID3大小
 	FIL* fmp3;					//MP3文件
+	u8 *fn;   					//文件名	
 
 	u16 playtime;				//播放时间标记
 	u16 time;						//时间变量
@@ -27,7 +28,12 @@ typedef struct
 	u8 *TPE1;						//作者
 	u8 *TALB;           //专辑
 
-	u8 pic_show;
+	u8 mode;						//当前模式
+											//0正常播放，1音效调整
+	
+	u8 pic_show;				//是否正在显示pic
+	u8 pic_type;				//pic类型
+											//0 JPG，1 PNG，2 没有图片
 
 }mp3_info;
 

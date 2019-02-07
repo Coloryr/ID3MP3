@@ -1,8 +1,9 @@
 #ifndef TOUCH_CHECK_H
 #define TOUCH_CHECK_H
 
-void button_check(void);
+#include "sys.h"
 
-extern u8 key_now;
+u8 button_check(void);
+void button_check1(void);
 
 #endif

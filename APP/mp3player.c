@@ -118,8 +118,7 @@ void mp3_play_ready()
 void mp3_play(void *pdata)
 {
 	u8 res;
-	DIR mp3dir;	 		//目录
-	u8 *fn;   			//长文件名	  
+	DIR mp3dir;	 		//目录  
 	u8 *databuf;
 	u8 rval = 0;
 	u16 i = 0;
@@ -140,26 +139,30 @@ void mp3_play(void *pdata)
 		dir_sdi(&mp3dir, info.mp3indextbl[info.curindex]);			//改变当前目录索引	   
 		res = f_readdir(&mp3dir, &info.mp3fileinfo);       		//读取目录下的一个文件
 		if (res != FR_OK || info.mp3fileinfo.fname[0] == 0)break;	//错误了/到末尾了,退出
-		fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
+		info.fn = (u8*)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
 		strcpy((char*)info.pname, "0:/MUSIC/");				//复制路径(目录)
-		strcat((char*)info.pname, (const char*)fn);  			//将文件名接在后面	
+		strcat((char*)info.pname, (const char*)info.fn);  			//将文件名接在后面	
 		info.size = 1;
 		res = f_open(info.fmp3, (const TCHAR*)info.pname, FA_READ);
 		f_open(fmp3, (const TCHAR*)info.pname, FA_READ);
-		if (write_bit == 0x10)
+		if (write_bit == 0x10 && info.mode == 0)
 		{
 			write_bit = 0x20;
 			OS_CRITICAL_EXIT();
 			while (write_bit == 0x20);
 			OS_CRITICAL_ENTER();
 		}
-		
 		if (res != FR_OK)
 			while (1)
 			{
 				Show_Str(30, 120, 240, 16, "文件夹错误!", 16, 0);
 			}
 		mp3id3();
+		LCD_Fill(0, 0, 240, (240 + 16 * 3) - 1, BLACK);
+		show_all(1);					//显示一次歌名
+		show_all(3);					//显示歌曲信息
+		if (info.mode == 1)
+			show_all(2);
 		f_lseek(info.fmp3, info.size);
 		rval = 0;
 		OS_CRITICAL_EXIT();
@@ -171,56 +174,13 @@ void mp3_play(void *pdata)
 			i = 0;
 			do//主播放循环
 			{
-				button_check();
-				switch (key_now)
+				if (info.mode == 0)
 				{
-				case KEY0_PRES:
-					rval = KEY0_PRES;		//下一曲
-					key_now = 0;
-					break;
-				case KEY1_PRES:
-					rval = KEY1_PRES;		//上一曲
-					key_now = 0;
-					break;
-				case KEY2_PRES:
-					rval = 5;						//随机					
-					key_now = 0;
-					break;
-				case KEY3_PRES:	   //暂停/播放
-					if (lcd_bit == 0)
-					{
-						lcd_bit = 1;
-						LCD_LED = 1;
-					}
-					else if (lcd_bit == 1)
-					{
-						lcd_bit = 0;
-						LCD_LED = 0;
-					}
-					key_now = 0;
-					break;
-				case 5:
-					vsset.mvol = vsset.mvol + 10;
-					if (vsset.mvol >= 200)
-					{
-						vsset.mvol = 100;
-					}
-					VS_Set_Vol(vsset.mvol);
-					write_data();
-					key_now = 0;
-					break;
-				case 6:
-					vsset.mvol = vsset.mvol - 10;
-					if (vsset.mvol < 100)
-					{
-						vsset.mvol = 200;
-					}
-					VS_Set_Vol(vsset.mvol);
-					write_data();
-					key_now = 0;
-					break;
-				default:
-					break;
+					rval = button_check();
+				}
+				else if (info.mode == 1)
+				{
+					button_check1();
 				}
 				if ((VS_Send_MusicData(databuf + i) == 0) && (pause == 0))//给VS10XX发送音频数据
 				{

@@ -2,6 +2,7 @@
 #include "spi.h" 
 #include "delay.h" 
 #include "malloc.h" 
+#include "includes.h"
 
 u16 SPI_FLASH_TYPE=W25Q128;//默认就是25Q64
 
@@ -73,7 +74,9 @@ u16 SPI_Flash_ReadID(void)
 //NumByteToRead:要读取的字节数(最大65535)
 void SPI_Flash_Read(u8* pBuffer, u32 ReadAddr, u16 NumByteToRead)
 {
+	CPU_SR_ALLOC();
 	u16 i;
+	OS_CRITICAL_ENTER();	//进入临界区
 	SPI_FLASH_CS = 0;                            //使能器件   
 	SPI1_ReadWriteByte(W25X_ReadData);         //发送读取命令   
 	SPI1_ReadWriteByte((u8)((ReadAddr) >> 16));  //发送24bit地址    
@@ -83,7 +86,8 @@ void SPI_Flash_Read(u8* pBuffer, u32 ReadAddr, u16 NumByteToRead)
 	{
 		pBuffer[i] = SPI1_ReadWriteByte(0XFF);   //循环读数  
 	}
-	SPI_FLASH_CS = 1;                            //取消片选     	      
+	SPI_FLASH_CS = 1;                            //取消片选     	 
+	OS_CRITICAL_EXIT();
 }
 //SPI在一页(0~65535)内写入少于256个字节的数据
 //在指定地址开始写入最大256字节的数据
@@ -92,7 +96,9 @@ void SPI_Flash_Read(u8* pBuffer, u32 ReadAddr, u16 NumByteToRead)
 //NumByteToWrite:要写入的字节数(最大256),该数不应该超过该页的剩余字节数!!!	 
 void SPI_Flash_Write_Page(u8* pBuffer, u32 WriteAddr, u16 NumByteToWrite)
 {
+	CPU_SR_ALLOC();
 	u16 i;
+	OS_CRITICAL_ENTER();	//进入临界区
 	SPI_FLASH_Write_Enable();                  //SET WEL 
 	SPI_FLASH_CS = 0;                            //使能器件   
 	SPI1_ReadWriteByte(W25X_PageProgram);      //发送写页命令   
@@ -102,6 +108,7 @@ void SPI_Flash_Write_Page(u8* pBuffer, u32 WriteAddr, u16 NumByteToWrite)
 	for (i = 0; i < NumByteToWrite; i++)SPI1_ReadWriteByte(pBuffer[i]);//循环写数  
 	SPI_FLASH_CS = 1;                            //取消片选 
 	SPI_Flash_Wait_Busy();					   //等待写入结束
+	OS_CRITICAL_EXIT();
 }
 //无检验写SPI FLASH 
 //必须确保所写的地址范围内的数据全部为0XFF,否则在非0XFF处写入的数据将失败!

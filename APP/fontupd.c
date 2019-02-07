@@ -6,23 +6,23 @@
 #include "malloc.h"
 #include "delay.h"
 					   
-u32 FONTINFOADDR=(1024*25)*1024;//默认是24M的地址
+#define FONTINFOADDR (1024*25)*1024 //默认是24M的地址
 //字库信息结构体. 
 //用来保存字库基本信息，地址，大小等
 _font_info ftinfo;
 
 //在sd卡中的路径
-const u8 *GBK32_SDPATH="0:/SYSTEM/FONT/GBK32.FON";		//GBK32的存放位置
-const u8 *GBK24_SDPATH="0:/SYSTEM/FONT/GBK24.FON";		//GBK24的存放位置
-const u8 *GBK16_SDPATH="0:/SYSTEM/FONT/GBK16.FON";		//GBK16的存放位置
-const u8 *GBK12_SDPATH="0:/SYSTEM/FONT/GBK12.FON";		//GBK12的存放位置
-const u8 *UNIGBK_SDPATH="0:/SYSTEM/FONT/UNIGBK.BIN";	//UNIGBK.BIN的存放位置
+#define GBK32_SDPATH "0:/SYSTEM/FONT/GBK32.FON"		//GBK32的存放位置
+#define GBK24_SDPATH "0:/SYSTEM/FONT/GBK24.FON"		//GBK24的存放位置
+#define GBK16_SDPATH "0:/SYSTEM/FONT/GBK16.FON"		//GBK16的存放位置
+#define GBK12_SDPATH "0:/SYSTEM/FONT/GBK12.FON"		//GBK12的存放位置
+#define UNIGBK_SDPATH "0:/SYSTEM/FONT/UNIGBK.BIN"	//UNIGBK.BIN的存放位置
 //在25Qxx中的路径
-const u8 *GBK32_25QPATH="1:/SYSTEM/FONT/GBK32.FON";		//GBK32的存放位置
-const u8 *GBK24_25QPATH="1:/SYSTEM/FONT/GBK24.FON";		//GBK24的存放位置
-const u8 *GBK16_25QPATH="1:/SYSTEM/FONT/GBK16.FON";		//GBK16的存放位置
-const u8 *GBK12_25QPATH="1:/SYSTEM/FONT/GBK12.FON";		//GBK12的存放位置
-const u8 *UNIGBK_25QPATH="1:/SYSTEM/FONT/UNIGBK.BIN";	//UNIGBK.BIN的存放位置
+#define GBK32_25QPATH "1:/SYSTEM/FONT/GBK32.FON"		//GBK32的存放位置
+#define GBK24_25QPATH "1:/SYSTEM/FONT/GBK24.FON"		//GBK24的存放位置
+#define GBK16_25QPATH "1:/SYSTEM/FONT/GBK16.FON"		//GBK16的存放位置
+#define GBK12_25QPATH "1:/SYSTEM/FONT/GBK12.FON"		//GBK12的存放位置
+#define UNIGBK_25QPATH "1:/SYSTEM/FONT/UNIGBK.BIN"	//UNIGBK.BIN的存放位置
 
 //显示当前字体更新进度
 //x,y:坐标
@@ -69,7 +69,7 @@ u8 updata_fontx(u16 x, u16 y, u8 size, u8 *fxpath, u8 fx)
 	{
 		if (fx == 0)		//更新UNIGBK.BIN
 		{
-			ftinfo.ugbkaddr = FONTINFOADDR + sizeof(ftinfo);//信息头之后，紧跟UNIGBK转换码表
+			ftinfo.ugbkaddr = sizeof(ftinfo) + FONTINFOADDR;//信息头之后，紧跟UNIGBK转换码表
 			ftinfo.ugbksize = fftemp->fsize;				//UNIGBK大小
 			flashaddr = ftinfo.ugbkaddr;
 		}
@@ -176,7 +176,6 @@ u8 update_font(u16 x, u16 y, u8 size, u8 src)
 //		 其他,字库丢失
 u8 font_init(void)
 {
-	FONTINFOADDR = (1024 * 25) * 1024;
 	ftinfo.ugbkaddr = FONTINFOADDR + 41;		//UNICODEGBK 表存放首地址固定地址
 	SPI_Flash_Read((u8*)&ftinfo, FONTINFOADDR, sizeof(ftinfo));//读出ftinfo结构体数据
 	if (ftinfo.fontok != 0XAA)return 1;		//字库错误. 

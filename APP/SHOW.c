@@ -42,10 +42,7 @@ void show_mp3_pic(void *pdata)
 	{
 		if (info.pic_show == 1)
 		{
-			OS_CRITICAL_ENTER();	//进入临界区
-			LCD_Fill(0, 0, 240,   (240 + 16 * 3) - 1, BLACK);
-			show_all(1);					//显示一次歌名
-			show_all(3);					//显示歌曲信息
+			OS_CRITICAL_ENTER();	//进入临界区		
 			//得到显示方框大小	  	 
 			picinfo.S_Height = pic_show_size;
 			picinfo.S_Width = pic_show_size;
@@ -124,7 +121,6 @@ void show_mp3_pic(void *pdata)
 
 void show_all(u8 mode)
 {
-	u8 *fn;
 	u16 temp = 0;
 	info.time = VS_Get_DecodeTime(); //得到解码时间
 	if (mode == 1)
@@ -138,13 +134,13 @@ void show_all(u8 mode)
 			if (info.TALB[0] != 0)
 				Show_Str(0, 240 + 34, 240, 16, info.TALB, 16, 0);		//显示歌曲专辑
 			if (info.TIT2[0] == 0 && info.TPE1[0] == 0 && info.TALB[0] == 0)
-				Show_Str(0, 240, 240, 16, fn, 16, 0);				//显示歌曲名字 
+				Show_Str(0, 240, 240, 16, info.fn, 16, 0);				//显示歌曲名字 
 		}
 		else
 		{
-			Show_Str(0, 0, 320, 16, fn, 16, 0);				//显示歌曲名字 
+			Show_Str(0, 0, 320, 16, info.fn, 16, 0);				//显示歌曲名字 
 		}
-		Show_Str(176, 288, 32, 16, "设置", 24, 0);
+		Show_Str(186, 292, 48, 24, "设置", 24, 0);
 	}
 	else if (((info.pic_show == 0 && mode == 0 && lcd_bit == 1) || mode == 3))
 	{
@@ -173,14 +169,45 @@ void show_all(u8 mode)
 			LCD_ShowString(62 + 24, 303, 200, 16, 16, "Kbps");
 		}
 		LCD_ShowString(0, 303, 32, 16, 16, "VOL:");
-		LCD_ShowxNum(0 + 32, 303, (vsset.mvol - 100) / 5, 2, 16, 0X80); 	//显示音量	 
+		LCD_ShowxNum(0 + 32, 303, (vsset.mvol - 100) / 10, 2, 16, 0X80); 	//显示音量	 
 		LCD_ShowxNum(95, 289, info.curindex + 1, 3, 16, 0X80);		//索引
 		LCD_ShowChar(95 + 24, 289, '/', 16, 0);
 		LCD_ShowxNum(95 + 32, 289, info.totmp3num, 3, 16, 0X80); 	//总曲目	
 	}
-	else if(mode == 4)
+	else if(mode == 2)
 	{
-		LCD_ShowString(30, 30, 32, 24, 24, "—");
+		Show_Str(88, 20, 64, 16, "音效设置", 16, 0);
+		
+		Show_Str(10, 44, 64, 16, "音量大小", 16, 0);
+		Show_Str(10, 76, 64, 16, "低音频率", 16, 0);
+		Show_Str(10, 108, 64, 16, "低音增益", 16, 0);
+		Show_Str(10, 140, 64, 16, "高音频率", 16, 0);
+		Show_Str(10, 172, 64, 16, "高音增益", 16, 0);
+		Show_Str(10, 204, 64, 16, "空间效果", 16, 0);
+		
+		LCD_ShowString(94, 40, 32, 24, 24, "<");
+		LCD_ShowString(94, 72, 32, 24, 24, "<");
+		LCD_ShowString(94, 104, 32, 24, 24, "<");
+		LCD_ShowString(94, 136, 32, 24, 24, "<");
+		LCD_ShowString(94, 168, 32, 24, 24, "<");
+		LCD_ShowString(94, 200, 32, 24, 24, "<");
+		
+		LCD_ShowxNum(126, 44, (vsset.mvol - 100) / 10, 2, 16, 0X80);
+		LCD_ShowxNum(126, 76, vsset.bflimit, 2, 16, 0X80);
+		LCD_ShowxNum(126, 108, vsset.bass, 2, 16, 0X80);
+		LCD_ShowxNum(126, 140, vsset.tflimit, 2, 16, 0X80);
+		LCD_ShowxNum(126, 172, vsset.treble, 2, 16, 0X80);
+		LCD_ShowxNum(130, 204, vsset.effect, 1, 16, 0X80);
+		
+		LCD_ShowString(162, 40, 32, 24, 24, ">");
+		LCD_ShowString(162, 72, 32, 24, 24, ">");
+		LCD_ShowString(162, 104, 32, 24, 24, ">");
+		LCD_ShowString(162, 136, 32, 24, 24, ">");
+		LCD_ShowString(162, 168, 32, 24, 24, ">");
+		LCD_ShowString(162, 200, 32, 24, 24, ">");
+		
+		Show_Str(186, 292, 48, 24, "保存", 24, 0);
+		
 	}
 }
 
