@@ -65,7 +65,7 @@ void mp3_play_ready()
 	
 	lcd_bit = 1;
 	info.pic_show = 0;
-
+	
 	Show_Str(30, 20, 240, 16, "正在读取文件", 16, 0);
 	while (f_opendir(&mp3dir, "0:/MUSIC"))//打开音乐文件夹
 	{
@@ -105,11 +105,11 @@ void mp3_play_ready()
 				info.curindex++;
 			}
 		}
-	}
+	}		
 	VS_Sine_Test();
 	vs_reset();
 	read_data();
-	VS_SPI_SpeedHigh();	//高速		
+	VS_SPI_SpeedHigh();	//高速
 	LCD_Clear(BLACK);
 }
 
@@ -176,7 +176,9 @@ void mp3_play(void *pdata)
 				if (info.mode == 0)
 				{
 					rval = button_check();
-					if(rval != 0)
+					if(rval == 8)
+						pause = !pause;
+					else if(rval != 0)
 						break;
 				}
 				else if (info.mode == 1)

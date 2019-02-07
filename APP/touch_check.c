@@ -7,6 +7,7 @@
 #include "mp3player.h"
 #include "tjpgd.h"
 #include "includes.h"
+#include "key.h"
 
 u8 button_check(void)
 {
@@ -49,16 +50,16 @@ u8 button_check(void)
 			case 3:
 				temp = 5;		//Ëæ»ú					
 				break;
-			case 4:	   		//ÔÝÍ£/²¥·Å
+			case 4:	   		
 				if (lcd_bit == 0)
 				{
 					lcd_bit = 1;
-					LCD_LED = 1;
+					TIM_SetCompare3(TIM3,1000);
 				}
 				else if (lcd_bit == 1)
 				{
 					lcd_bit = 0;
-					LCD_LED = 0;
+					TIM_SetCompare3(TIM3,pwmval);
 				}
 				break;
 			case 5:
@@ -72,7 +73,7 @@ u8 button_check(void)
 				if (vsset.mvol <= 100)
 					vsset.mvol = 200;
 				else
-					vsset.mvol = vsset.mvol - 10;	
+					vsset.mvol = vsset.mvol - 10;
 				VS_Set_Vol(vsset.mvol);
 				break;
 			case 7:
@@ -89,9 +90,28 @@ u8 button_check(void)
 				break;
 			}
 			check = 0;
-			data_save_bit =1;
+			data_save_bit = 1;
 			return temp;
 		}
+	}
+	if (KEY_Scan(0) == 3)
+	{
+		return 8;
+	}
+	switch (KEY_Scan(1))
+	{
+	case 1:
+		if (pwmval > 10)
+			pwmval = pwmval - 10;
+		data_save_bit = 1;
+		TIM_SetCompare3(TIM3,pwmval);
+		break;
+	case 2:
+		if (pwmval < 890)
+			pwmval = pwmval + 10;
+		data_save_bit = 1;
+		TIM_SetCompare3(TIM3,pwmval);
+		break;
 	}
 	return 0;
 }
@@ -105,29 +125,29 @@ void button_check1(void)
 	{
 		if (tp_dev.x[0] < lcddev.width&&tp_dev.y[0] < lcddev.height)
 		{
-			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] > 36 & tp_dev.y[0] <= 56)
+			if (tp_dev.x[0] > 1 && tp_dev.x[0] <= 120 && tp_dev.y[0] > 36 & tp_dev.y[0] <= 56)
 				check = 1;
-			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] > 72 && tp_dev.y[0] <= 92)
+			if (tp_dev.x[0] > 1 && tp_dev.x[0] <= 120 && tp_dev.y[0] > 72 && tp_dev.y[0] <= 92)
 				check = 2;
-			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] >= 100 & tp_dev.y[0] <= 120)
+			if (tp_dev.x[0] > 1 && tp_dev.x[0] <= 120 && tp_dev.y[0] >= 100 & tp_dev.y[0] <= 120)
 				check = 3;
-			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] >= 132 & tp_dev.y[0] <= 142)
+			if (tp_dev.x[0] > 1 && tp_dev.x[0] <= 120 && tp_dev.y[0] >= 132 & tp_dev.y[0] <= 152)
 				check = 4;
-			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] >= 164 & tp_dev.y[0] <= 184)
+			if (tp_dev.x[0] > 1 && tp_dev.x[0] <= 120 && tp_dev.y[0] >= 164 & tp_dev.y[0] <= 184)
 				check = 5;
-			if (tp_dev.x[0] > 90 && tp_dev.x[0] <= 110 && tp_dev.y[0] >= 196 & tp_dev.y[0] <= 216)
+			if (tp_dev.x[0] > 1 && tp_dev.x[0] <= 120 && tp_dev.y[0] >= 196 & tp_dev.y[0] <= 216)
 				check = 6;
-			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] > 36 & tp_dev.y[0] <= 56)
+			if (tp_dev.x[0] > 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] > 36 & tp_dev.y[0] <= 56)
 				check = 7;
-			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] > 72 && tp_dev.y[0] <= 92)
+			if (tp_dev.x[0] > 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] > 72 && tp_dev.y[0] <= 92)
 				check = 8;
-			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 100 & tp_dev.y[0] <= 120)
+			if (tp_dev.x[0] > 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 100 & tp_dev.y[0] <= 120)
 				check = 9;
-			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 132 & tp_dev.y[0] <= 142)
+			if (tp_dev.x[0] > 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 132 & tp_dev.y[0] <= 152)
 				check = 10;
-			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 164 & tp_dev.y[0] <= 184)
+			if (tp_dev.x[0] > 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 164 & tp_dev.y[0] <= 184)
 				check = 11;
-			if (tp_dev.x[0] > 158 && tp_dev.x[0] <= 178 && tp_dev.y[0] >= 196 & tp_dev.y[0] <= 216)
+			if (tp_dev.x[0] > 121 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 196 & tp_dev.y[0] <= 216)
 				check = 12;
 			if (tp_dev.x[0] >= 161 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 240 & tp_dev.y[0] <= 320)
 				check = 13;
@@ -179,7 +199,7 @@ void button_check1(void)
 				if (vsset.mvol >= 200)
 					vsset.mvol = 100;
 				else
-					vsset.mvol = vsset.mvol + 10;	
+					vsset.mvol = vsset.mvol + 10;
 				break;
 			case 8:
 				if (vsset.bflimit == 15)
@@ -226,7 +246,7 @@ void button_check1(void)
 				break;
 			}
 			if (check != 13)
-				show_all(2);		
+				show_all(2);
 			check = 0;
 			VS_Set_All();
 		}

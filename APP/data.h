@@ -2,7 +2,6 @@
 #define __DATA_H
 #include "sys.h"
 
-extern u8 save_bit[2];
 extern u8 data_save_bit;
 
 void read_data(void);

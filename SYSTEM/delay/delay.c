@@ -39,7 +39,7 @@ void delay_osschedunlock(void)
 void delay_ostimedly(u32 ticks)
 {
 	OS_ERR err; 
-	OSTimeDly(ticks,OS_OPT_TIME_PERIODIC,&err);//UCOSIII延时采用周期模式
+	OSTimeDly(ticks,OS_OPT_TIME_MATCH,&err);//UCOSIII延时采用周期模式
 }
  
 //systick中断服务函数,使用OS时用到

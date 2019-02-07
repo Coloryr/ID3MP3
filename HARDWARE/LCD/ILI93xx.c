@@ -314,7 +314,6 @@ void LCD_Init(void)
 		LCD_WriteReg(0x0007, 0x0133);
 	}
 	LCD_Display_Dir(0);	//EMWIN实验默认设置为横屏
-	LCD_LED = 1;				//点亮背光
 	LCD_Clear(BLACK);
 }
 //清屏函数
