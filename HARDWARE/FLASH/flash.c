@@ -4,6 +4,13 @@
 #include "malloc.h" 
 #include "includes.h"
 
+u16 SPI_FLASH_TYPE=W25Q128;//默认就是25Q64
+
+//4Kbytes为一个Sector
+//16个扇区为1个Block
+//W25Q64
+//容量为8M字节,共有128个Block,2048个Sector 
+
 //读取SPI_FLASH的状态寄存器
 //BIT7  6   5   4   3   2   1   0
 //SPR   RV  TB BP2 BP1 BP0 WEL BUSY

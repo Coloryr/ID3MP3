@@ -30,9 +30,6 @@
     <ClInclude Include="..\..\APP\fontupd.h">
       <Filter>APP</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\APP\lunar.h">
-      <Filter>APP</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\APP\mp3player.h">
       <Filter>APP</Filter>
     </ClInclude>
@@ -66,12 +63,6 @@
     <ClInclude Include="..\..\HARDWARE\FLASH\flash.h">
       <Filter>HARDWARE</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\HARDWARE\IMAGE2LCD\image1.h">
-      <Filter>HARDWARE</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\HARDWARE\IMAGE2LCD\image2lcd.h">
-      <Filter>HARDWARE</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\HARDWARE\KEY\key.h">
       <Filter>HARDWARE</Filter>
     </ClInclude>
@@ -82,9 +73,6 @@
       <Filter>HARDWARE</Filter>
     </ClInclude>
     <ClInclude Include="..\..\HARDWARE\MALLOC\malloc.h">
-      <Filter>HARDWARE</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\HARDWARE\RTC\rtc.h">
       <Filter>HARDWARE</Filter>
     </ClInclude>
     <ClInclude Include="..\..\HARDWARE\SD\sdio_sdcard.h">
@@ -195,9 +183,6 @@
     <ClInclude Include="..\..\APP\mp3id3.h">
       <Filter>APP</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\APP\gui.h">
-      <Filter>APP</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\APP\guix.h">
       <Filter>APP</Filter>
     </ClInclude>
@@ -216,15 +201,15 @@
     <ClInclude Include="..\..\APP\data.h">
       <Filter>APP</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\HARDWARE\VS10XX\VS_PATH.h">
-      <Filter>HARDWARE</Filter>
+    <ClInclude Include="..\..\APP\init.h">
+      <Filter>APP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\APP\touch_check.h">
+      <Filter>APP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\APP\fontupd.c">
-      <Filter>APP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\APP\LUNAR.c">
       <Filter>APP</Filter>
     </ClCompile>
     <ClCompile Include="..\..\APP\mp3player.c">
@@ -257,9 +242,6 @@
     <ClCompile Include="..\..\HARDWARE\FLASH\flash.c">
       <Filter>HARDWARE</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\HARDWARE\IMAGE2LCD\image2lcd.c">
-      <Filter>HARDWARE</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\HARDWARE\KEY\key.c">
       <Filter>HARDWARE</Filter>
     </ClCompile>
@@ -267,9 +249,6 @@
       <Filter>HARDWARE</Filter>
     </ClCompile>
     <ClCompile Include="..\..\HARDWARE\MALLOC\malloc.c">
-      <Filter>HARDWARE</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\HARDWARE\RTC\rtc.c">
       <Filter>HARDWARE</Filter>
     </ClCompile>
     <ClCompile Include="..\..\HARDWARE\SD\sdio_sdcard.c">
@@ -374,9 +353,6 @@
     <ClCompile Include="..\..\APP\piclib.c">
       <Filter>APP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\APP\png2tga.c">
-      <Filter>APP</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\APP\tjpgd.c">
       <Filter>APP</Filter>
     </ClCompile>
@@ -384,6 +360,12 @@
       <Filter>APP</Filter>
     </ClCompile>
     <ClCompile Include="..\..\APP\data.c">
+      <Filter>APP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\init.c">
+      <Filter>APP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\APP\touch_check.c">
       <Filter>APP</Filter>
     </ClCompile>
   </ItemGroup>

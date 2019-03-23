@@ -59,3 +59,7 @@ dkms.conf
 *.sct
 *.uvoptx
 *.__i
+
+.vs
+*.uvguix
+*.YZQ
