@@ -140,7 +140,7 @@ void show_all(u8 mode)
 		{
 			Show_Str(0, 0, 320, 16, info.fn, 16, 0);				//显示歌曲名字 
 		}
-		Show_Str(186, 292, 48, 24, "设置", 24, 0);
+		//Show_Str(186, 292, 48, 24, "设置", 24, 0);
 	}
 	else if (((info.pic_show == 0 && mode == 0 && lcd_bit == 1) || mode == 3))
 	{

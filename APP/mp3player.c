@@ -108,7 +108,8 @@ void mp3_play_ready()
 	}		
 	VS_Sine_Test();
 	vs_reset();
-	read_data();
+	//read_data();
+	VS_Set_All();
 	VS_SPI_SpeedHigh();	//高速
 	LCD_Clear(BLACK);
 }
@@ -130,6 +131,7 @@ void mp3_play(void *pdata)
 	mp3_play_ready();
 	res = f_opendir(&mp3dir, (const TCHAR*)"0:/MUSIC"); 	//打开目录
 	OS_CRITICAL_EXIT();
+	info.curindex=0;
 	while (res == FR_OK)//打开成功
 	{
 		OS_CRITICAL_ENTER();	//进入临界区

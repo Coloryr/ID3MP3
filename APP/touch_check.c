@@ -11,10 +11,10 @@
 
 u8 button_check(void)
 {
-	static u8 check = 0;
-	static u16 pwmval = 300;
+//	static u8 check = 0;
+	//static u16 pwmval = 300;
 	u8 temp;
-
+	/*
 	tp_dev.scan(0);
 	if (tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
 	{
@@ -60,7 +60,7 @@ u8 button_check(void)
 				else if (lcd_bit == 1)
 				{
 					lcd_bit = 0;
-					TIM_SetCompare3(TIM3,pwmval);
+					//TIM_SetCompare3(TIM3,pwmval);
 				}
 				break;
 			case 5:
@@ -98,9 +98,10 @@ u8 button_check(void)
 	if (KEY_Scan(0) == 3)
 	{
 		return 8;
-	}
-	switch (KEY_Scan(1))
+	}*/
+	switch (KEY_Scan(0))
 	{
+		/*
 	case 1:
 		if (pwmval > 10)
 			pwmval = pwmval - 10;
@@ -113,6 +114,32 @@ u8 button_check(void)
 		data_save_bit = 1;
 		TIM_SetCompare3(TIM3,pwmval);
 		break;
+		*/
+		case 1:
+			temp = 2;		//上一曲
+		return temp;
+		case 2:
+			temp = 5;		//随机	
+		return temp;
+		case 3:
+			if (vsset.mvol >= 200)
+					vsset.mvol = 100;
+				else
+					vsset.mvol = vsset.mvol + 10;
+				VS_Set_Vol(vsset.mvol);
+				break;
+		case 4:
+				if (lcd_bit == 0)
+				{
+					lcd_bit = 1;
+					TIM_SetCompare3(TIM3,1000);
+				}
+				else if (lcd_bit == 1)
+				{
+					lcd_bit = 0;
+					TIM_SetCompare3(TIM3,500);
+				}
+				break;
 	}
 	return 0;
 }
@@ -121,7 +148,7 @@ void button_check1(void)
 {
 	static u8 check = 0;
 
-	tp_dev.scan(0);
+	/*tp_dev.scan(0);
 	if (tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
 	{
 		if (tp_dev.x[0] < lcddev.width&&tp_dev.y[0] < lcddev.height)
@@ -153,9 +180,10 @@ void button_check1(void)
 			if (tp_dev.x[0] >= 161 && tp_dev.x[0] <= 240 && tp_dev.y[0] >= 240 & tp_dev.y[0] <= 320)
 				check = 13;
 		}
-	}
+	}	
 	else
 	{
+	*/
 		if (check != 0)
 		{
 			switch (check)
@@ -251,5 +279,5 @@ void button_check1(void)
 			check = 0;
 			VS_Set_All();
 		}
-	}
+	//}
 }
