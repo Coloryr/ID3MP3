@@ -116,7 +116,7 @@ u8 button_check(void)
 		break;
 		*/
 		case 1:
-			temp = 2;		//上一曲
+			temp = 1;		//下一曲
 		return temp;
 		case 2:
 			temp = 5;		//随机	
