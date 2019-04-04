@@ -154,10 +154,11 @@ void mp3_play(void *pdata)
 			OS_CRITICAL_ENTER();
 		}
 		if (res != FR_OK)
-			while (1)
-			{
-				Show_Str(30, 120, 240, 16, "文件夹错误!", 16, 0);
-			}
+		{
+			Show_Str(30, 120, 240, 16, "文夹错误!", 16, 0);
+			Show_Str(0, 140, 240, 16, info.fn, 16, 0);
+			goto a;
+		}
 		mp3id3();
 		LCD_Fill(0, 0, 240, (240 + 16 * 3) - 1, BLACK);
 		show_all(1);					//显示一次歌名
@@ -211,7 +212,7 @@ void mp3_play(void *pdata)
 		}
 		else if (rval == KEY0_PRES)//下一曲
 		{
-			info.curindex++;
+			a:			info.curindex++;
 			if (info.curindex >= info.totmp3num)info.curindex = 0;//到末尾的时候,自动从头开始
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 		}
