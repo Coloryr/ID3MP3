@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\APP;..\FATFS;..\HARDWARE\FLASH;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\LED;..\HARDWARE\SD;..\HARDWARE\SPI;..\HARDWARE\VS10XX;..\HARDWARE\TOUCH;..\HARDWARE\MALLOC;..\HARDWARE\LCD;..\UCOSIII\uC-CPU;..\UCOSIII\uC-LIB;..\UCOSIII\UCOS_BSP;..\UCOSIII\uCOS_CONFIG;..\UCOSIII\uCOS-III\Source;..\UCOSIII\uC-CPU\ARM-Cortex-M3\RealView;..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M3\RealView;..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M3\Generic\RealView;..\PNG;..\JPG</IncludePath>
+              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\APP;..\FATFS;..\HARDWARE\FLASH;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\LED;..\HARDWARE\SD;..\HARDWARE\SPI;..\HARDWARE\VS10XX;..\HARDWARE\TOUCH;..\HARDWARE\MALLOC;..\HARDWARE\LCD;..\UCOSIII\uC-CPU;..\UCOSIII\uC-LIB;..\UCOSIII\UCOS_BSP;..\UCOSIII\uCOS_CONFIG;..\UCOSIII\uCOS-III\Source;..\UCOSIII\uC-CPU\ARM-Cortex-M3\RealView;..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M3\RealView;..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M3\Generic\RealView;..\JPG;..\EMWIN\STemWin\Config;..\EMWIN\STemWin\inc;..\EMWIN\png</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -848,17 +848,202 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EMWIN_Config</GroupName>
+          <Files>
+            <File>
+              <FileName>GUI_X_Touch_Analog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\STemWin\Config\GUI_X_Touch_Analog.c</FilePath>
+            </File>
+            <File>
+              <FileName>GUIConf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\STemWin\Config\GUIConf.c</FilePath>
+            </File>
+            <File>
+              <FileName>GUIDRV_Template.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\STemWin\Config\GUIDRV_Template.c</FilePath>
+            </File>
+            <File>
+              <FileName>LCDConf_FlexColor_Template.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\STemWin\Config\LCDConf_FlexColor_Template.c</FilePath>
+            </File>
+            <File>
+              <FileName>GUI_X_UCOSIII.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\STemWin\OS\GUI_X_UCOSIII.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>EMWIN_LIB</GroupName>
+          <Files>
+            <File>
+              <FileName>STemWin526_CM3_OS_Keil.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\EMWIN\STemWin\Lib\STemWin526_CM3_OS_Keil.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>PNG</GroupName>
           <Files>
             <File>
-              <FileName>png_dec.c</FileName>
+              <FileName>adler32.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\PNG\png_dec.c</FilePath>
+              <FilePath>..\EMWIN\png\adler32.c</FilePath>
             </File>
             <File>
-              <FileName>upng.c</FileName>
+              <FileName>compress.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\PNG\upng.c</FilePath>
+              <FilePath>..\EMWIN\png\compress.c</FilePath>
+            </File>
+            <File>
+              <FileName>crc32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\crc32.c</FilePath>
+            </File>
+            <File>
+              <FileName>deflate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\deflate.c</FilePath>
+            </File>
+            <File>
+              <FileName>GUI_PNG.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\GUI_PNG.c</FilePath>
+            </File>
+            <File>
+              <FileName>gzio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\gzio.c</FilePath>
+            </File>
+            <File>
+              <FileName>IMAGE_PNG.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\IMAGE_PNG.c</FilePath>
+            </File>
+            <File>
+              <FileName>infback.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\infback.c</FilePath>
+            </File>
+            <File>
+              <FileName>inffast.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\inffast.c</FilePath>
+            </File>
+            <File>
+              <FileName>inflate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\inflate.c</FilePath>
+            </File>
+            <File>
+              <FileName>inftrees.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\inftrees.c</FilePath>
+            </File>
+            <File>
+              <FileName>png.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\png.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngerror.c</FilePath>
+            </File>
+            <File>
+              <FileName>pnggccrd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pnggccrd.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngget.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngget.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngmem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngmem.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngpread.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngpread.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngread.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngread.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngrio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngrio.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngrtran.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngrtran.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngrutil.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngrutil.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngset.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngset.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngtrans.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngtrans.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngvcrd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngvcrd.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngwio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngwio.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngwrite.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngwrite.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngwtran.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngwtran.c</FilePath>
+            </File>
+            <File>
+              <FileName>pngwutil.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\pngwutil.c</FilePath>
+            </File>
+            <File>
+              <FileName>trees.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\trees.c</FilePath>
+            </File>
+            <File>
+              <FileName>uncompr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\uncompr.c</FilePath>
+            </File>
+            <File>
+              <FileName>zutil.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\EMWIN\png\zutil.c</FilePath>
             </File>
           </Files>
         </Group>

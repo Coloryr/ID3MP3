@@ -3,7 +3,7 @@
 #include "sys.h"
 #include "ff.h"
 
-#define MP3_BUFF_SIZE			512			
+#define MP3_BUFF_SIZE			1024			
 
 //mp3变量管理
 typedef struct
