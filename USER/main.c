@@ -70,7 +70,7 @@ int main(void)
 		BACK_COLOR = BLACK;
 		LCD_Clear(WHITE);//«Â∆¡
 	}
-	test();
+	//test();
 	APP_start();
 }
 

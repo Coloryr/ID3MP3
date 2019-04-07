@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include "mp3player.h"
 #include "malloc.h"
 #include "show.h"
+#include "exfuns.h"
 
 #define MAKE_BYTE(b) ((b)&0xFF)
 #define MAKE_DWORD(a, b, c, d) ((MAKE_BYTE(a) << 24) | (MAKE_BYTE(b) << 16) | (MAKE_BYTE(c) << 8) | MAKE_BYTE(d))
@@ -1537,7 +1538,7 @@ upng_t *upng_new_from_file(FIL *file, int head)
 		SET_ERROR(upng, UPNG_ENOMEM);
 		return upng;
 	}
-	//fread(buffer, 1, (unsigned long)size, file);
+	f_read(fmp3_pic, buffer, (unsigned int)size, (UINT *)&br);
 
 	/* set the read buffer as our source buffer, with owning flag set */
 	upng->source.buffer = buffer;
