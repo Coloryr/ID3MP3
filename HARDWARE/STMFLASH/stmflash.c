@@ -1,6 +1,5 @@
 #include "stmflash.h"
 #include "delay.h"
-#include "usart.h"
 
 //读取指定地址的半字(16位数据)
 //faddr:读地址(此地址必须为2的倍数!!)

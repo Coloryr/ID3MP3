@@ -5,16 +5,16 @@
 #include "touch.h" 
 #include "vs10xx.h"
 #include "show.h"
+#include "stmflash.h"
 
 u8 data_save_bit=0;
 
 //保存在EEPROM里面的地址区间基址,占用14个字节(RANGE:SAVE_ADDR_BASE~SAVE_ADDR_BASE+13)
 #define SAVE_ADDR_BASE (1024*23)*1024 + 20//触摸保存的位置
-#define save_bit_local (1024*23)*1024 		//默认是23的地址
+#define save_bit_local 0x08070000 		//默认是23的地址
 
-void data(u8 *data)
+void data(u16 *data)
 {
-	data[0] = (info.curindex >> 8) & 0xff;
 	data[1] = info.curindex & 0xff;
 	data[2] = vsset.mvol;
 	data[3] = vsset.bflimit;
@@ -23,27 +23,11 @@ void data(u8 *data)
 	data[6] = vsset.treble;
 	data[7] = vsset.effect;
 }
-u8 data_check(u8 *data)
-{
-	if (
-		data[0] != (info.curindex >> 8) & 0xff
-		|| data[1] != info.curindex & 0xff
-		|| data[2] != vsset.mvol
-		|| data[3] != vsset.bflimit
-		|| data[4] != vsset.bass
-		|| data[5] != vsset.tflimit
-		|| data[6] != vsset.treble
-		|| data[7] != vsset.effect
-		)
-		return 0;
-	else
-		return 1;
-}
 void read_data(void)
 {
-	u8 buff[8];
-	SPI_Flash_Read(buff, save_bit_local, 8);
-	info.curindex = (buff[0] << 8) | buff[1];
+	u16 buff[8];
+	STMFLASH_Read( save_bit_local,buff, 8);
+	info.curindex = buff[1];
 	if (info.curindex > info.totmp3num
 		|| buff[2] > 200 || buff[3] > 15 || buff[4] > 15
 		|| buff[5] > 15 || buff[6] > 15 || buff[7] > 3
@@ -51,7 +35,7 @@ void read_data(void)
 	{
 		info.curindex = 0;
 		data(buff);
-		SPI_Flash_Write(buff, save_bit_local, 8);
+		STMFLASH_Write( save_bit_local,buff, 8);
 	}
 	else
 	{
@@ -68,15 +52,9 @@ void read_data(void)
 
 void write_data(void)
 {
-	u8 buff[8];
+	u16 buff[8];
 	data(buff);
-	SPI_Flash_Write(buff, save_bit_local, 8);
-	SPI_Flash_Read(buff, save_bit_local, 8);
-	if (data_check(buff))
-	{	//再写一次
-		data(buff);
-		SPI_Flash_Write(buff, save_bit_local, 8);
-	}
+	STMFLASH_Write( save_bit_local, buff,8);
 	data_save_bit = 0;
 }
 

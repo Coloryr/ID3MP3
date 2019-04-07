@@ -110,8 +110,7 @@ void mp3_play_ready()
 	}
 	VS_Sine_Test();
 	vs_reset();
-	//read_data();
-	VS_Set_All();
+	read_data();
 	VS_SPI_SpeedHigh(); //¸ßËÙ
 	LCD_Clear(BLACK);
 }
@@ -245,6 +244,6 @@ void mp3_play(void *pdata)
 			while (1)
 				;
 		}
-		//write_data();
+		write_data();
 	}
 }

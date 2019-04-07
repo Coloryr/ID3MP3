@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\APP;..\FATFS;..\HARDWARE\FLASH;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\LED;..\HARDWARE\SD;..\HARDWARE\SPI;..\HARDWARE\VS10XX;..\HARDWARE\TOUCH;..\HARDWARE\MALLOC;..\HARDWARE\LCD;..\UCOSIII\uC-CPU;..\UCOSIII\uC-LIB;..\UCOSIII\UCOS_BSP;..\UCOSIII\uCOS_CONFIG;..\UCOSIII\uCOS-III\Source;..\UCOSIII\uC-CPU\ARM-Cortex-M3\RealView;..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M3\RealView;..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M3\Generic\RealView;..\JPG</IncludePath>
+              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\APP;..\FATFS;..\HARDWARE\FLASH;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\SD;..\HARDWARE\SPI;..\HARDWARE\VS10XX;..\HARDWARE\TOUCH;..\HARDWARE\MALLOC;..\HARDWARE\STMFLASH;..\HARDWARE\LCD;..\UCOSIII\uC-CPU;..\UCOSIII\uC-LIB;..\UCOSIII\UCOS_BSP;..\UCOSIII\uCOS_CONFIG;..\UCOSIII\uCOS-III\Source;..\UCOSIII\uC-CPU\ARM-Cortex-M3\RealView;..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M3\RealView;..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M3\Generic\RealView;..\JPG</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -494,6 +494,11 @@
               <FileName>touch.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\TOUCH\touch.c</FilePath>
+            </File>
+            <File>
+              <FileName>stmflash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\STMFLASH\stmflash.c</FilePath>
             </File>
           </Files>
         </Group>
