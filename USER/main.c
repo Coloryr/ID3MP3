@@ -25,9 +25,10 @@ int main(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //中断分组配置
 	init();											//GPIO等初始化
 	PWM_Init(899, 0);								//不分频。PWM频率=72000/(899+1)=80Khz
-	TIM_SetCompare3(TIM3, 500);
+	TIM_SetCompare3(TIM3, 800);
 	LCD_Init(); //LCD初始化
 	mem_init(); //初始化内存池
+	Adc_Init();
 	piclib_init();
 	gui_init();
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_2); //设置为18M时钟,高速模式

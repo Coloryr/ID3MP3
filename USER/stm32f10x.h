@@ -7897,7 +7897,7 @@ extern "C"
 #define ETH_MACCR_IPCO ((uint32_t)0x00000400)      /* IP Checksum offload */
 #define ETH_MACCR_RD ((uint32_t)0x00000200)        /* Retry disable */
 #define ETH_MACCR_APCS ((uint32_t)0x00000080)      /* Automatic Pad/CRC stripping */
-#define ETH_MACCR_BL ((uint32_t)0x00000060)        /* Back-off limit: random integer number (r) of slot time delays before rescheduling \ \
+#define ETH_MACCR_BL ((uint32_t)0x00000060)        /* Back-off limit: random integer number (r) of slot time delays before rescheduling \ \ \
                                                         a transmission attempt during retries after a collision: 0 =< r <2^k */
 #define ETH_MACCR_BL_10 ((uint32_t)0x00000000)     /* k = min (n, 10) */
 #define ETH_MACCR_BL_8 ((uint32_t)0x00000020)      /* k = min (n, 8) */

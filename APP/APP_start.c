@@ -127,3 +127,47 @@ void APP_start(void)
 	while (1)
 		;
 }
+
+void Adc_Init(void)
+{
+	ADC_InitTypeDef ADC_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_ADC1, ENABLE); //使能IO口时钟，ADC1通道时钟
+
+	RCC_ADCCLKConfig(RCC_PCLK2_Div6);
+
+	//PC4 作为模拟输入
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN; //模拟输入引脚
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	ADC_DeInit(ADC1); //复位ADC1
+
+	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;					//ADC工作模式：独立模式
+	ADC_InitStructure.ADC_ScanConvMode = DISABLE;						//魔术转换工作在单通道
+	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;					//单次转换模式
+	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None; //转换有软件启动
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;				//ADC数据右对齐
+	ADC_InitStructure.ADC_NbrOfChannel = 1;								//顺序进行规则转换
+	ADC_Init(ADC1, &ADC_InitStructure);									//根据ADC_InitStruct中指定 的参数初始化外设ADCx的寄存器
+
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 1, ADC_SampleTime_239Cycles5);
+	ADC_Cmd(ADC1, ENABLE);		//使能指定的ADC1
+	ADC_ResetCalibration(ADC1); //使能复位校准
+	while (ADC_GetResetCalibrationStatus(ADC1))
+		;						//等待复位校准结束
+	ADC_StartCalibration(ADC1); //开启AD校准
+	while (ADC_GetCalibrationStatus(ADC1))
+		; //等待校准结束
+}
+u16 Get_Adc_Average(void)
+{
+	u16 temp_val;
+	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC))
+		;
+	temp_val = ADC_GetConversionValue(ADC1);
+	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
+	return temp_val;
+}

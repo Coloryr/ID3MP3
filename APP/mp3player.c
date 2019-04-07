@@ -133,7 +133,6 @@ void mp3_play(void *pdata)
 	mp3_play_ready();
 	res = f_opendir(&mp3dir, (const TCHAR *)"0:/MUSIC"); //打开目录
 	OS_CRITICAL_EXIT();
-	info.curindex = 0;
 	while (1) //打开成功
 	{
 		OS_CRITICAL_ENTER(); //进入临界区
@@ -232,8 +231,7 @@ void mp3_play(void *pdata)
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 			break;
 		case 5:
-			srand(info.curindex);
-			srand(rand());
+			srand(Get_Adc_Average());
 			info.curindex = rand() % (info.totmp3num - 1);
 			LCD_Fill(0, 0, 240, 240 + 17 * 3, BLACK);
 			break;
