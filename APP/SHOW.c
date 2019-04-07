@@ -37,7 +37,7 @@ void jpeg_freeall(void)
 void show_mp3_pic(void *pdata)
 {
 	u8 res;
-	UINT (*outfun)
+	UINT(*outfun)
 	(JDEC *, void *, JRECT *);
 	u8 scale; //图像输出比例 0,1/2,1/4,1/8
 	CPU_SR_ALLOC();
@@ -60,8 +60,8 @@ void show_mp3_pic(void *pdata)
 				if (res == FR_OK) //打开文件成功
 				{
 					res = jd_prepare(jpeg_dev, jpeg_in_func, jpg_buffer, JPEG_WBUF_SIZE, fmp3_pic); //执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
-					outfun = jpeg_out_func_point;												//默认采用画点的方式显示
-					if (res == JDR_OK)															//准备解码成功
+					outfun = jpeg_out_func_point;													//默认采用画点的方式显示
+					if (res == JDR_OK)																//准备解码成功
 					{
 						for (scale = 0; scale < 4; scale++) //确定输出图像的比例因子
 						{

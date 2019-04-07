@@ -7,15 +7,3 @@ void APP_pic_start(void);
 u32 app_get_rand(u32 max);
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

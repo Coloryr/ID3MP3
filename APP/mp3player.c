@@ -82,7 +82,7 @@ void mp3_play_ready()
 	info.pname = mymalloc(info.mp3fileinfo.lfsize);				 //为带路径的文件名分配内存
 	info.mp3indextbl = mymalloc(2 * info.totmp3num);			 //申请2*totmp3num个字节的内存,用于存放音乐文件索引
 	info.fmp3 = (FIL *)mymalloc(sizeof(FIL));					 //申请内存
-	fmp3_pic = (FIL *)mymalloc(sizeof(FIL));						 //申请内存
+	fmp3_pic = (FIL *)mymalloc(sizeof(FIL));					 //申请内存
 	while (info.mp3fileinfo.lfname == NULL || info.pname == NULL ||
 		   info.mp3indextbl == NULL || info.fmp3 == NULL) //内存分配出错
 	{

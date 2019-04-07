@@ -11,11 +11,10 @@ void show_mp3_pic(void *pdata);
 void show_all(u8 mode);
 
 extern u8 lcd_bit;
-extern FIL* fmp3_pic;
+extern FIL *fmp3_pic;
 
-#define pic_show_x   0						//图片显示的位置_x
-#define pic_show_y   0						//图片显示的位置_y
-#define pic_show_size   240				//图片显示的大小
-
+#define pic_show_x 0      //图片显示的位置_x
+#define pic_show_y 0      //图片显示的位置_y
+#define pic_show_size 240 //图片显示的大小
 
 #endif

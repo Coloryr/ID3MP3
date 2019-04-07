@@ -11,7 +11,7 @@
 
 u8 button_check(void)
 {
-//	static u8 check = 0;
+	//	static u8 check = 0;
 	//static u16 pwmval = 300;
 	u8 temp;
 	/*
@@ -101,7 +101,7 @@ u8 button_check(void)
 	}*/
 	switch (KEY_Scan(0))
 	{
-		/*
+	/*
 	case 1:
 		if (pwmval > 10)
 			pwmval = pwmval - 10;
@@ -115,31 +115,31 @@ u8 button_check(void)
 		TIM_SetCompare3(TIM3,pwmval);
 		break;
 		*/
-		case 1:
-			temp = 1;		//下一曲
+	case 1:
+		temp = 1; //下一曲
 		return temp;
-		case 2:
-			temp = 5;		//随机	
+	case 2:
+		temp = 5; //随机
 		return temp;
-		case 3:
-			if (vsset.mvol >= 200)
-					vsset.mvol = 100;
-				else
-					vsset.mvol = vsset.mvol + 10;
-				VS_Set_Vol(vsset.mvol);
-				break;
-		case 4:
-				if (lcd_bit == 0)
-				{
-					lcd_bit = 1;
-					TIM_SetCompare3(TIM3,1000);
-				}
-				else if (lcd_bit == 1)
-				{
-					lcd_bit = 0;
-					TIM_SetCompare3(TIM3,500);
-				}
-				break;
+	case 3:
+		if (vsset.mvol >= 200)
+			vsset.mvol = 100;
+		else
+			vsset.mvol = vsset.mvol + 10;
+		VS_Set_Vol(vsset.mvol);
+		break;
+	case 4:
+		if (lcd_bit == 0)
+		{
+			lcd_bit = 1;
+			TIM_SetCompare3(TIM3, 1000);
+		}
+		else if (lcd_bit == 1)
+		{
+			lcd_bit = 0;
+			TIM_SetCompare3(TIM3, 500);
+		}
+		break;
 	}
 	return 0;
 }
@@ -184,100 +184,100 @@ void button_check1(void)
 	else
 	{
 	*/
-		if (check != 0)
+	if (check != 0)
+	{
+		switch (check)
 		{
-			switch (check)
-			{
-			case 1:
-				if (vsset.mvol <= 100)
-					vsset.mvol = 200;
-				else
-					vsset.mvol = vsset.mvol - 10;
-				break;
-			case 2:
-				if (vsset.bflimit == 0)
-					vsset.bflimit = 15;
-				else
-					vsset.bflimit--;
-				break;
-			case 3:
-				if (vsset.bass == 0)
-					vsset.bass = 15;
-				else
-					vsset.bass--;
-				break;
-			case 4:
-				if (vsset.tflimit == 0)
-					vsset.tflimit = 15;
-				else
-					vsset.tflimit--;
-				break;
-			case 5:
-				if (vsset.treble == 0)
-					vsset.treble = 15;
-				else
-					vsset.treble--;
-				break;
-			case 6:
-				if (vsset.effect == 0)
-					vsset.effect = 3;
-				else
-					vsset.effect--;
-				break;
-			case 7:
-				if (vsset.mvol >= 200)
-					vsset.mvol = 100;
-				else
-					vsset.mvol = vsset.mvol + 10;
-				break;
-			case 8:
-				if (vsset.bflimit == 15)
-					vsset.bflimit = 0;
-				else
-					vsset.bflimit++;
-				break;
-			case 9:
-				if (vsset.bass == 15)
-					vsset.bass = 0;
-				else
-					vsset.bass++;
-				break;
-			case 10:
-				if (vsset.tflimit == 15)
-					vsset.tflimit = 0;
-				else
-					vsset.tflimit++;
-				break;
-			case 11:
-				if (vsset.treble == 15)
-					vsset.treble = 0;
-				else
-					vsset.treble++;
-				break;
-			case 12:
-				if (vsset.effect == 3)
-					vsset.effect = 0;
-				else
-					vsset.effect++;
-				break;
-			case 13:
-				LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size, pic_show_y + pic_show_size, BACK_COLOR);
-				f_lseek(fmp3_pic, info.pic_local);				//还原指针
-				if (info.pic_type == 0)								//JPG
-					info.pic_show = 1;
-				else if (info.pic_type == 1)					//PNG
-					info.pic_show = 2;
-				info.mode = 0;
-				show_all(1);
-				data_save_bit = 1;
-				break;
-			default:
-				break;
-			}
-			if (check != 13)
-				show_all(2);
-			check = 0;
-			VS_Set_All();
+		case 1:
+			if (vsset.mvol <= 100)
+				vsset.mvol = 200;
+			else
+				vsset.mvol = vsset.mvol - 10;
+			break;
+		case 2:
+			if (vsset.bflimit == 0)
+				vsset.bflimit = 15;
+			else
+				vsset.bflimit--;
+			break;
+		case 3:
+			if (vsset.bass == 0)
+				vsset.bass = 15;
+			else
+				vsset.bass--;
+			break;
+		case 4:
+			if (vsset.tflimit == 0)
+				vsset.tflimit = 15;
+			else
+				vsset.tflimit--;
+			break;
+		case 5:
+			if (vsset.treble == 0)
+				vsset.treble = 15;
+			else
+				vsset.treble--;
+			break;
+		case 6:
+			if (vsset.effect == 0)
+				vsset.effect = 3;
+			else
+				vsset.effect--;
+			break;
+		case 7:
+			if (vsset.mvol >= 200)
+				vsset.mvol = 100;
+			else
+				vsset.mvol = vsset.mvol + 10;
+			break;
+		case 8:
+			if (vsset.bflimit == 15)
+				vsset.bflimit = 0;
+			else
+				vsset.bflimit++;
+			break;
+		case 9:
+			if (vsset.bass == 15)
+				vsset.bass = 0;
+			else
+				vsset.bass++;
+			break;
+		case 10:
+			if (vsset.tflimit == 15)
+				vsset.tflimit = 0;
+			else
+				vsset.tflimit++;
+			break;
+		case 11:
+			if (vsset.treble == 15)
+				vsset.treble = 0;
+			else
+				vsset.treble++;
+			break;
+		case 12:
+			if (vsset.effect == 3)
+				vsset.effect = 0;
+			else
+				vsset.effect++;
+			break;
+		case 13:
+			LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size, pic_show_y + pic_show_size, BACK_COLOR);
+			f_lseek(fmp3_pic, info.pic_local); //还原指针
+			if (info.pic_type == 0)			   //JPG
+				info.pic_show = 1;
+			else if (info.pic_type == 1) //PNG
+				info.pic_show = 2;
+			info.mode = 0;
+			show_all(1);
+			data_save_bit = 1;
+			break;
+		default:
+			break;
 		}
+		if (check != 13)
+			show_all(2);
+		check = 0;
+		VS_Set_All();
+	}
 	//}
 }

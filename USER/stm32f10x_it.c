@@ -22,29 +22,29 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x_it.h" 
+#include "stm32f10x_it.h"
 
-#include "core_cm3.h" 
-#include "lcd.h" 
-#include "text.h" 
- 
+#include "core_cm3.h"
+#include "lcd.h"
+#include "text.h"
+
 void NMI_Handler(void)
 {
 }
- 
+
 void HardFault_Handler(void)
 {
   /* Go to infinite loop when Hard Fault exception occurs */
-	LCD_Clear(BLACK);//清屏  
-	
+  LCD_Clear(BLACK); //清屏
+
   while (1)
   {
-		Show_Str(0, 0, 240, 16, "发生错误，尝试复位", 16, 0);
-		__set_FAULTMASK(1); // ??????
+    Show_Str(0, 0, 240, 16, "发生错误，尝试复位", 16, 0);
+    __set_FAULTMASK(1); // ??????
     NVIC_SystemReset(); // ??
   }
 }
- 
+
 void MemManage_Handler(void)
 {
   /* Go to infinite loop when Memory Manage exception occurs */
@@ -53,7 +53,6 @@ void MemManage_Handler(void)
   }
 }
 
- 
 void BusFault_Handler(void)
 {
   /* Go to infinite loop when Bus Fault exception occurs */
@@ -61,7 +60,7 @@ void BusFault_Handler(void)
   {
   }
 }
- 
+
 void UsageFault_Handler(void)
 {
   /* Go to infinite loop when Usage Fault exception occurs */
@@ -69,16 +68,14 @@ void UsageFault_Handler(void)
   {
   }
 }
- 
+
 void SVC_Handler(void)
 {
 }
- 
+
 void DebugMon_Handler(void)
 {
 }
- 
- 
 
 /******************************************************************************/
 /*                 STM32F10x Peripherals Interrupt Handlers                   */
