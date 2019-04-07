@@ -262,7 +262,7 @@ void button_check1(void)
 				break;
 			case 13:
 				LCD_Fill(pic_show_x, pic_show_y, pic_show_x + pic_show_size, pic_show_y + pic_show_size, BACK_COLOR);
-				f_lseek(fmp3, info.pic_local);				//还原指针
+				f_lseek(fmp3_pic, info.pic_local);				//还原指针
 				if (info.pic_type == 0)								//JPG
 					info.pic_show = 1;
 				else if (info.pic_type == 1)					//PNG

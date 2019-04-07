@@ -343,7 +343,7 @@ void mp3id3(void)
 			info.pic_local = 0;
 			info.pic_show = 3;
 		}
-		f_lseek(fmp3, info.pic_local);				//跳过头
+		f_lseek(fmp3_pic, info.pic_local);				//跳过头
 	}
 	myfree(databuf);						//释放内存	
 }

@@ -82,7 +82,7 @@ void mp3_play_ready()
 	info.pname = mymalloc(info.mp3fileinfo.lfsize);				 //为带路径的文件名分配内存
 	info.mp3indextbl = mymalloc(2 * info.totmp3num);			 //申请2*totmp3num个字节的内存,用于存放音乐文件索引
 	info.fmp3 = (FIL *)mymalloc(sizeof(FIL));					 //申请内存
-	fmp3 = (FIL *)mymalloc(sizeof(FIL));						 //申请内存
+	fmp3_pic = (FIL *)mymalloc(sizeof(FIL));						 //申请内存
 	while (info.mp3fileinfo.lfname == NULL || info.pname == NULL ||
 		   info.mp3indextbl == NULL || info.fmp3 == NULL) //内存分配出错
 	{
@@ -143,7 +143,10 @@ void mp3_play(void *pdata)
 		dir_sdi(&mp3dir, info.mp3indextbl[info.curindex]); //改变当前目录索引
 		res = f_readdir(&mp3dir, &info.mp3fileinfo);	   //读取目录下的一个文件
 		if (res != FR_OK || info.mp3fileinfo.fname[0] == 0)
+		{
 			rval = KEY0_PRES; //错误了/到末尾了,退出
+			OS_CRITICAL_EXIT();
+		}
 		else
 		{
 			info.fn = (u8 *)(*info.mp3fileinfo.lfname ? info.mp3fileinfo.lfname : info.mp3fileinfo.fname);
@@ -151,12 +154,13 @@ void mp3_play(void *pdata)
 			strcat((char *)info.pname, (const char *)info.fn); //将文件名接在后面
 			info.size = 1;
 			res = f_open(info.fmp3, (const TCHAR *)info.pname, FA_READ);
-			f_open(fmp3, (const TCHAR *)info.pname, FA_READ);
+			f_open(fmp3_pic, (const TCHAR *)info.pname, FA_READ);
 			if (res != FR_OK)
 			{
 				Show_Str(30, 120, 240, 16, "文夹错误!", 16, 0);
 				Show_Str(0, 140, 240, 16, info.fn, 16, 0);
 				rval = KEY0_PRES;
+				OS_CRITICAL_EXIT();
 			}
 			else
 			{
@@ -210,10 +214,8 @@ void mp3_play(void *pdata)
 		if (write_bit == 0x10 && info.mode == 0)
 		{
 			write_bit = 0x20;
-			OS_CRITICAL_EXIT();
 			while (write_bit == 0x30)
 				;
-			OS_CRITICAL_ENTER();
 		}
 		switch (rval)
 		{

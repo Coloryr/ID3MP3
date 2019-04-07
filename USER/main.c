@@ -18,6 +18,7 @@
 #include "guix.h"
 #include "piclib.h" 
 #include "show.h" 
+#include "png_dec.h"
 
 int main(void)
 {
@@ -69,6 +70,7 @@ int main(void)
 		BACK_COLOR = BLACK;
 		LCD_Clear(WHITE);//«Â∆¡
 	}
+	test();
 	APP_start();
 }
 

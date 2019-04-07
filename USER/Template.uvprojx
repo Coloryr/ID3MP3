@@ -848,6 +848,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>PNG</GroupName>
+          <Files>
+            <File>
+              <FileName>png_dec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PNG\png_dec.c</FilePath>
+            </File>
+            <File>
+              <FileName>upng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PNG\upng.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>

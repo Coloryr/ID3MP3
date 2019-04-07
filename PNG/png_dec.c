@@ -12,7 +12,7 @@
 #define HI(w) (((w) >> 8) & 0xFF)
 #define LO(w) ((w) & 0xFF)
 
-static uint8_t decoder_buffer[1000*1024];
+static uint8_t decoder_buffer[1024];
 
 uint8_t header[54] =
 	{
@@ -51,15 +51,15 @@ void encodeToBMP(uint8_t *bmp_header, uint32_t xsize, uint32_t ysize)
 	memmove(bmp_header, header, sizeof(header));
 }
 
-/*
+
 int test(void)
 {
 	upng_t* upng;
 	unsigned width, height, depth;
 	unsigned x, y, d;
 	uint8_t header[54];
-
-	upng = upng_new_from_file(fmp3, info.pic_local);
+	f_open(fmp3_pic, "0:/test.png", FA_READ);
+	upng = upng_new_from_file(fmp3_pic, info.pic_local);
     if(upng != NULL)
     {
 //        upng_decode(upng);
@@ -75,6 +75,7 @@ int test(void)
 	height = upng_get_height(upng);
 	depth = upng_get_bpp(upng) / 8;
 
+		/*
 	if (upng_get_format(upng) == UPNG_RGB8 || upng_get_format(upng) == UPNG_RGBA8) 
     {
 		fh = fopen(BMP_PATH, "wb");
@@ -96,8 +97,8 @@ int test(void)
 
 		fclose(fh);
 	}
-
+  */
 	upng_free(upng);
 	return 0;
 }
-*/
+
