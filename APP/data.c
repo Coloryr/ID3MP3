@@ -15,7 +15,7 @@ u8 data_save_bit = 0;
 
 void data(u16 *data)
 {
-	data[1] = info.curindex & 0xff;
+	data[1] = info.curindex;
 	data[2] = vsset.mvol;
 	data[3] = vsset.bflimit;
 	data[4] = vsset.bass;

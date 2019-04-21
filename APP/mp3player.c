@@ -209,10 +209,10 @@ void mp3_play(void *pdata)
 			f_close(info.fmp3);
 			vs_reset();
 		}
-		if (write_bit == 0x10 && info.mode == 0)
+		if (write_bit == 0x00 && info.mode == 0)
 		{
-			write_bit = 0x20;
-			while (write_bit == 0x30)
+			write_bit = 0x10;
+			while (write_bit == 0x20)
 				;
 		}
 		switch (rval)

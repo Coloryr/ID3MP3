@@ -82,6 +82,7 @@ void show_mp3_pic(void *pdata)
 						picinfo.ImgHeight = jpeg_dev->height >> scale; //缩放后的图片尺寸
 						picinfo.ImgWidth = jpeg_dev->width >> scale;   //缩放后的图片尺寸
 						ai_draw_init();								   //初始化智能画图
+						write_bit = 0x00;
 						//执行解码工作，调用TjpgDec模块的jd_decomp函数
 						OS_CRITICAL_EXIT(); //进入临界区
 						res = jd_decomp(jpeg_dev, outfun, scale);
@@ -91,14 +92,7 @@ void show_mp3_pic(void *pdata)
 			}
 			jpeg_freeall(); //释放内存
 			info.pic_show = 0;
-			if (write_bit == 0x20)
-			{
-				write_bit = 0x30;
-			}
-			else if (write_bit == 0x10)
-			{
-				write_bit = 0x30;
-			}
+			write_bit = 0x20;
 			OS_CRITICAL_EXIT(); //进入临界区
 		}
 		else if (info.pic_show == 2)

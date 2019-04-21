@@ -137,7 +137,7 @@ u8 button_check(void)
 		else if (lcd_bit == 1)
 		{
 			lcd_bit = 0;
-			TIM_SetCompare3(TIM3, 500);
+			TIM_SetCompare3(TIM3, 850);
 		}
 		break;
 	}

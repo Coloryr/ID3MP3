@@ -1049,7 +1049,6 @@ JRESULT jd_decomp(
 	rst = rsc = 0;
 
 	rc = JDR_OK;
-	write_bit = 0x10;
 	for (y = 0; y < jd->height; y += my)
 	{ /* Vertical loop of MCUs */
 		for (x = 0; x < jd->width; x += mx)
@@ -1069,7 +1068,7 @@ JRESULT jd_decomp(
 			OS_CRITICAL_EXIT();
 			if (rc != JDR_OK)
 				return rc;
-			if (write_bit == 0x20)
+			if (write_bit == 0x10)
 			{
 				return rc;
 			}
