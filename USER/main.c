@@ -6,7 +6,7 @@
 #include "diskio.h"
 #include "malloc.h"
 #include "exfuns.h"
-#include "app_start.h"
+#include "APP_start.h"
 #include "includes.h"
 #include "touch.h"
 #include "delay.h"
@@ -21,33 +21,34 @@
 
 int main(void)
 {
-	delay_init(72);									//ÑÓÊ±º¯Êı³õÊ¼»¯
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //ÖĞ¶Ï·Ö×éÅäÖÃ
-	init();											//GPIOµÈ³õÊ¼»¯
-	PWM_Init(899, 0);								//²»·ÖÆµ¡£PWMÆµÂÊ=72000/(899+1)=80Khz
+	delay_init(72);									//å»¶æ—¶å‡½æ•°åˆå§‹åŒ–
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //ä¸­æ–­åˆ†ç»„é…ç½®
+	init();											//GPIOç­‰åˆå§‹åŒ–
+	//PWM_Init(899, 0);								//ä¸åˆ†é¢‘ã€‚PWMé¢‘ç‡=72000/(899+1)=80Khz
 	TIM_SetCompare3(TIM3, 850);
-	LCD_Init(); //LCD³õÊ¼»¯
-	mem_init(); //³õÊ¼»¯ÄÚ´æ³Ø
+	LCD_Init(); //LCDåˆå§‹åŒ–
+	mem_init(); //åˆå§‹åŒ–å†…å­˜æ± 
 	Adc_Init();
 	piclib_init();
 	gui_init();
-	SPI1_SetSpeed(SPI_BaudRatePrescaler_2); //ÉèÖÃÎª18MÊ±ÖÓ,¸ßËÙÄ£Ê½
-	//TP_Init();								//´¥ÃşÆÁ³õÊ¼»¯
+	SPI1_SetSpeed(SPI_BaudRatePrescaler_2); //è®¾ç½®ä¸º18Mæ—¶é’Ÿ,é«˜é€Ÿæ¨¡å¼
+	//TP_Init();								//è§¦æ‘¸å±åˆå§‹åŒ–
 	POINT_COLOR = RED;
 	BACK_COLOR = BLACK;
-	LCD_Clear(BLACK); //ÇåÆÁ
+	LCD_Clear(BLACK); //æ¸…å±
 
-	while (exfuns_init()) //ÎªfatfsÏà¹Ø±äÁ¿ÉêÇëÄÚ´æ
+	while (exfuns_init()) //ä¸ºfatfsç›¸å…³å˜é‡ç”³è¯·å†…å­˜
 	{
 		LCD_ShowString(30, 20, 320, 16, 16, "Fatfs -> ERROR!");
 	}
-	while (SD_Init()) //SD¿¨³õÊ¼»¯
+	while (SD_Init()) //SDå¡åˆå§‹åŒ–
 	{
 		LCD_ShowString(30, 20, 320, 16, 16, "TFcard -> ERROR!");
+		Show_Str(30, 120, 240, 16, "æµ‹è¯•", 16, 0);
 	}
 
-	f_mount(fs[0], "0:", 1); //¹ÒÔØSD¿¨
-	f_mount(fs[1], "1:", 1); //¹ÒÔØFLASH.
+	f_mount(fs[0], "0:", 1); //æŒ‚è½½SDå¡
+	f_mount(fs[1], "1:", 1); //æŒ‚è½½FLASH.
 
 	if (font_init() == 1 || KEY_Scan(0) == 1)
 	{
@@ -57,18 +58,18 @@ int main(void)
 		{
 			goto a;
 		}
-		LCD_Clear(WHITE); //ÇåÆÁ
-		TP_Adjust();	  //ÆÁÄ»Ğ£×¼
+		LCD_Clear(WHITE); //æ¸…å±
+		//TP_Adjust();	  //å±å¹•æ ¡å‡†
 		POINT_COLOR = RED;
 		BACK_COLOR = BLACK;
 	}
 	if (KEY_Scan(0) == 2)
 	{
-		LCD_Clear(WHITE); //ÇåÆÁ
-		TP_Adjust();	  //ÆÁÄ»Ğ£×¼
+		LCD_Clear(WHITE); //æ¸…å±
+		TP_Adjust();	  //å±å¹•æ ¡å‡†
 		POINT_COLOR = RED;
 		BACK_COLOR = BLACK;
-		LCD_Clear(WHITE); //ÇåÆÁ
+		LCD_Clear(WHITE); //æ¸…å±
 	}
 	APP_start();
 }

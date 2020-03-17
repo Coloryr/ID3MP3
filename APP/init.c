@@ -27,12 +27,18 @@ void init(void)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
@@ -40,10 +46,11 @@ void init(void)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_2 | GPIO_Pin_1 | GPIO_Pin_0;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
@@ -67,8 +74,9 @@ void init(void)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
+  GPIO_SetBits(GPIOA, GPIO_Pin_8);
 	GPIO_SetBits(GPIOA, GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7); //PB13/14/15上拉
-	GPIO_SetBits(GPIOC, GPIO_Pin_13);
+	GPIO_SetBits(GPIOC, GPIO_Pin_15);
 	GPIO_SetBits(GPIOD, GPIO_Pin_7);  //CS=1
 	GPIO_SetBits(GPIOD, GPIO_Pin_11); //RS=1
 	GPIO_SetBits(GPIOD, GPIO_Pin_14 | GPIO_Pin_15 | GPIO_Pin_0 | GPIO_Pin_1);
@@ -136,9 +144,9 @@ void init(void)
 
 	SPI_Cmd(SPI1, ENABLE); //使能SPI外设
 
-	SPI1_ReadWriteByte(0xff); //启动传输
+	SPI1_ReadWriteByte(0xff);//启动传输		 
 
-	SPI1_SetSpeed(SPI_BaudRatePrescaler_4); //设置为18M时钟,高速模式
+	SPI1_SetSpeed(SPI_BaudRatePrescaler_2); //设置为18M时钟,高速模式
 
 	SPI_FLASH_TYPE = SPI_Flash_ReadID(); //??FLASH ID
 }

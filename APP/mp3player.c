@@ -110,6 +110,7 @@ void mp3_play_ready()
 	}
 	VS_Sine_Test();
 	vs_reset();
+	VS_Set_Bass(10, 15, 10, 0);
 	read_data();
 	VS_SPI_SpeedHigh(); //高速
 	LCD_Clear(BLACK);
@@ -125,7 +126,7 @@ void mp3_play(void *pdata)
 	u16 i = 0;
 	static u8 pause = 0; //暂停标志
 	CPU_SR_ALLOC();
-
+	
 	databuf = (u8 *)mymalloc(MP3_BUFF_SIZE); //开辟4096字节的内存区域
 	if (databuf == NULL)
 		rval = 0XFF;	 //内存申请失败.
