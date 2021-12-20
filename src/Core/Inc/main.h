@@ -71,13 +71,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-void   MX_GPIO_Init(void);
-void   MX_FMC_Init(void);
-void   MX_JPEG_Init(void);
-void   MX_QUADSPI_Init(void);
-void   MX_SDMMC1_SD_Init(void);
-void   MX_SPI1_Init(void);
-void   MX_USART1_Init(void);
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
