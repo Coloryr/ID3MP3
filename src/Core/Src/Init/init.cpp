@@ -3,6 +3,7 @@
 #include "cmsis_os.h"
 #include "libjpeg.h"
 #include "fatfs.h"
+#include "lvgl.h"
 
 /* BSP LCD driver */
 #include "stm32_adafruit_lcd.h"
@@ -16,6 +17,102 @@ QSPI_HandleTypeDef hqspi;
 SD_HandleTypeDef hsd1;
 
 SRAM_HandleTypeDef hsram1;
+
+FRESULT res;
+
+#define DISP_HOR_RES 320
+#define DISP_VER_RES 480
+
+static lv_disp_draw_buf_t draw_buf;
+static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
+
+void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * color_p)
+{
+    int32_t x, y;
+    /*It's a very slow but simple implementation.
+     *`set_pixel` needs to be written by you to a set pixel on the screen*/
+    for(y = area->y1; y <= area->y2; y++) {
+        for(x = area->x1; x <= area->x2; x++) {
+            BSP_LCD_DrawPixel(x, y, color_p->full);
+            color_p++;
+        }
+    }
+
+    lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
+}
+
+//void my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
+//{
+//    /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
+//    if(touchpad_is_pressed()) {
+//        data->state = LV_INDEV_STATE_PRESSED;
+//        touchpad_get_xy(&data->point.x, &data->point.y);
+//    } else {
+//        data->state = LV_INDEV_STATE_RELEASED;
+//    }
+//
+//}
+
+static void set_angle(void * img, int32_t v)
+{
+    lv_img_set_angle((lv_obj_t*)img, v);
+}
+
+static void set_zoom(void * img, int32_t v)
+{
+    lv_img_set_zoom((lv_obj_t*)img, v);
+}
+
+void Lvgl_Config(){
+    lv_init();
+    lv_disp_draw_buf_init(&draw_buf, buf1, NULL, DISP_HOR_RES * DISP_VER_RES / 10);  /*Initialize the display buffer.*/
+
+    if(res!= FR_OK)
+    {
+        lv_obj_t * label1 = lv_label_create(lv_scr_act());
+        lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);     /*Break the long lines*/
+        lv_label_set_recolor(label1, true);                      /*Enable re-coloring by commands in the text*/
+        lv_label_set_text(label1, "#0000ff Re-color# #ff00ff words# #ff0000 of a# label, align the lines to the center "
+                                  "and wrap long text automatically.");
+        lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
+        lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
+        lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
+
+
+        lv_obj_t * label2 = lv_label_create(lv_scr_act());
+        lv_label_set_long_mode(label2, LV_LABEL_LONG_SCROLL_CIRCULAR);     /*Circular scroll*/
+        lv_obj_set_width(label2, 150);
+        lv_label_set_text(label2, "Fatfs Error...");
+        lv_obj_align(label2, LV_ALIGN_CENTER, 0, 40);
+    }
+    else
+    {
+        static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
+        lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
+        disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
+        disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
+        disp_drv.hor_res = DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
+        disp_drv.ver_res = DISP_VER_RES;   /*Set the vertical resolution of the display*/
+        lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+
+//    static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
+//    lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
+//    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
+//    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
+//    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
+
+
+        /*Now create the actual image*/
+        lv_obj_t * img = lv_img_create(lv_scr_act());
+        lv_img_set_src(img, "S:test.jpg");
+        lv_img_set_pivot(img, 0, 0);    /*Rotate around the top left corner*/
+    }
+
+}
+
+void Fatfs_Config(){
+    res = f_mount(&SDFatFS,(TCHAR const*)SDPath, 1);
+}
 
 void MPU_Config() {
 
@@ -397,6 +494,7 @@ void MX_GPIO_Init() {
 
     /**/
     LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_1);
+    LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_6);
 
     /**/
     GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
@@ -412,6 +510,8 @@ void MX_GPIO_Init() {
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    GPIO_InitStruct.Pin = LL_GPIO_PIN_6;
+    LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
 void init(){
@@ -422,7 +522,7 @@ void init(){
     SystemClock_Config();
     PeriphCommonClock_Config();
     MX_GPIO_Init();
-    MX_FMC_Init();
+//    MX_FMC_Init();
     MX_JPEG_Init();
     MX_QUADSPI_Init();
     MX_SDMMC1_SD_Init();
@@ -431,12 +531,9 @@ void init(){
     MX_FATFS_Init();
     MX_LIBJPEG_Init();
 
-    TS_StateTypeDef ts;
-    uint16_t boxsize;
-    uint16_t oldcolor, currentcolor;
-
     BSP_LCD_Init();
-    BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
-    BSP_LCD_Clear(LCD_COLOR_BLACK);
 
+    Lvgl_Config();
+    Fatfs_Config();
+    //    BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
 }

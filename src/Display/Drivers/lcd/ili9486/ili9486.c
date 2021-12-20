@@ -10,51 +10,69 @@
 #include "ili9486.h"
 
 /* Lcd */
-void     ili9486_Init(void);
+void ili9486_Init(void);
+
 uint16_t ili9486_ReadID(void);
-void     ili9486_DisplayOn(void);
-void     ili9486_DisplayOff(void);
-void     ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos);
-void     ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code);
+
+void ili9486_DisplayOn(void);
+
+void ili9486_DisplayOff(void);
+
+void ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos);
+
+void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code);
+
 uint16_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos);
-void     ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
-void     ili9486_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
-void     ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
-void     ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t RGBCode);
+
+void ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
+
+void ili9486_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+
+void ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+
+void ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t RGBCode);
+
 uint16_t ili9486_GetLcdPixelWidth(void);
+
 uint16_t ili9486_GetLcdPixelHeight(void);
-void     ili9486_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
-void     ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData);
-void     ili9486_ReadRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData);
-void     ili9486_Scroll(int16_t Scroll, uint16_t TopFix, uint16_t BottonFix);
+
+void ili9486_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
+
+void ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData);
+
+void ili9486_ReadRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData);
+
+void ili9486_Scroll(int16_t Scroll, uint16_t TopFix, uint16_t BottonFix);
 
 /* Touchscreen */
-void     ili9486_ts_Init(uint16_t DeviceAddr);
-uint8_t  ili9486_ts_DetectTouch(uint16_t DeviceAddr);
-void     ili9486_ts_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y);
+void ili9486_ts_Init(uint16_t DeviceAddr);
 
-LCD_DrvTypeDef   ili9486_drv =
-{
-  ili9486_Init,
-  ili9486_ReadID,
-  ili9486_DisplayOn,
-  ili9486_DisplayOff,
-  ili9486_SetCursor,
-  ili9486_WritePixel,
-  ili9486_ReadPixel,
-  ili9486_SetDisplayWindow,
-  ili9486_DrawHLine,
-  ili9486_DrawVLine,
-  ili9486_GetLcdPixelWidth,
-  ili9486_GetLcdPixelHeight,
-  ili9486_DrawBitmap,
-  ili9486_DrawRGBImage,
-  ili9486_FillRect,
-  ili9486_ReadRGBImage,
-  ili9486_Scroll,
-};
+uint8_t ili9486_ts_DetectTouch(uint16_t DeviceAddr);
 
-LCD_DrvTypeDef  *lcd_drv = &ili9486_drv;
+void ili9486_ts_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y);
+
+LCD_DrvTypeDef ili9486_drv =
+        {
+                ili9486_Init,
+                ili9486_ReadID,
+                ili9486_DisplayOn,
+                ili9486_DisplayOff,
+                ili9486_SetCursor,
+                ili9486_WritePixel,
+                ili9486_ReadPixel,
+                ili9486_SetDisplayWindow,
+                ili9486_DrawHLine,
+                ili9486_DrawVLine,
+                ili9486_GetLcdPixelWidth,
+                ili9486_GetLcdPixelHeight,
+                ili9486_DrawBitmap,
+                ili9486_DrawRGBImage,
+                ili9486_FillRect,
+                ili9486_ReadRGBImage,
+                ili9486_Scroll,
+        };
+
+LCD_DrvTypeDef *lcd_drv = &ili9486_drv;
 
 #define ILI9486_NOP            0x00
 #define ILI9486_SWRESET        0x01
@@ -162,7 +180,7 @@ LCD_DrvTypeDef  *lcd_drv = &ili9486_drv;
 //-----------------------------------------------------------------------------
 #define ILI9486_LCD_INITIALIZED    0x01
 #define ILI9486_IO_INITIALIZED     0x02
-static  uint8_t   Is_ili9486_Initialized = 0;
+static uint8_t Is_ili9486_Initialized = 0;
 
 #if      ILI9486_MULTITASK_MUTEX == 1 && ILI9486_TOUCH == 1
 volatile uint8_t io_lcd_busy = 0;
@@ -176,34 +194,49 @@ volatile uint8_t io_ts_busy = 0;
 
 //-----------------------------------------------------------------------------
 /* Link functions for LCD IO peripheral */
-void     LCD_Delay (uint32_t delay);
-void     LCD_IO_Init(void);
-void     LCD_IO_Bl_OnOff(uint8_t Bl);
+void LCD_Delay(uint32_t delay);
 
-void     LCD_IO_WriteCmd8(uint8_t Cmd);
-void     LCD_IO_WriteCmd16(uint16_t Cmd);
-void     LCD_IO_WriteData8(uint8_t Data);
-void     LCD_IO_WriteData16(uint16_t Data);
+void LCD_IO_Init(void);
 
-void     LCD_IO_WriteCmd8DataFill16(uint8_t Cmd, uint16_t Data, uint32_t Size);
-void     LCD_IO_WriteCmd8MultipleData8(uint8_t Cmd, uint8_t *pData, uint32_t Size);
-void     LCD_IO_WriteCmd8MultipleData16(uint8_t Cmd, uint16_t *pData, uint32_t Size);
-void     LCD_IO_WriteCmd16DataFill16(uint16_t Cmd, uint16_t Data, uint32_t Size);
-void     LCD_IO_WriteCmd16MultipleData8(uint16_t Cmd, uint8_t *pData, uint32_t Size);
-void     LCD_IO_WriteCmd16MultipleData16(uint16_t Cmd, uint16_t *pData, uint32_t Size);
+void LCD_IO_Bl_OnOff(uint8_t Bl);
 
-void     LCD_IO_ReadCmd8MultipleData8(uint8_t Cmd, uint8_t *pData, uint32_t Size, uint32_t DummySize);
-void     LCD_IO_ReadCmd8MultipleData16(uint8_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize);
-void     LCD_IO_ReadCmd8MultipleData24to16(uint8_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize);
-void     LCD_IO_ReadCmd16MultipleData8(uint16_t Cmd, uint8_t *pData, uint32_t Size, uint32_t DummySize);
-void     LCD_IO_ReadCmd16MultipleData16(uint16_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize);
-void     LCD_IO_ReadCmd16MultipleData24to16(uint16_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize);
+void LCD_IO_WriteCmd8(uint8_t Cmd);
+
+void LCD_IO_WriteCmd16(uint16_t Cmd);
+
+void LCD_IO_WriteData8(uint8_t Data);
+
+void LCD_IO_WriteData16(uint16_t Data);
+
+void LCD_IO_WriteCmd8DataFill16(uint8_t Cmd, uint16_t Data, uint32_t Size);
+
+void LCD_IO_WriteCmd8MultipleData8(uint8_t Cmd, uint8_t *pData, uint32_t Size);
+
+void LCD_IO_WriteCmd8MultipleData16(uint8_t Cmd, uint16_t *pData, uint32_t Size);
+
+void LCD_IO_WriteCmd16DataFill16(uint16_t Cmd, uint16_t Data, uint32_t Size);
+
+void LCD_IO_WriteCmd16MultipleData8(uint16_t Cmd, uint8_t *pData, uint32_t Size);
+
+void LCD_IO_WriteCmd16MultipleData16(uint16_t Cmd, uint16_t *pData, uint32_t Size);
+
+void LCD_IO_ReadCmd8MultipleData8(uint8_t Cmd, uint8_t *pData, uint32_t Size, uint32_t DummySize);
+
+void LCD_IO_ReadCmd8MultipleData16(uint8_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize);
+
+void LCD_IO_ReadCmd8MultipleData24to16(uint8_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize);
+
+void LCD_IO_ReadCmd16MultipleData8(uint16_t Cmd, uint8_t *pData, uint32_t Size, uint32_t DummySize);
+
+void LCD_IO_ReadCmd16MultipleData16(uint16_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize);
+
+void LCD_IO_ReadCmd16MultipleData24to16(uint16_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize);
 
 #define  LCD_IO_WriteData16_to_2x8(dt)    {LCD_IO_WriteData8((dt) >> 8); LCD_IO_WriteData8(dt); }
 
 //-----------------------------------------------------------------------------
 
-static  uint16_t  yStart, yEnd;
+static uint16_t yStart, yEnd;
 
 //-----------------------------------------------------------------------------
 /**
@@ -211,12 +244,11 @@ static  uint16_t  yStart, yEnd;
   * @param  None
   * @retval None
   */
-void ili9486_DisplayOn(void)
-{
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep
-  ILI9486_LCDMUTEX_POP();
-  LCD_IO_Bl_OnOff(1);
+void ili9486_DisplayOn(void) {
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep
+    ILI9486_LCDMUTEX_POP();
+    LCD_IO_Bl_OnOff(1);
 }
 
 //-----------------------------------------------------------------------------
@@ -225,12 +257,11 @@ void ili9486_DisplayOn(void)
   * @param  None
   * @retval None
   */
-void ili9486_DisplayOff(void)
-{
-  LCD_IO_Bl_OnOff(0);
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8(ILI9486_SLPIN);    // Sleep
-  ILI9486_LCDMUTEX_POP();
+void ili9486_DisplayOff(void) {
+    LCD_IO_Bl_OnOff(0);
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8(ILI9486_SLPIN);    // Sleep
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -239,9 +270,8 @@ void ili9486_DisplayOff(void)
   * @param  None
   * @retval The Lcd Pixel Width
   */
-uint16_t ili9486_GetLcdPixelWidth(void)
-{
-  return ILI9486_SIZE_X;
+uint16_t ili9486_GetLcdPixelWidth(void) {
+    return ILI9486_SIZE_X;
 }
 
 //-----------------------------------------------------------------------------
@@ -250,9 +280,8 @@ uint16_t ili9486_GetLcdPixelWidth(void)
   * @param  None
   * @retval The Lcd Pixel Height
   */
-uint16_t ili9486_GetLcdPixelHeight(void)
-{
-  return ILI9486_SIZE_Y;
+uint16_t ili9486_GetLcdPixelHeight(void) {
+    return ILI9486_SIZE_Y;
 }
 
 //-----------------------------------------------------------------------------
@@ -261,16 +290,15 @@ uint16_t ili9486_GetLcdPixelHeight(void)
   * @param  None
   * @retval The ILI9486 ID
   */
-uint16_t ili9486_ReadID(void)
-{
-  uint32_t id = 0;
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_ReadCmd8MultipleData8(0xD3, (uint8_t *)&id, 3, 1);
-  ILI9486_LCDMUTEX_POP();
-  if(id == 0x869400)
-    return 0x9486;
-  else
-    return 0;
+uint16_t ili9486_ReadID(void) {
+    uint32_t id = 0;
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_ReadCmd8MultipleData8(0xD3, (uint8_t *) &id, 3, 1);
+    ILI9486_LCDMUTEX_POP();
+    if (id == 0x869400)
+        return 0x9486;
+    else
+        return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -279,45 +307,48 @@ uint16_t ili9486_ReadID(void)
   * @param  None
   * @retval None
   */
-void ili9486_Init(void)
-{
-  if((Is_ili9486_Initialized & ILI9486_LCD_INITIALIZED) == 0)
-  {
-    Is_ili9486_Initialized |= ILI9486_LCD_INITIALIZED;
-    if((Is_ili9486_Initialized & ILI9486_IO_INITIALIZED) == 0)
-      LCD_IO_Init();
-    Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
-  }
-  LCD_Delay(10);
-  LCD_IO_WriteCmd8(ILI9486_SWRESET);
-  LCD_Delay(100);
+void ili9486_Init(void) {
+    if ((Is_ili9486_Initialized & ILI9486_LCD_INITIALIZED) == 0) {
+        Is_ili9486_Initialized |= ILI9486_LCD_INITIALIZED;
+        if ((Is_ili9486_Initialized & ILI9486_IO_INITIALIZED) == 0)
+            LCD_IO_Init();
+        Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
+    }
 
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_RGB_INTERFACE, (uint8_t *)"\x00", 1); // RGB mode off (0xB0)
-  LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
-  LCD_Delay(10);
+    LCD_Delay(10);
+    LCD_IO_WriteCmd8(ILI9486_SWRESET);
+    LCD_Delay(100);
 
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *)"\x55", 1); // interface format (0x3A)
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_RGB_INTERFACE, (uint8_t *) "\x00", 1); // RGB mode off (0xB0)
+    LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
+    LCD_Delay(10);
 
-  LCD_IO_WriteCmd8(ILI9486_MADCTL); LCD_IO_WriteData8(ILI9486_MAD_DATA_RIGHT_THEN_DOWN);
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *) "\x55", 1); // interface format (0x3A)
 
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_PWCTR3, (uint8_t *)"\x44", 1); // 0xC2
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_VMCTR1, (uint8_t *)"\x00\x00\x00\x00", 4); // 0xC5
+    LCD_IO_WriteCmd8(ILI9486_MADCTL);
+    LCD_IO_WriteData8(ILI9486_MAD_DATA_RIGHT_THEN_DOWN);
 
-  // positive gamma control (0xE0)
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_GMCTRP1, (uint8_t *)"\x0F\x1F\x1C\x0C\x0F\x08\x48\x98\x37\x0A\x13\x04\x11\x0D\x00", 15);
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_PWCTR3, (uint8_t *) "\x44", 1); // 0xC2
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_VMCTR1, (uint8_t *) "\x00\x00\x00\x00", 4); // 0xC5
 
-  // negative gamma control (0xE1)
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_GMCTRN1, (uint8_t *)"\x0F\x32\x2E\x0B\x0D\x05\x47\x75\x37\x06\x10\x03\x24\x20\x00", 15);
+    // positive gamma control (0xE0)
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_GMCTRP1,
+                                  (uint8_t *) "\x0F\x1F\x1C\x0C\x0F\x08\x48\x98\x37\x0A\x13\x04\x11\x0D\x00", 15);
 
-  // Digital gamma control1 (0xE2)
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_DGCTR1, (uint8_t *)"\x0F\x32\x2E\x0B\x0D\x05\x47\x75\x37\x06\x10\x03\x24\x20\x00", 15);
+    // negative gamma control (0xE1)
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_GMCTRN1,
+                                  (uint8_t *) "\x0F\x32\x2E\x0B\x0D\x05\x47\x75\x37\x06\x10\x03\x24\x20\x00", 15);
 
-  LCD_IO_WriteCmd8(ILI9486_NORON);     // Normal display on (0x13)
-  LCD_IO_WriteCmd8(ILI9486_INVOFF);    // Display inversion off (0x20)
-  LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
-  LCD_Delay(200);
-  LCD_IO_WriteCmd8(ILI9486_DISPON);    // Display on (0x29)
-  LCD_Delay(10);
+    // Digital gamma control1 (0xE2)
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_DGCTR1,
+                                  (uint8_t *) "\x0F\x32\x2E\x0B\x0D\x05\x47\x75\x37\x06\x10\x03\x24\x20\x00", 15);
+
+    LCD_IO_WriteCmd8(ILI9486_NORON);     // Normal display on (0x13)
+    LCD_IO_WriteCmd8(ILI9486_INVOFF);    // Display inversion off (0x20)
+    LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
+    LCD_Delay(200);
+    LCD_IO_WriteCmd8(ILI9486_DISPON);    // Display on (0x29)
+    LCD_Delay(10);
 }
 
 //-----------------------------------------------------------------------------
@@ -327,11 +358,10 @@ void ili9486_Init(void)
   * @param  Ypos: specifies the Y position.
   * @retval None
   */
-void ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos)
-{
-  ILI9486_LCDMUTEX_PUSH();
-  ILI9486_SETCURSOR(Xpos, Ypos);
-  ILI9486_LCDMUTEX_POP();
+void ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos) {
+    ILI9486_LCDMUTEX_PUSH();
+    ILI9486_SETCURSOR(Xpos, Ypos);
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -342,12 +372,12 @@ void ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos)
   * @param  RGBCode: the RGB pixel color
   * @retval None
   */
-void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
-{
-  ILI9486_LCDMUTEX_PUSH();
-  ILI9486_SETCURSOR(Xpos, Ypos);
-  LCD_IO_WriteCmd8(ILI9486_RAMWR); LCD_IO_WriteData16(RGBCode);
-  ILI9486_LCDMUTEX_POP();
+void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode) {
+    ILI9486_LCDMUTEX_PUSH();
+    ILI9486_SETCURSOR(Xpos, Ypos);
+    LCD_IO_WriteCmd8(ILI9486_RAMWR);
+    LCD_IO_WriteData16(RGBCode);
+    ILI9486_LCDMUTEX_POP();
 }
 
 
@@ -357,16 +387,15 @@ void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
   * @param  None
   * @retval the RGB pixel color
   */
-uint16_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos)
-{
-  uint16_t ret;
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *)"\x66", 1); // Read: only 24bit pixel mode
-  ILI9486_SETCURSOR(Xpos, Ypos);
-  LCD_IO_ReadCmd8MultipleData24to16(ILI9486_RAMRD, (uint16_t *)&ret, 1, 1);
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *)"\x55", 1); // Return to 16bit pixel mode
-  ILI9486_LCDMUTEX_POP();
-  return(ret);
+uint16_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos) {
+    uint16_t ret;
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *) "\x66", 1); // Read: only 24bit pixel mode
+    ILI9486_SETCURSOR(Xpos, Ypos);
+    LCD_IO_ReadCmd8MultipleData24to16(ILI9486_RAMRD, (uint16_t *) &ret, 1, 1);
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *) "\x55", 1); // Return to 16bit pixel mode
+    ILI9486_LCDMUTEX_POP();
+    return (ret);
 }
 
 //-----------------------------------------------------------------------------
@@ -378,13 +407,17 @@ uint16_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos)
   * @param  Width:  display window width.
   * @retval None
   */
-void ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
-{
-  yStart = Ypos; yEnd = Ypos + Height - 1;
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8(ILI9486_CASET); LCD_IO_WriteData16_to_2x8(Xpos); LCD_IO_WriteData16_to_2x8(Xpos + Width - 1);
-  LCD_IO_WriteCmd8(ILI9486_PASET); LCD_IO_WriteData16_to_2x8(Ypos); LCD_IO_WriteData16_to_2x8(Ypos + Height - 1);
-  ILI9486_LCDMUTEX_POP();
+void ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height) {
+    yStart = Ypos;
+    yEnd = Ypos + Height - 1;
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8(ILI9486_CASET);
+    LCD_IO_WriteData16_to_2x8(Xpos);
+    LCD_IO_WriteData16_to_2x8(Xpos + Width - 1);
+    LCD_IO_WriteCmd8(ILI9486_PASET);
+    LCD_IO_WriteData16_to_2x8(Ypos);
+    LCD_IO_WriteData16_to_2x8(Ypos + Height - 1);
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -396,13 +429,16 @@ void ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint
   * @param  Length:   specifies the Line length.
   * @retval None
   */
-void ili9486_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
-{
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8(ILI9486_CASET); LCD_IO_WriteData16_to_2x8(Xpos); LCD_IO_WriteData16_to_2x8(Xpos + Length - 1);
-  LCD_IO_WriteCmd8(ILI9486_PASET); LCD_IO_WriteData16_to_2x8(Ypos); LCD_IO_WriteData16_to_2x8(Ypos);
-  LCD_IO_WriteCmd8DataFill16(ILI9486_RAMWR, RGBCode, Length);
-  ILI9486_LCDMUTEX_POP();
+void ili9486_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length) {
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8(ILI9486_CASET);
+    LCD_IO_WriteData16_to_2x8(Xpos);
+    LCD_IO_WriteData16_to_2x8(Xpos + Length - 1);
+    LCD_IO_WriteCmd8(ILI9486_PASET);
+    LCD_IO_WriteData16_to_2x8(Ypos);
+    LCD_IO_WriteData16_to_2x8(Ypos);
+    LCD_IO_WriteCmd8DataFill16(ILI9486_RAMWR, RGBCode, Length);
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -414,13 +450,16 @@ void ili9486_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t 
   * @param  Length:   specifies the Line length.
   * @retval None
   */
-void ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
-{
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8(ILI9486_CASET); LCD_IO_WriteData16_to_2x8(Xpos); LCD_IO_WriteData16_to_2x8(Xpos);
-  LCD_IO_WriteCmd8(ILI9486_PASET); LCD_IO_WriteData16_to_2x8(Ypos); LCD_IO_WriteData16_to_2x8(Ypos + Length - 1);
-  LCD_IO_WriteCmd8DataFill16(ILI9486_RAMWR, RGBCode, Length);
-  ILI9486_LCDMUTEX_POP();
+void ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length) {
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8(ILI9486_CASET);
+    LCD_IO_WriteData16_to_2x8(Xpos);
+    LCD_IO_WriteData16_to_2x8(Xpos);
+    LCD_IO_WriteCmd8(ILI9486_PASET);
+    LCD_IO_WriteData16_to_2x8(Ypos);
+    LCD_IO_WriteData16_to_2x8(Ypos + Length - 1);
+    LCD_IO_WriteCmd8DataFill16(ILI9486_RAMWR, RGBCode, Length);
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -433,13 +472,16 @@ void ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t 
   * @param  RGBCode:  specifies the RGB color
   * @retval None
   */
-void ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t RGBCode)
-{
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8(ILI9486_CASET); LCD_IO_WriteData16_to_2x8(Xpos); LCD_IO_WriteData16_to_2x8(Xpos + Xsize - 1);
-  LCD_IO_WriteCmd8(ILI9486_PASET); LCD_IO_WriteData16_to_2x8(Ypos); LCD_IO_WriteData16_to_2x8(Ypos + Ysize - 1);
-  LCD_IO_WriteCmd8DataFill16(ILI9486_RAMWR, RGBCode, Xsize * Ysize);
-  ILI9486_LCDMUTEX_POP();
+void ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t RGBCode) {
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8(ILI9486_CASET);
+    LCD_IO_WriteData16_to_2x8(Xpos);
+    LCD_IO_WriteData16_to_2x8(Xpos + Xsize - 1);
+    LCD_IO_WriteCmd8(ILI9486_PASET);
+    LCD_IO_WriteData16_to_2x8(Ypos);
+    LCD_IO_WriteData16_to_2x8(Ypos + Ysize - 1);
+    LCD_IO_WriteCmd8DataFill16(ILI9486_RAMWR, RGBCode, Xsize * Ysize);
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -451,22 +493,25 @@ void ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysi
   * @retval None
   * @brief  Draw direction: right then up
   */
-void ili9486_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
-{
-  uint32_t index, size;
-  /* Read bitmap size */
-  size = ((BITMAPSTRUCT *)pbmp)->fileHeader.bfSize;
-  /* Get bitmap data address offset */
-  index = ((BITMAPSTRUCT *)pbmp)->fileHeader.bfOffBits;
-  size = (size - index) / 2;
-  pbmp += index;
+void ili9486_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp) {
+    uint32_t index, size;
+    /* Read bitmap size */
+    size = ((BITMAPSTRUCT *) pbmp)->fileHeader.bfSize;
+    /* Get bitmap data address offset */
+    index = ((BITMAPSTRUCT *) pbmp)->fileHeader.bfOffBits;
+    size = (size - index) / 2;
+    pbmp += index;
 
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8(ILI9486_MADCTL); LCD_IO_WriteData8(ILI9486_MAD_DATA_RIGHT_THEN_UP);
-  LCD_IO_WriteCmd8(ILI9486_PASET); LCD_IO_WriteData16_to_2x8(ILI9486_SIZE_Y - 1 - yEnd); LCD_IO_WriteData16_to_2x8(ILI9486_SIZE_Y - 1 - yStart);
-  LCD_IO_WriteCmd8MultipleData16(ILI9486_RAMWR, (uint16_t *)pbmp, size);
-  LCD_IO_WriteCmd8(ILI9486_MADCTL); LCD_IO_WriteData8(ILI9486_MAD_DATA_RIGHT_THEN_DOWN);
-  ILI9486_LCDMUTEX_POP();
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8(ILI9486_MADCTL);
+    LCD_IO_WriteData8(ILI9486_MAD_DATA_RIGHT_THEN_UP);
+    LCD_IO_WriteCmd8(ILI9486_PASET);
+    LCD_IO_WriteData16_to_2x8(ILI9486_SIZE_Y - 1 - yEnd);
+    LCD_IO_WriteData16_to_2x8(ILI9486_SIZE_Y - 1 - yStart);
+    LCD_IO_WriteCmd8MultipleData16(ILI9486_RAMWR, (uint16_t *) pbmp, size);
+    LCD_IO_WriteCmd8(ILI9486_MADCTL);
+    LCD_IO_WriteData8(ILI9486_MAD_DATA_RIGHT_THEN_DOWN);
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -480,12 +525,11 @@ void ili9486_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
   * @retval None
   * @brief  Draw direction: right then down
   */
-void ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData)
-{
-  ili9486_SetDisplayWindow(Xpos, Ypos, Xsize, Ysize);
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8MultipleData16(ILI9486_RAMWR, pData, Xsize * Ysize);
-  ILI9486_LCDMUTEX_POP();
+void ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData) {
+    ili9486_SetDisplayWindow(Xpos, Ypos, Xsize, Ysize);
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8MultipleData16(ILI9486_RAMWR, pData, Xsize * Ysize);
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -499,14 +543,13 @@ void ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t
   * @retval None
   * @brief  Draw direction: right then down
   */
-void ili9486_ReadRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData)
-{
-  ili9486_SetDisplayWindow(Xpos, Ypos, Xsize, Ysize);
-  ILI9486_LCDMUTEX_PUSH();
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *)"\x66", 1); // Read: only 24bit pixel mode
-  LCD_IO_ReadCmd8MultipleData24to16(ILI9486_RAMRD, pData, Xsize * Ysize, 1);
-  LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *)"\x55", 1); // Return to 16bit pixel mode
-  ILI9486_LCDMUTEX_POP();
+void ili9486_ReadRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData) {
+    ili9486_SetDisplayWindow(Xpos, Ypos, Xsize, Ysize);
+    ILI9486_LCDMUTEX_PUSH();
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *) "\x66", 1); // Read: only 24bit pixel mode
+    LCD_IO_ReadCmd8MultipleData24to16(ILI9486_RAMRD, pData, Xsize * Ysize, 1);
+    LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *) "\x55", 1); // Return to 16bit pixel mode
+    ILI9486_LCDMUTEX_POP();
 }
 
 //-----------------------------------------------------------------------------
@@ -517,73 +560,70 @@ void ili9486_ReadRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t
   * @param  BottonFix : Botton fix size [pixel]
   * @retval None
   */
-void ili9486_Scroll(int16_t Scroll, uint16_t TopFix, uint16_t BottonFix)
-{
-  static uint16_t scrparam[4] = {0, 0, 0, 0};
-  ILI9486_LCDMUTEX_PUSH();
-  #if (ILI9486_ORIENTATION == 0)
-  if((TopFix != scrparam[1]) || (BottonFix != scrparam[3]))
-  {
-    scrparam[1] = TopFix;
-    scrparam[3] = BottonFix;
-    scrparam[2] = ILI9486_LCD_PIXEL_HEIGHT - TopFix - BottonFix;
-    LCD_IO_WriteCmd8MultipleData16(ILI9486_VSCRDEF, &scrparam[1], 3);
-  }
-  Scroll = (0 - Scroll) % scrparam[2];
-  if(Scroll < 0)
-    Scroll = scrparam[2] + Scroll + scrparam[1];
-  else
-    Scroll = Scroll + scrparam[1];
-  #elif (ILI9486_ORIENTATION == 1)
-  if((TopFix != scrparam[1]) || (BottonFix != scrparam[3]))
-  {
-    scrparam[1] = TopFix;
-    scrparam[3] = BottonFix;
-    scrparam[2] = ILI9486_LCD_PIXEL_HEIGHT - TopFix - BottonFix;
-    LCD_IO_WriteCmd8MultipleData16(ILI9486_VSCRDEF, &scrparam[1], 3);
-  }
-  Scroll = (0 - Scroll) % scrparam[2];
-  if(Scroll < 0)
-    Scroll = scrparam[2] + Scroll + scrparam[1];
-  else
-    Scroll = Scroll + scrparam[1];
-  #elif (ILI9486_ORIENTATION == 2)
-  if((TopFix != scrparam[3]) || (BottonFix != scrparam[1]))
-  {
-    scrparam[3] = TopFix;
-    scrparam[1] = BottonFix;
-    scrparam[2] = ILI9486_LCD_PIXEL_HEIGHT - TopFix - BottonFix;
-    LCD_IO_WriteCmd8MultipleData16(ILI9486_VSCRDEF, &scrparam[1], 3);
-  }
-  Scroll %= scrparam[2];
-  if(Scroll < 0)
-    Scroll = scrparam[2] + Scroll + scrparam[1];
-  else
-    Scroll = Scroll + scrparam[1];
-  #elif (ILI9486_ORIENTATION == 3)
-  if((TopFix != scrparam[3]) || (BottonFix != scrparam[1]))
-  {
-    scrparam[3] = TopFix;
-    scrparam[1] = BottonFix;
-    scrparam[2] = ILI9486_LCD_PIXEL_HEIGHT - TopFix - BottonFix;
-    LCD_IO_WriteCmd8MultipleData16(ILI9486_VSCRDEF, &scrparam[1], 3);
-  }
-  Scroll %= scrparam[2];
-  if(Scroll < 0)
-    Scroll = scrparam[2] + Scroll + scrparam[1];
-  else
-    Scroll = Scroll + scrparam[1];
-  #endif
-  if(Scroll != scrparam[0])
-  {
-    scrparam[0] = Scroll;
-    LCD_IO_WriteCmd8DataFill16(ILI9486_VSCRSADD, scrparam[0], 1);
-  }
-  ILI9486_LCDMUTEX_POP();
+void ili9486_Scroll(int16_t Scroll, uint16_t TopFix, uint16_t BottonFix) {
+    static uint16_t scrparam[4] = {0, 0, 0, 0};
+    ILI9486_LCDMUTEX_PUSH();
+#if (ILI9486_ORIENTATION == 0)
+    if ((TopFix != scrparam[1]) || (BottonFix != scrparam[3])) {
+        scrparam[1] = TopFix;
+        scrparam[3] = BottonFix;
+        scrparam[2] = ILI9486_LCD_PIXEL_HEIGHT - TopFix - BottonFix;
+        LCD_IO_WriteCmd8MultipleData16(ILI9486_VSCRDEF, &scrparam[1], 3);
+    }
+    Scroll = (0 - Scroll) % scrparam[2];
+    if (Scroll < 0)
+        Scroll = scrparam[2] + Scroll + scrparam[1];
+    else
+        Scroll = Scroll + scrparam[1];
+#elif (ILI9486_ORIENTATION == 1)
+    if((TopFix != scrparam[1]) || (BottonFix != scrparam[3]))
+    {
+      scrparam[1] = TopFix;
+      scrparam[3] = BottonFix;
+      scrparam[2] = ILI9486_LCD_PIXEL_HEIGHT - TopFix - BottonFix;
+      LCD_IO_WriteCmd8MultipleData16(ILI9486_VSCRDEF, &scrparam[1], 3);
+    }
+    Scroll = (0 - Scroll) % scrparam[2];
+    if(Scroll < 0)
+      Scroll = scrparam[2] + Scroll + scrparam[1];
+    else
+      Scroll = Scroll + scrparam[1];
+#elif (ILI9486_ORIENTATION == 2)
+    if((TopFix != scrparam[3]) || (BottonFix != scrparam[1]))
+    {
+      scrparam[3] = TopFix;
+      scrparam[1] = BottonFix;
+      scrparam[2] = ILI9486_LCD_PIXEL_HEIGHT - TopFix - BottonFix;
+      LCD_IO_WriteCmd8MultipleData16(ILI9486_VSCRDEF, &scrparam[1], 3);
+    }
+    Scroll %= scrparam[2];
+    if(Scroll < 0)
+      Scroll = scrparam[2] + Scroll + scrparam[1];
+    else
+      Scroll = Scroll + scrparam[1];
+#elif (ILI9486_ORIENTATION == 3)
+    if((TopFix != scrparam[3]) || (BottonFix != scrparam[1]))
+    {
+      scrparam[3] = TopFix;
+      scrparam[1] = BottonFix;
+      scrparam[2] = ILI9486_LCD_PIXEL_HEIGHT - TopFix - BottonFix;
+      LCD_IO_WriteCmd8MultipleData16(ILI9486_VSCRDEF, &scrparam[1], 3);
+    }
+    Scroll %= scrparam[2];
+    if(Scroll < 0)
+      Scroll = scrparam[2] + Scroll + scrparam[1];
+    else
+      Scroll = Scroll + scrparam[1];
+#endif
+    if (Scroll != scrparam[0]) {
+        scrparam[0] = Scroll;
+        LCD_IO_WriteCmd8DataFill16(ILI9486_VSCRSADD, scrparam[0], 1);
+    }
+    ILI9486_LCDMUTEX_POP();
 }
 
 //=============================================================================
-#if ILI9486_TOUCH == 1
+#if ILI9486_TOUCH == 0
 
 #include "ts.h"
 
@@ -593,24 +633,24 @@ void ili9486_Scroll(int16_t Scroll, uint16_t TopFix, uint16_t BottonFix)
 
 #define ABS(N)   (((N)<0) ? (-(N)) : (N))
 
-TS_DrvTypeDef   ili9486_ts_drv =
-{
-  ili9486_ts_Init,
-  0,
-  0,
-  0,
-  ili9486_ts_DetectTouch,
-  ili9486_ts_GetXY,
-  0,
-  0,
-  0,
-  0,
-};
+TS_DrvTypeDef ili9486_ts_drv =
+        {
+                ili9486_ts_Init,
+                0,
+                0,
+                0,
+                ili9486_ts_DetectTouch,
+                ili9486_ts_GetXY,
+                0,
+                0,
+                0,
+                0,
+        };
 
-TS_DrvTypeDef  *ts_drv = &ili9486_ts_drv;
+TS_DrvTypeDef *ts_drv = &ili9486_ts_drv;
 
 #if (ILI9486_ORIENTATION == 0)
-int32_t  ts_cindex[] = TS_CINDEX_0;
+int32_t ts_cindex[] = TS_CINDEX_0;
 #elif (ILI9486_ORIENTATION == 1)
 int32_t  ts_cindex[] = TS_CINDEX_1;
 #elif (ILI9486_ORIENTATION == 2)
@@ -622,78 +662,72 @@ int32_t  ts_cindex[] = TS_CINDEX_3;
 uint16_t tx, ty;
 
 /* Link function for Touchscreen */
-uint8_t   TS_IO_DetectToch(void);
-uint16_t  TS_IO_GetX(void);
-uint16_t  TS_IO_GetY(void);
-uint16_t  TS_IO_GetZ1(void);
-uint16_t  TS_IO_GetZ2(void);
+uint8_t TS_IO_DetectToch(void);
+
+uint16_t TS_IO_GetX(void);
+
+uint16_t TS_IO_GetY(void);
+
+uint16_t TS_IO_GetZ1(void);
+
+uint16_t TS_IO_GetZ2(void);
 
 //-----------------------------------------------------------------------------
-void ili9486_ts_Init(uint16_t DeviceAddr)
-{
-  if((Is_ili9486_Initialized & ILI9486_IO_INITIALIZED) == 0)
-    LCD_IO_Init();
-  Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
+void ili9486_ts_Init(uint16_t DeviceAddr) {
+    if ((Is_ili9486_Initialized & ILI9486_IO_INITIALIZED) == 0)
+        LCD_IO_Init();
+    Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
 }
 
 //-----------------------------------------------------------------------------
-uint8_t ili9486_ts_DetectTouch(uint16_t DeviceAddr)
-{
-  static uint8_t ret = 0;
-  int32_t x1, x2, y1, y2, i;
+uint8_t ili9486_ts_DetectTouch(uint16_t DeviceAddr) {
+    static uint8_t ret = 0;
+    int32_t x1, x2, y1, y2, i;
 
-  #if TS_MULTITASK_MUTEX == 1
-  io_ts_busy = 1;
+#if TS_MULTITASK_MUTEX == 1
+    io_ts_busy = 1;
 
-  if(io_lcd_busy)
-  {
-    io_ts_busy = 0;
-    return ret;
-  }
-  #endif
-
-  ret = 0;
-  if(TS_IO_DetectToch())
-  {
-    x1 = TS_IO_GetX();
-    y1 = TS_IO_GetY();
-    i = TOUCH_MAXREPEAT;
-    while(i--)
-    {
-      x2 = TS_IO_GetX();
-      y2 = TS_IO_GetY();
-      if((ABS(x1 - x2) < TOUCH_FILTER) && (ABS(y1 - y2) < TOUCH_FILTER))
-      {
-        x1 = (x1 + x2) >> 1;
-        y1 = (y1 + y2) >> 1;
-        i = 0;
-        if(TS_IO_DetectToch())
-        {
-          tx = x1;
-          ty = y1;
-          ret = 1;
-        }
-      }
-      else
-      {
-        x1 = x2;
-        y1 = y2;
-      }
+    if (io_lcd_busy) {
+        io_ts_busy = 0;
+        return ret;
     }
-  }
+#endif
 
-  #if TS_MULTITASK_MUTEX == 1
-  io_ts_busy = 0;
-  #endif
+    ret = 0;
+    if (TS_IO_DetectToch()) {
+        x1 = TS_IO_GetX();
+        y1 = TS_IO_GetY();
+        i = TOUCH_MAXREPEAT;
+        while (i--) {
+            x2 = TS_IO_GetX();
+            y2 = TS_IO_GetY();
+            if ((ABS(x1 - x2) < TOUCH_FILTER) && (ABS(y1 - y2) < TOUCH_FILTER)) {
+                x1 = (x1 + x2) >> 1;
+                y1 = (y1 + y2) >> 1;
+                i = 0;
+                if (TS_IO_DetectToch()) {
+                    tx = x1;
+                    ty = y1;
+                    ret = 1;
+                }
+            } else {
+                x1 = x2;
+                y1 = y2;
+            }
+        }
+    }
 
-  return ret;
+#if TS_MULTITASK_MUTEX == 1
+    io_ts_busy = 0;
+#endif
+
+    return ret;
 }
 
 //-----------------------------------------------------------------------------
-void ili9486_ts_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y)
-{
-  *X = tx,
-  *Y = ty;
+void ili9486_ts_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y) {
+    *X = tx,
+            *Y = ty;
 }
 
 #endif /* #if ILI9486_TOUCH == 1 */

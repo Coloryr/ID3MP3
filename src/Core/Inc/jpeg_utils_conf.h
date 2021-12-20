@@ -10,7 +10,7 @@
  * JPEG HW configuration.  Most users will not need to touch this file.
  */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
+ /* Define to prevent recursive inclusion -------------------------------------*/
 
 #ifndef  __JPEG_UTILS_CONF_H__
 #define  __JPEG_UTILS_CONF_H__

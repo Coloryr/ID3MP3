@@ -32,6 +32,8 @@ add_compile_definitions(ARM_MATH_CM4;ARM_MATH_MATRIX_CHECK;ARM_MATH_ROUNDING)
 add_compile_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
 add_link_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
 
+#target_compile_options(lvgl PUBLIC -mfloat-abi=hard -mfpu=fpv4-sp-d16)
+
 #Uncomment for software floating point
 #add_compile_options(-mfloat-abi=soft)
 
@@ -72,6 +74,7 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/Middlewares/Third_Party/FatFs/src
         ${CMAKE_SOURCE_DIR}/Middlewares/Third_Party/LibJPEG/include
         ${CMAKE_SOURCE_DIR}/Display/Drivers
+        ${CMAKE_SOURCE_DIR}/Lvgl/src
 )
 
 add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DDEBUG -DSTM32H743xx)
@@ -87,6 +90,7 @@ file(GLOB_RECURSE SOURCES
         "Middlewares/*.*"
         "Utilities/*.*"
         "Display/Drivers/*.*"
+        "Lvgl/src/*.*"
 )
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32H743VITX_FLASH.ld)
@@ -97,7 +101,7 @@ add_link_options(-T ${LINKER_SCRIPT})
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 # Lvgl
-target_link_libraries(${PROJECT_NAME}.elf PRIVATE lvgl)
+#target_link_libraries(${PROJECT_NAME}.elf PRIVATE lvgl)
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
