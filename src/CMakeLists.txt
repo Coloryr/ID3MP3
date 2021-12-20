@@ -18,6 +18,15 @@ set(CMAKE_C_STANDARD 11)
 
 set(MCPU cortex-m7)
 
+# Lvgl
+set(LV_CONF_PATH
+        ${CMAKE_SOURCE_DIR}/Core/Inc/lv_conf.h
+        CACHE STRING "" FORCE)
+
+add_definitions(-DLV_CONF_INCLUDE_SIMPLE)
+
+add_subdirectory(Lvgl)
+
 #Uncomment for hardware floating point
 add_compile_definitions(ARM_MATH_CM4;ARM_MATH_MATRIX_CHECK;ARM_MATH_ROUNDING)
 add_compile_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
@@ -62,18 +71,23 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
         ${CMAKE_SOURCE_DIR}/Middlewares/Third_Party/FatFs/src
         ${CMAKE_SOURCE_DIR}/Middlewares/Third_Party/LibJPEG/include
+        ${CMAKE_SOURCE_DIR}/Display/Drivers
 )
 
 add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DDEBUG -DSTM32H743xx)
 
 file(GLOB_RECURSE SOURCES
         "Core/*.*"
+        "Core/Init/*.*"
+        "Core/Tasks/*.*"
         "Core/Startup/*.*"
         "Drivers/*.*"
         "LIBJPEG/*.*"
         "FATFS/*.*"
         "Middlewares/*.*"
-        "Utilities/*.*")
+        "Utilities/*.*"
+        "Display/Drivers/*.*"
+)
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32H743VITX_FLASH.ld)
 
@@ -82,6 +96,8 @@ add_link_options(-mcpu=${MCPU} -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT})
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
+# Lvgl
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE lvgl)
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
