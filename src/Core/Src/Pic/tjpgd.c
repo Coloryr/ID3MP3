@@ -4,9 +4,9 @@
 //下面根据是否使用malloc来决定变量的分配方法.
 #if JPEG_USE_MALLOC == 1 //使用malloc
 
-ramfast FIL *f_jpeg;			//JPEG文件指针
-ramfast JDEC *jpeg_dev;   		//待解码对象结构体指针
-ramfast uint8_t  *jpg_buffer;    	//定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
+ramfast FIL *f_jpeg;            //JPEG文件指针
+ramfast JDEC *jpeg_dev;        //待解码对象结构体指针
+ramfast uint8_t *jpg_buffer;        //定义jpeg解码工作区大小(最少需要3092字节)，作为解压缓冲区，必须4字节对齐
 
 //给占内存大的数组/结构体申请内存
 uint8_t jpeg_mallocall(void) {
@@ -18,6 +18,7 @@ uint8_t jpeg_mallocall(void) {
     if (jpg_buffer == NULL)return PIC_MEM_ERR;        //申请内存失败.
     return 0;
 }
+
 //释放内存
 void jpeg_freeall(void) {
     pic_memfree(f_jpeg);        //释放f_jpeg申请到的内存
@@ -40,7 +41,7 @@ __align(4) uint8_t jpg_buffer[JPEG_WBUF_SIZE];	//定义jpeg解码工作区大小
 //buf:输入数据缓冲区 (NULL:执行地址偏移)
 //num:需要从输入数据流读出的数据量/地址偏移量
 //返回值:读取到的字节数/地址偏移量
-uint32_t jpeg_in_func(JDEC* jd,uint8_t* buf,uint32_t num) {
+UINT jpeg_in_func(JDEC *jd, uint8_t *buf, UINT num) {
     UINT rb; //读取到的字节数
     FIL *dev = (FIL *) jd->device;  //待解码的文件的信息，使用FATFS中的FIL结构类型进行定义
     if (buf)                    //读取数据有效，开始读取数据
@@ -49,27 +50,29 @@ uint32_t jpeg_in_func(JDEC* jd,uint8_t* buf,uint32_t num) {
         return rb;                //返回读取到的字节数目
     } else return (f_lseek(dev, f_tell(dev) + num) == FR_OK) ? num : 0;//重新定位数据点，相当于删除之前的n字节数据
 }
+
 //采用填充的方式进行图片解码显示
 //jd:储存待解码的对象信息的结构体
 //rgbbuf:指向等待输出的RGB位图数据的指针
 //rect:等待输出的矩形图像的参数
 //返回值:0,输出成功;1,输出失败/结束输出
-uint32_t jpeg_out_func_fill(JDEC* jd,void* rgbbuf,JRECT* rect) {
+UINT jpeg_out_func_fill(JDEC *jd, void *rgbbuf, JRECT *rect) {
     uint16_t *pencolor = (uint16_t *) rgbbuf;
     uint16_t width = rect->right - rect->left + 1;        //填充的宽度
     uint16_t height = rect->bottom - rect->top + 1;    //填充的高度
     pic_phy.fillcolor(rect->left + picinfo.S_XOFF, rect->top + picinfo.S_YOFF, width, height, pencolor);//颜色填充
     return 0;    //返回0,使得解码工作继续执行
 }
+
 //采用画点的方式进行图片解码显示
 //jd:储存待解码的对象信息的结构体
 //rgbbuf:指向等待输出的RGB位图数据的指针
 //rect:等待输出的矩形图像的参数
 //返回值:0,输出成功;1,输出失败/结束输出
-uint32_t jpeg_out_func_point(JDEC* jd,void* rgbbuf,JRECT* rect) {
+UINT jpeg_out_func_point(JDEC *jd, void *rgbbuf, JRECT *rect) {
     uint16_t i, j;
     uint16_t realx = rect->left, realy = 0;
-    uint16_t *pencolor = (uint16_t *)rgbbuf;
+    uint16_t *pencolor = (uint16_t *) rgbbuf;
     uint16_t width = rect->right - rect->left + 1;        //图片的宽度
     uint16_t height = rect->bottom - rect->top + 1;    //图片的高度
     for (i = 0; i < height; i++)//y坐标
@@ -96,11 +99,12 @@ uint32_t jpeg_out_func_point(JDEC* jd,void* rgbbuf,JRECT* rect) {
     }
     return 0;    //返回0,使得解码工作继续执行
 }
+
 //获取jpeg/jpg图片的宽度和高度
 //width,height:图片的宽度和高度
 //返回值:0,成功
 //    其他,失败
-uint8_t jpg_get_size(const uint8_t* filename,uint32_t *width,uint32_t *height) {
+uint8_t jpg_get_size(const uint8_t *filename, uint32_t *width, uint32_t *height) {
     uint8_t res = JDR_OK;    //返回值
 #if JPEG_USE_MALLOC == 1    //使用malloc
     res = jpeg_mallocall();
@@ -111,7 +115,7 @@ uint8_t jpg_get_size(const uint8_t* filename,uint32_t *width,uint32_t *height) {
         if (res == FR_OK)//打开文件成功
         {
             res = jd_prepare(jpeg_dev, jpeg_in_func, jpg_buffer, JPEG_WBUF_SIZE,
-                                       f_jpeg);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
+                             f_jpeg);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
             if (res == JDR_OK)//准备解码成功,即获取到了图片的宽度和高度.返回正确的宽度和高度
             {
                 *width = jpeg_dev->width;
@@ -125,11 +129,12 @@ uint8_t jpg_get_size(const uint8_t* filename,uint32_t *width,uint32_t *height) {
 #endif
     return res;
 }
+
 //解码jpeg/jpg文件s
 //filename:jpeg/jpg路径+文件名
 //fast:使能小图片(图片尺寸小于等于液晶分辨率)快速解码,0,不使能;1,使能.
 //返回值:0,解码成功;其他,解码失败.
-uint8_t jpg_decode(const uint8_t *filename,uint8_t fast) {
+uint8_t jpg_decode(const uint8_t *filename, uint8_t fast) {
     uint8_t res = 0;    //返回值
     uint8_t scale;    //图像输出比例 0,1/2,1/4,1/8
     UINT (*outfun)(JDEC *, void *, JRECT *);

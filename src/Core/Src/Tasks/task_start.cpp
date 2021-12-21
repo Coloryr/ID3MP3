@@ -3,7 +3,7 @@
 #include "lvgl.h"
 
 #include "fatfs.h"
-#include "lvgl.h"
+#include "Pic/piclib.h"
 
 /* BSP LCD driver */
 #include "stm32_adafruit_lcd.h"
@@ -146,14 +146,7 @@ void Lvgl_Config(){
 
         else
         {
-            /*Now create the actual image*/
-            lv_obj_t * img = lv_img_create(lv_scr_act());
-            lv_img_set_src(img, "0:test1.jpg");
-            lv_img_set_size_mode(img, LV_IMG_SIZE_MODE_VIRTUAL);
-            lv_img_set_pivot(img, 0, 0);    /*Rotate around the top left corner*/
-
-
-
+            ai_load_picfile((const uint8_t*)"0:test.jpg" ,0, 0, lcd_drv->getLcdPixelWidth(),lcd_drv->getLcdPixelHeight(), 1);
         }
     }
 

@@ -6,21 +6,23 @@
 #include "tjpgd.h"
 #include "gif.h"
 
-ramfast _pic_info picinfo;	 	//图片信息
-ramfast _pic_phy pic_phy;		//图片显示物理接口
+ramfast _pic_info picinfo;        //图片信息
+ramfast _pic_phy pic_phy;        //图片显示物理接口
 //////////////////////////////////////////////////////////////////////////
 //lcd.h没有提供划横线函数,需要自己实现
-void piclib_draw_hline(uint16_t x0,uint16_t y0,uint16_t len,uint16_t color) {
+void piclib_draw_hline(uint16_t x0, uint16_t y0, uint16_t len, uint16_t color) {
     if ((len == 0) || (x0 > lcd_drv->getLcdPixelWidth()) || (y0 > lcd_drv->getLcdPixelHeight()))return;
     lcd_drv->FillRect(x0, y0, x0 + len - 1, y0, color);
 }
+
 //填充颜色
 //x,y:起始坐标
 //width，height：宽度和高度。
 //*color：颜色数组
-void piclib_fill_color(uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint16_t *color) {
+void piclib_fill_color(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t *color) {
     lcd_drv->DrawRGBImage(x, y, x + width - 1, y + height - 1, color);//其他情况,直接填充
 }
+
 //////////////////////////////////////////////////////////////////////////
 //画图初始化,在画图之前,必须先调用此函数
 //指定画点/读点
@@ -44,12 +46,13 @@ void piclib_init() {
     picinfo.staticx = 0;    //初始化当前显示到的x坐标为0
     picinfo.staticy = 0;    //初始化当前显示到的y坐标为0
 }
+
 //快速ALPHA BLENDING算法.
 //src:源颜色
 //dst:目标颜色
 //alpha:透明程度(0~32)
 //返回值:混合后的颜色.
-uint16_t piclib_alpha_blend(uint16_t src,uint16_t dst,uint8_t alpha) {
+uint16_t piclib_alpha_blend(uint16_t src, uint16_t dst, uint8_t alpha) {
     uint32_t src2;
     uint32_t dst2;
     //Convert to 32bit |-----GGGGGG-----RRRRR------BBBBB|
@@ -62,6 +65,7 @@ uint16_t piclib_alpha_blend(uint16_t src,uint16_t dst,uint8_t alpha) {
     dst2 = ((((dst2 - src2) * alpha) >> 5) + src2) & 0x07E0F81F;
     return (dst2 >> 16) | dst2;
 }
+
 //初始化智能画点
 //内部调用
 void ai_draw_init() {
@@ -78,11 +82,12 @@ void ai_draw_init() {
     picinfo.staticx = 0xffff;
     picinfo.staticy = 0xffff;//放到一个不可能的值上面
 }
+
 //判断这个像素是否可以显示
 //(x,y) :像素原始坐标
 //chg   :功能变量.
 //返回值:0,不需要显示.1,需要显示
-uint8_t is_element_ok(uint16_t x,uint16_t y,uint8_t chg) {
+uint8_t is_element_ok(uint16_t x, uint16_t y, uint8_t chg) {
     if (x != picinfo.staticx || y != picinfo.staticy) {
         if (chg == 1) {
             picinfo.staticx = x;
@@ -99,7 +104,7 @@ uint8_t is_element_ok(uint16_t x,uint16_t y,uint8_t chg) {
 //fast:使能jpeg/jpg小图片(图片尺寸小于等于液晶分辨率时才启用)快速解码,0,不使能;1,使能.
 //     当有硬件JPEG解码的时候,快速解码使用硬件jpeg解码,以提高速度
 //图片在开始和结束的坐标点范围内显示
-uint8_t ai_load_picfile(const uint8_t *filename,uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint8_t fast) {
+uint8_t ai_load_picfile(const uint8_t *filename, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t fast) {
     uint8_t res;//返回值
     uint8_t temp;
     if ((x + width) > picinfo.lcdwidth)return PIC_WINDOW_ERR;        //x坐标超范围了.
@@ -143,11 +148,13 @@ uint8_t ai_load_picfile(const uint8_t *filename,uint16_t x,uint16_t y,uint16_t w
     }
     return res;
 }
+
 //动态分配内存
-void *pic_memalloc (uint32_t size) {
+void *pic_memalloc(uint32_t size) {
     return (void *) malloc(size);
 }
+
 //释放内存
-void pic_memfree (void* mf) {
+void pic_memfree(void *mf) {
     free(mf);
 }

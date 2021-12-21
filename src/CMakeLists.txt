@@ -59,6 +59,7 @@ endif ()
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/Core/Inc
+        ${CMAKE_SOURCE_DIR}/Core/Src
         ${CMAKE_SOURCE_DIR}/Drivers/CMSIS/Include
         ${CMAKE_SOURCE_DIR}/Drivers/STM32H7xx_HAL_Driver/Inc
         ${CMAKE_SOURCE_DIR}/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
