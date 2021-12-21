@@ -2942,6 +2942,8 @@ static uint32_t SD_InitCard(SD_HandleTypeDef *hsd)
     return HAL_SD_ERROR_REQUEST_NOT_APPLICABLE;
   }
 
+  HAL_Delay(10);
+
   if (hsd->SdCard.CardType != CARD_SECURED)
   {
     /* Send CMD2 ALL_SEND_CID */

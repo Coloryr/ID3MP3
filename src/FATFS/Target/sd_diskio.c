@@ -276,9 +276,10 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
   {
 #endif
     /* Fast path cause destination buffer is correctly aligned */
-    ret = BSP_SD_ReadBlocks_DMA((uint32_t*)buff, (uint32_t)(sector), count);
+    ret = BSP_SD_ReadBlocks((uint32_t*)buff, (uint32_t)(sector), count, SD_TIMEOUT);
 
     if (ret == MSD_OK) {
+        return RES_OK;
 #if (osCMSIS < 0x20000U)
     /* wait for a message from the queue or a timeout */
     event = osMessageGet(SDQueueID, SD_TIMEOUT);
@@ -448,10 +449,11 @@ DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
   SCB_CleanDCache_by_Addr((uint32_t*)alignedAddr, count*BLOCKSIZE + ((uint32_t)buff - alignedAddr));
 #endif
 
-  if(BSP_SD_WriteBlocks_DMA((uint32_t*)buff,
-                           (uint32_t) (sector),
-                           count) == MSD_OK)
-  {
+    if(BSP_SD_WriteBlocks((uint32_t*)buff,
+                          (uint32_t) (sector),
+                          count, SD_TIMEOUT) == MSD_OK)
+    {
+        return RES_OK;
 #if (osCMSIS < 0x20000U)
     /* Get the message from the queue */
     event = osMessageGet(SDQueueID, SD_TIMEOUT);

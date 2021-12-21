@@ -280,7 +280,7 @@ typedef struct
 #define SDMMC_SDR50_SWITCH_PATTERN         ((uint32_t)0x80FF1F02U)
 #define SDMMC_SDR25_SWITCH_PATTERN         ((uint32_t)0x80FFFF01U)
 
-#define SDMMC_MAX_VOLT_TRIAL               ((uint32_t)0x0000FFFFU)
+#define SDMMC_MAX_VOLT_TRIAL               ((uint32_t)0x00000834U)//((uint32_t)0x0000FFFFU)
 
 #define SDMMC_MAX_TRIAL                    ((uint32_t)0x0000FFFFU)
 

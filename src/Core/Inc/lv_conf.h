@@ -49,7 +49,7 @@
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
 /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-#  define LV_MEM_SIZE (32U * 1024U)          /*[bytes]*/
+#  define LV_MEM_SIZE (440U * 1024U)          /*[bytes]*/
 
 /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
 #  define LV_MEM_ADR 0     /*0: unused*/
@@ -553,7 +553,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_USE_FS_WIN32 '\0'        /*Uses CreateFile, ReadFile, etc*/
 //#define LV_FS_WIN32_PATH "C:\\Users\\john\\"    /*Set the working directory. If commented it will be ".\\" */
 
-#define LV_USE_FS_FATFS '\1'        /*Uses f_open, f_read, etc*/
+#define LV_USE_FS_FATFS '0'        /*Uses f_open, f_read, etc*/
 
 /*PNG decoder library*/
 #define LV_USE_PNG 1
