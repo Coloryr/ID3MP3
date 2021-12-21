@@ -30,9 +30,9 @@ typedef struct {
 
     void (*SetCursor)(uint16_t, uint16_t);
 
-    void (*WritePixel)(uint16_t, uint16_t, uint16_t);
+    void (*WritePixel)(uint16_t, uint16_t, uint32_t);
 
-    uint16_t (*ReadPixel)(uint16_t, uint16_t);
+    uint32_t (*readPixel)(uint16_t, uint16_t);
 
     void (*SetDisplayWindow)(uint16_t, uint16_t, uint16_t, uint16_t);
 
@@ -40,15 +40,15 @@ typedef struct {
 
     void (*DrawVLine)(uint16_t, uint16_t, uint16_t, uint16_t);
 
-    uint16_t (*GetLcdPixelWidth)(void);
+    uint16_t (*getLcdPixelWidth)(void);
 
-    uint16_t (*GetLcdPixelHeight)(void);
+    uint16_t (*getLcdPixelHeight)(void);
 
     void (*DrawBitmap)(uint16_t, uint16_t, uint8_t *);
 
     void (*DrawRGBImage)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t *);
 
-    void (*FillRect)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t);
+    void (*FillRect)(uint16_t, uint16_t, uint16_t, uint16_t, uint32_t);
 
     void (*ReadRGBImage)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t *);
 

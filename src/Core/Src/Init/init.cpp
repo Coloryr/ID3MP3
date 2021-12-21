@@ -1,7 +1,6 @@
 #include "init.h"
 #include "main.h"
 #include "cmsis_os.h"
-#include "libjpeg.h"
 #include "fatfs.h"
 
 /* BSP LCD driver */
@@ -9,13 +8,10 @@
 /* BSP TS driver */
 #include "stm32_adafruit_ts.h"
 
-JPEG_HandleTypeDef hjpeg;
-
-QSPI_HandleTypeDef hqspi;
-
-SD_HandleTypeDef hsd1;
-
-SRAM_HandleTypeDef hsram1;
+ JPEG_HandleTypeDef hjpeg;
+ QSPI_HandleTypeDef hqspi;
+ SD_HandleTypeDef hsd1;
+ SRAM_HandleTypeDef hsram1;
 
 void MPU_Config() {
 
@@ -432,7 +428,6 @@ void init(){
     MX_SPI1_Init();
     MX_USART1_Init();
     MX_FATFS_Init();
-    MX_LIBJPEG_Init();
 
     BSP_LCD_Init();
     //    BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());

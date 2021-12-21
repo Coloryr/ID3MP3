@@ -10,21 +10,21 @@
 /* BSP TS driver */
 #include "stm32_adafruit_ts.h"
 
-osThreadId_t ledTask;
+ osThreadId_t ledTask;
 const osThreadAttr_t ledTask_attributes = {
         .name = "ledTask",
         .stack_size = 512,
         .priority = (osPriority_t) osPriorityNormal,
 };
 
-osThreadId_t lcdTask;
+ osThreadId_t lcdTask;
 const osThreadAttr_t lcdTask_attributes = {
         .name = "lcdTask",
         .stack_size = 2048,
         .priority = (osPriority_t) osPriorityNormal,
 };
 
-osThreadId_t defaultTaskHandle;
+ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
         .name = "defaultTask",
         .stack_size = 512 * 4,
@@ -44,8 +44,8 @@ FRESULT res;
 #define DISP_HOR_RES 320
 #define DISP_VER_RES 480
 
-static lv_disp_draw_buf_t draw_buf;
-static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
+ramfast static lv_disp_draw_buf_t draw_buf;
+ramfast static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
 
 void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * color_p)
 {
@@ -88,6 +88,20 @@ void Lvgl_Config(){
     lv_init();
     lv_disp_draw_buf_init(&draw_buf, buf1, NULL, DISP_HOR_RES * DISP_VER_RES / 10);  /*Initialize the display buffer.*/
 
+    static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
+    lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
+    disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
+    disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
+    disp_drv.hor_res = DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
+    disp_drv.ver_res = DISP_VER_RES;   /*Set the vertical resolution of the display*/
+    lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+
+//    static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
+//    lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
+//    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
+//    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
+//    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
+
     if(res!= FR_OK)
     {
         lv_obj_t * label1 = lv_label_create(lv_scr_act());
@@ -108,19 +122,6 @@ void Lvgl_Config(){
     }
     else
     {
-        static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
-        lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
-        disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
-        disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
-        disp_drv.hor_res = DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
-        disp_drv.ver_res = DISP_VER_RES;   /*Set the vertical resolution of the display*/
-        lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
-
-//    static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
-//    lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
-//    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
-//    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
-//    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
         FIL fp;
         res=f_open(&fp,"0:test.jpg",FA_OPEN_EXISTING);
         if(res!= FR_OK)
@@ -147,15 +148,18 @@ void Lvgl_Config(){
         {
             /*Now create the actual image*/
             lv_obj_t * img = lv_img_create(lv_scr_act());
-            lv_img_set_src(img, "0:test.jpg");
+            lv_img_set_src(img, "0:test1.jpg");
+            lv_img_set_size_mode(img, LV_IMG_SIZE_MODE_VIRTUAL);
             lv_img_set_pivot(img, 0, 0);    /*Rotate around the top left corner*/
+
+
+
         }
     }
 
 }
 
 void Fatfs_Config(){
-    FRESULT res;
     if ((res = f_mount(&SDFatFS, SDPath, 1)) != FR_OK) {
         while (1);
     }

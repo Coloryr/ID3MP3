@@ -23,6 +23,8 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 
+#include "mymem.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

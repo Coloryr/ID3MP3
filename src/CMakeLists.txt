@@ -83,12 +83,11 @@ file(GLOB_RECURSE SOURCES
         "Core/*.*"
         "Core/Init/*.*"
         "Core/Tasks/*.*"
+        "Core/Pic/*.*"
         "Core/Startup/*.*"
         "Drivers/*.*"
-        "LIBJPEG/*.*"
         "FATFS/*.*"
         "Middlewares/*.*"
-        "Utilities/*.*"
         "Display/Drivers/*.*"
         "Lvgl/src/*.*"
 )

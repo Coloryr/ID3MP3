@@ -20,9 +20,9 @@ void ili9486_DisplayOff(void);
 
 void ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos);
 
-void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code);
+void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint32_t RGB_Code);
 
-uint16_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos);
+uint32_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos);
 
 void ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
 
@@ -30,7 +30,7 @@ void ili9486_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t 
 
 void ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
 
-void ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t RGBCode);
+void ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint32_t RGBCode);
 
 uint16_t ili9486_GetLcdPixelWidth(void);
 
@@ -372,7 +372,7 @@ void ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos) {
   * @param  RGBCode: the RGB pixel color
   * @retval None
   */
-void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode) {
+void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint32_t RGBCode) {
     ILI9486_LCDMUTEX_PUSH();
     ILI9486_SETCURSOR(Xpos, Ypos);
     LCD_IO_WriteCmd8(ILI9486_RAMWR);
@@ -387,7 +387,7 @@ void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode) {
   * @param  None
   * @retval the RGB pixel color
   */
-uint16_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos) {
+uint32_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos) {
     uint16_t ret;
     ILI9486_LCDMUTEX_PUSH();
     LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *) "\x66", 1); // Read: only 24bit pixel mode
@@ -472,7 +472,7 @@ void ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t 
   * @param  RGBCode:  specifies the RGB color
   * @retval None
   */
-void ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t RGBCode) {
+void ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint32_t RGBCode) {
     ILI9486_LCDMUTEX_PUSH();
     LCD_IO_WriteCmd8(ILI9486_CASET);
     LCD_IO_WriteData16_to_2x8(Xpos);

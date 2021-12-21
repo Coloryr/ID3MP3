@@ -40,10 +40,9 @@ typedef struct {
   */
 uint8_t BSP_LCD_Init(void);
 
-void BSP_LCD_Clear(uint16_t Color);
-
 void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code);
 
+extern LCD_DrvTypeDef *lcd_drv;
 
 #ifdef __cplusplus
 }

@@ -10,9 +10,6 @@
 #define ABS(X) ((X) > 0 ? (X) : -(X))
 #define SWAP16(a, b) {uint16_t t = a; a = b; b = t;}
 
-extern LCD_DrvTypeDef *lcd_drv;
-
-
 /**
   * @brief  Initializes the LCD.
   * @param  None
@@ -25,15 +22,6 @@ uint8_t BSP_LCD_Init(void) {
     lcd_drv->Init();
     ret = LCD_OK;
     return ret;
-}
-
-/**
-  * @brief  Clears the hole LCD.
-  * @param  Color: Color of the background
-  * @retval None
-  */
-void BSP_LCD_Clear(uint16_t Color) {
-    lcd_drv->FillRect(0, 0, lcd_drv->GetLcdPixelWidth(), lcd_drv->GetLcdPixelHeight(), Color);
 }
 
 /**
