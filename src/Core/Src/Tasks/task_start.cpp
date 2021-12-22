@@ -88,6 +88,8 @@ static void set_zoom(void * img, int32_t v)
     lv_img_set_zoom((lv_obj_t*)img, v);
 }
 
+ramfast lv_obj_t *info;
+
 void Lvgl_Config() {
     lv_init();
     lv_disp_draw_buf_init(&draw_buf, buf1, NULL, DISP_HOR_RES * DISP_VER_RES / 10);  /*Initialize the display buffer.*/
@@ -106,33 +108,9 @@ void Lvgl_Config() {
 //    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 //    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-    load_font();
-
-    if (res != FR_OK) {
-        lv_obj_t *label4 = lv_label_create(lv_scr_act());
-        lv_label_set_long_mode(label4, LV_LABEL_LONG_SCROLL_CIRCULAR);     /*Circular scroll*/
-        lv_obj_set_width(label4, 150);
-        lv_label_set_text(label4, "Fatfs Error...");
-        lv_obj_align(label4, LV_ALIGN_CENTER, 0, 0);
-    } else {
-        lv_obj_t *label1 = lv_label_create(lv_scr_act());
-        lv_label_set_text(label1, "ノンフィクション!!\n测试\nabc");
-        lv_obj_set_style_text_font(label1, sy16, 0);
-        lv_obj_set_width(label1, 310);
-        lv_obj_align(label1, LV_ALIGN_TOP_LEFT, 5, 0);
-
-        lv_obj_t *label2 = lv_label_create(lv_scr_act());
-        lv_label_set_text(label2, "ノンフィクション!!\n测试\nabc");
-        lv_obj_set_style_text_font(label2, sy24, 0);
-        lv_obj_set_width(label2, 310);
-        lv_obj_align(label2, LV_ALIGN_LEFT_MID, 5, 0);
-
-        lv_obj_t *label3 = lv_label_create(lv_scr_act());
-        lv_label_set_text(label3, "ノンフィクション!!\n测试\nabc");
-        lv_obj_set_style_text_font(label3, sy32, 0);
-        lv_obj_set_width(label3, 310);
-        lv_obj_align(label3, LV_ALIGN_BOTTOM_LEFT, 5, 0);
-    }
+    info = lv_label_create(lv_scr_act());
+    lv_label_set_text(info, "init...");
+    lv_obj_align(info, LV_ALIGN_CENTER, 0, 0);
 }
 
 void Fatfs_Config() {
@@ -147,13 +125,36 @@ void flash_config() {
 }
 
 void StartDefaultTask(void *argument) {
-    piclib_init();
-    Fatfs_Config();
-    Lvgl_Config();
-    flash_config();
-
     ledTask = osThreadNew(task_led, nullptr, &ledTask_attributes);
     lcdTask = osThreadNew(LCD_LOOP, nullptr, &lcdTask_attributes);
+
+    Lvgl_Config();
+    lv_label_set_text(info, "init piclib");
+    piclib_init();
+    lv_label_set_text(info, "init fatfs");
+    Fatfs_Config();
+    lv_label_set_text(info, "init flash");
+    flash_config();
+    lv_label_set_text(info, "init font");
+    load_font();
+
+    lv_obj_t *label1 = lv_label_create(lv_scr_act());
+    lv_label_set_text(label1, "ノンフィクション!!\n测试\nabc");
+    lv_obj_set_style_text_font(label1, sy16, 0);
+    lv_obj_set_width(label1, 310);
+    lv_obj_align(label1, LV_ALIGN_TOP_LEFT, 5, 0);
+
+    lv_obj_t *label2 = lv_label_create(lv_scr_act());
+    lv_label_set_text(label2, "ノンフィクション!!\n测试\nabc");
+    lv_obj_set_style_text_font(label2, sy24, 0);
+    lv_obj_set_width(label2, 310);
+    lv_obj_align(label2, LV_ALIGN_LEFT_MID, 5, 0);
+
+    lv_obj_t *label3 = lv_label_create(lv_scr_act());
+    lv_label_set_text(label3, "ノンフィクション!!\n测试\nabc");
+    lv_obj_set_style_text_font(label3, sy32, 0);
+    lv_obj_set_width(label3, 310);
+    lv_obj_align(label3, LV_ALIGN_BOTTOM_LEFT, 5, 0);
 
     osDelay(2000);
 //    ai_load_picfile((const uint8_t *) "0:test.jpg", 0, 0, lcd_drv->getLcdPixelWidth(),

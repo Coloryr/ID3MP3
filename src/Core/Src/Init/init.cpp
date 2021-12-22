@@ -161,9 +161,9 @@ void MX_QUADSPI_Init() {
     /* QUADSPI parameter configuration*/
     hqspi.Instance = QUADSPI;
     hqspi.Init.ClockPrescaler = 1;
-    hqspi.Init.FifoThreshold = 4;
+    hqspi.Init.FifoThreshold = 8;
     hqspi.Init.SampleShifting = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
-    hqspi.Init.FlashSize = POSITION_VAL(0X800000 * 2)-1;
+    hqspi.Init.FlashSize = POSITION_VAL(0X1000000)-1;
     hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_5_CYCLE;
     hqspi.Init.ClockMode = QSPI_CLOCK_MODE_0;
     hqspi.Init.FlashID = QSPI_FLASH_ID_1;
