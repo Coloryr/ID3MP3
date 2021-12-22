@@ -25,7 +25,7 @@ uint8_t BSP_TS_Init(uint16_t XSize, uint16_t YSize) {
 
     if (ret == TS_OK) {
         /* Initialize the LL TS Driver */
-//        ts_drv->Init(0);
+        ts_drv->Init();
     }
 
     return ret;
@@ -39,7 +39,7 @@ void BSP_TS_GetState(TS_StateTypeDef *TsState) {
     uint16_t x, y;
     int32_t x1, y1, x2, y2;
 
-    TsState->TouchDetected = ts_drv->DetectTouch(0);
+    TsState->TouchDetected = ts_drv->DetectTouch();
     if (TsState->TouchDetected) {
         ts_drv->GetXY(0, &x, &y);
         x1 = x;

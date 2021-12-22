@@ -78,7 +78,7 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/Lvgl/src
 )
 
-add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DDEBUG -DSTM32H743xx)
+add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DDEBUG -DSTM32H743xx -DLV_LVGL_H_INCLUDE_SIMPLE)
 
 file(GLOB_RECURSE SOURCES
         "Core/*.*"

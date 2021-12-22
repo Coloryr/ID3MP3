@@ -4,11 +4,15 @@
 
 #include "fatfs.h"
 #include "Pic/piclib.h"
+#include "Font/myfont.h"
+#include "Flash/w25q64.h"
 
 /* BSP LCD driver */
 #include "stm32_adafruit_lcd.h"
 /* BSP TS driver */
 #include "stm32_adafruit_ts.h"
+
+#include "Font/myfont.h"
 
  osThreadId_t ledTask;
 const osThreadAttr_t ledTask_attributes = {
@@ -102,32 +106,58 @@ void Lvgl_Config() {
 //    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 //    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
+    load_font();
+
     if (res != FR_OK) {
+        lv_obj_t *label4 = lv_label_create(lv_scr_act());
+        lv_label_set_long_mode(label4, LV_LABEL_LONG_SCROLL_CIRCULAR);     /*Circular scroll*/
+        lv_obj_set_width(label4, 150);
+        lv_label_set_text(label4, "Fatfs Error...");
+        lv_obj_align(label4, LV_ALIGN_CENTER, 0, 0);
+    } else {
+        lv_obj_t *label1 = lv_label_create(lv_scr_act());
+        lv_label_set_text(label1, "ノンフィクション!!\n测试\nabc");
+        lv_obj_set_style_text_font(label1, sy16, 0);
+        lv_obj_set_width(label1, 310);
+        lv_obj_align(label1, LV_ALIGN_TOP_LEFT, 5, 0);
+
         lv_obj_t *label2 = lv_label_create(lv_scr_act());
-        lv_label_set_long_mode(label2, LV_LABEL_LONG_SCROLL_CIRCULAR);     /*Circular scroll*/
-        lv_obj_set_width(label2, 150);
-        lv_label_set_text(label2, "Fatfs Error...");
-        lv_obj_align(label2, LV_ALIGN_CENTER, 0, 40);
+        lv_label_set_text(label2, "ノンフィクション!!\n测试\nabc");
+        lv_obj_set_style_text_font(label2, sy24, 0);
+        lv_obj_set_width(label2, 310);
+        lv_obj_align(label2, LV_ALIGN_LEFT_MID, 5, 0);
+
+        lv_obj_t *label3 = lv_label_create(lv_scr_act());
+        lv_label_set_text(label3, "ノンフィクション!!\n测试\nabc");
+        lv_obj_set_style_text_font(label3, sy32, 0);
+        lv_obj_set_width(label3, 310);
+        lv_obj_align(label3, LV_ALIGN_BOTTOM_LEFT, 5, 0);
     }
 }
 
-void Fatfs_Config(){
-    if ((res = f_mount(&SDFatFS, SDPath, 1)) != FR_OK) {
-        while (1);
-    }
+void Fatfs_Config() {
+    res = f_mount(&SDFatFS, SDPath, 1);
+}
+
+void flash_config() {
+    uint8_t datatemp[32];
+    W25QXX_Write((uint8_t *) "test", 0x0, 4);
+
+    W25QXX_Read(datatemp,  0x0, 4);
 }
 
 void StartDefaultTask(void *argument) {
     piclib_init();
     Fatfs_Config();
     Lvgl_Config();
+    flash_config();
 
     ledTask = osThreadNew(task_led, nullptr, &ledTask_attributes);
     lcdTask = osThreadNew(LCD_LOOP, nullptr, &lcdTask_attributes);
 
     osDelay(2000);
-    ai_load_picfile((const uint8_t *) "0:test.jpg", 0, 0, lcd_drv->getLcdPixelWidth(),
-                    lcd_drv->getLcdPixelHeight());
+//    ai_load_picfile((const uint8_t *) "0:test.jpg", 0, 0, lcd_drv->getLcdPixelWidth(),
+//                    lcd_drv->getLcdPixelHeight());
 
     osThreadExit();
 }

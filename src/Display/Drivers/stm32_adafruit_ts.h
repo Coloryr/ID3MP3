@@ -12,7 +12,6 @@ typedef struct {
     uint16_t TouchDetected;
     uint16_t X;
     uint16_t Y;
-    uint16_t Z;
 } TS_StateTypeDef;
 
 #define TS_SWAP_NONE                    0x00
