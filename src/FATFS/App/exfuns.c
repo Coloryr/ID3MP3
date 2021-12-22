@@ -54,9 +54,9 @@ uint8_t char_upper(uint8_t c) {
 //fname:文件名
 //返回值:0XFF,表示无法识别的文件类型编号.
 //		 其他,高四位表示所属大类,低四位表示所属小类.
-uint8_t f_typetell(char *fname) {
+uint8_t f_typetell(uint8_t *fname) {
     uint8_t tbuf[5];
-    char *attr = "\0";//后缀名
+    uint8_t *attr = '\0';//后缀名
     uint8_t i = 0, j;
     while (i < 250) {
         i++;

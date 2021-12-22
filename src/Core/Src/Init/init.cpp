@@ -26,6 +26,22 @@ void MPU_Config() {
     /* Enables the MPU */
     LL_MPU_Enable(LL_MPU_CTRL_PRIVILEGED_DEFAULT);
 
+    MPU_Region_InitTypeDef MPU_InitStruct = {0};
+    /** Initializes and configures the Region and the memory to be protected
+    */
+    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+    MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+    MPU_InitStruct.BaseAddress = 0x60000000;
+    MPU_InitStruct.Size = MPU_REGION_SIZE_256MB;
+    MPU_InitStruct.SubRegionDisable = 0x0;
+    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+    HAL_MPU_ConfigRegion(&MPU_InitStruct);
 }
 
 /**
@@ -357,12 +373,12 @@ void MX_FMC_Init() {
     hsram1.Init.WriteFifo = FMC_WRITE_FIFO_ENABLE;
     hsram1.Init.PageSize = FMC_PAGE_SIZE_NONE;
     /* Timing */
-    Timing.AddressSetupTime = 15;
-    Timing.AddressHoldTime = 15;
-    Timing.DataSetupTime = 255;
-    Timing.BusTurnAroundDuration = 15;
-    Timing.CLKDivision = 16;
-    Timing.DataLatency = 17;
+    Timing.AddressSetupTime = 5;
+    Timing.AddressHoldTime = 5;
+    Timing.DataSetupTime = 50;
+    Timing.BusTurnAroundDuration = 5;
+    Timing.CLKDivision = 0;
+    Timing.DataLatency = 0;
     Timing.AccessMode = FMC_ACCESS_MODE_A;
     /* ExtTiming */
 
@@ -421,7 +437,7 @@ void init(){
     SystemClock_Config();
     PeriphCommonClock_Config();
     MX_GPIO_Init();
-//    MX_FMC_Init();
+    MX_FMC_Init();
     MX_JPEG_Init();
     MX_QUADSPI_Init();
     MX_SDMMC1_SD_Init();

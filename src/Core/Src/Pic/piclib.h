@@ -54,6 +54,11 @@ typedef struct {
     uint32_t staticy;
 } _pic_info;
 extern _pic_info picinfo;//图像信息
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void piclib_fill_color(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t *color);
 
@@ -61,8 +66,12 @@ void piclib_init(void);                                //初始化画图
 uint16_t piclib_alpha_blend(uint16_t src, uint16_t dst, uint8_t alpha);    //alphablend处理
 void ai_draw_init(void);                            //初始化智能画图
 uint8_t is_element_ok(uint16_t x, uint16_t y, uint8_t chg);                //判断像素是否有效
-uint8_t ai_load_picfile(const uint8_t *filename, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t fast);//智能画图
+uint8_t ai_load_picfile(const uint8_t *filename, uint16_t x, uint16_t y, uint16_t width, uint16_t height);//智能画图
 void *pic_memalloc(uint32_t size);    //pic申请内存
 void pic_memfree(void *mf);    //pic释放内存
+
+#ifdef __cplusplus
+}
+#endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif

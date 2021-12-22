@@ -49,6 +49,16 @@
 #define LCD_READ_DELAY   20
 #define TS_AD_DELAY     500
 
+//=============================================================================
+/* Memory address
+  - Bank1 (NE1) 0x60000000
+  - Bank2 (NE2) 0x64000000
+  - Bank3 (NE3) 0x68000000
+  - Bank4 (NE4) 0x6C000000
+  - REGSELECT_BIT: if example A18 pin -> 18 */
+#define LCD_ADDR_BASE     0x60000000
+#define LCD_REGSELECT_BIT 19
+
 /*=============================================================================
 I/O group optimization so that GPIO operations are not performed bit by bit:
 Note: If the pins are in order, they will automatically optimize.

@@ -21,6 +21,16 @@
 #define  TS_YP                LCD_WR
 #define  TS_YM                LCD_D7
 
+/* Change the byte order of 16bits data? */
+#if LCD_REVERSE16 == 0
+#define RD(a)                 __REVSH(a)
+#endif
+#if LCD_REVERSE16 == 1
+#define RD(a)                 a
+#endif
+
+#define LCD_ADDR_DATA         (LCD_ADDR_BASE + (1 << (LCD_REGSELECT_BIT + 2)) - 2)
+
 /* Link function for LCD peripheral */
 void     LCD_Delay (uint32_t delay);
 void     LCD_IO_Init(void);
@@ -383,43 +393,43 @@ void LCD_IO_Init(void)
   LCD_RST_OFF;                          /* RST = 1 */
   GPIOX_MODER(MODE_OUT, LCD_RST);
   #endif
-
-  #if GPIOX_PORTNUM(LCD_BL) >= GPIOX_PORTNUM_A
-  GPIOX_ODR(LCD_BL) = LCD_BLON;
-  GPIOX_MODER(MODE_OUT, LCD_BL);
-  #endif
-
-  GPIOX_SET(LCD_CS);                    /* CS = 1 */
-  LCD_RS_DATA;                          /* RS = 1 */
-  GPIOX_SET(LCD_WR);                    /* WR = 1 */
-  #if GPIOX_PORTNUM(LCD_RD) >=  GPIOX_PORTNUM_A
-  GPIOX_SET(LCD_RD);                    /* RD = 1 */
-  #endif
-
-  GPIOX_MODER(MODE_OUT, LCD_CS);
-  GPIOX_MODER(MODE_OUT, LCD_RS);
-  GPIOX_MODER(MODE_OUT, LCD_WR);
-  #if GPIOX_PORTNUM(LCD_RD) >=  GPIOX_PORTNUM_A
-  GPIOX_MODER(MODE_OUT, LCD_RD);
-  #endif
-
-  LCD_DIRWRITE;                         /* data pins set the output direction */
-
-  /* GPIO speed */
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_CS);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_RS);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_WR);
-  #if GPIOX_PORTNUM(LCD_RD) >=  GPIOX_PORTNUM_A
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_RD);
-  #endif
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D0);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D1);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D2);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D3);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D4);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D5);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D6);
-  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D7);
+//
+//  #if GPIOX_PORTNUM(LCD_BL) >= GPIOX_PORTNUM_A
+//  GPIOX_ODR(LCD_BL) = LCD_BLON;
+//  GPIOX_MODER(MODE_OUT, LCD_BL);
+//  #endif
+//
+//  GPIOX_SET(LCD_CS);                    /* CS = 1 */
+//  LCD_RS_DATA;                          /* RS = 1 */
+//  GPIOX_SET(LCD_WR);                    /* WR = 1 */
+//  #if GPIOX_PORTNUM(LCD_RD) >=  GPIOX_PORTNUM_A
+//  GPIOX_SET(LCD_RD);                    /* RD = 1 */
+//  #endif
+//
+//  GPIOX_MODER(MODE_OUT, LCD_CS);
+//  GPIOX_MODER(MODE_OUT, LCD_RS);
+//  GPIOX_MODER(MODE_OUT, LCD_WR);
+//  #if GPIOX_PORTNUM(LCD_RD) >=  GPIOX_PORTNUM_A
+//  GPIOX_MODER(MODE_OUT, LCD_RD);
+//  #endif
+//
+//  LCD_DIRWRITE;                         /* data pins set the output direction */
+//
+//  /* GPIO speed */
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_CS);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_RS);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_WR);
+//  #if GPIOX_PORTNUM(LCD_RD) >=  GPIOX_PORTNUM_A
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_RD);
+//  #endif
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D0);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D1);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D2);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D3);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D4);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D5);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D6);
+//  GPIOX_OSPEEDR(MODE_SPD_VHIGH, LCD_D7);
 
   /* Reset the LCD */
   #if GPIOX_PORTNUM(LCD_RST) >= GPIOX_PORTNUM_A
@@ -434,238 +444,419 @@ void LCD_IO_Init(void)
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteCmd8(uint8_t Cmd)
 {
-  LCD_CS_ON;
-  LCD_CMD8_WRITE(Cmd);
-  LCD_CS_OFF;
+    *(uint8_t *)LCD_ADDR_BASE = Cmd;
+//  LCD_CS_ON;
+//  LCD_CMD8_WRITE(Cmd);
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteCmd16(uint16_t Cmd)
 {
-  LCD_CS_ON;
-  LCD_CMD16_WRITE(Cmd);
-  LCD_CS_OFF;
+    *(volatile uint16_t *)LCD_ADDR_BASE = RD(Cmd);
+//  LCD_CS_ON;
+//  LCD_CMD16_WRITE(Cmd);
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteData8(uint8_t Data)
 {
-  LCD_CS_ON;
-  LCD_DATA8_WRITE(Data);
-  LCD_CS_OFF;
+    *(volatile uint8_t *)LCD_ADDR_DATA = Data;
+//  LCD_CS_ON;
+//  LCD_DATA8_WRITE(Data);
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteData16(uint16_t Data)
 {
-  LCD_CS_ON;
-  LCD_DATA16_WRITE(Data);
-  LCD_CS_OFF;
+    *(volatile uint16_t *)LCD_ADDR_DATA = RD(Data);
+//  LCD_CS_ON;
+//  LCD_DATA16_WRITE(Data);
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteCmd8DataFill16(uint8_t Cmd, uint16_t Data, uint32_t Size)
 {
-  LCD_CS_ON;
-  LCD_CMD8_WRITE(Cmd);
-  while(Size--)
-  {
-    LCD_DATA16_WRITE(Data);
-  }
-  LCD_CS_OFF;
+    uint16_t d = RD(Data);
+    *(volatile uint8_t *)LCD_ADDR_BASE = Cmd;
+
+    while(Size--)
+        *(volatile uint16_t *)LCD_ADDR_DATA = d;
+//  LCD_CS_ON;
+//  LCD_CMD8_WRITE(Cmd);
+//  while(Size--)
+//  {
+//    LCD_DATA16_WRITE(Data);
+//  }
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteCmd8MultipleData8(uint8_t Cmd, uint8_t *pData, uint32_t Size)
 {
-  LCD_CS_ON;
-  LCD_CMD8_WRITE(Cmd);
+    *(volatile uint8_t *)LCD_ADDR_BASE = Cmd;
 
-  while(Size--)
-  {
-    LCD_DATA8_WRITE(*pData);
-    pData ++;
-  }
-  LCD_CS_OFF;
+    while(Size--)
+    {
+        *(volatile uint8_t *)LCD_ADDR_DATA =*pData;
+        pData++;
+    }
+//  LCD_CS_ON;
+//  LCD_CMD8_WRITE(Cmd);
+//
+//  while(Size--)
+//  {
+//    LCD_DATA8_WRITE(*pData);
+//    pData ++;
+//  }
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteCmd8MultipleData16(uint8_t Cmd, uint16_t *pData, uint32_t Size)
 {
-  LCD_CS_ON;
-  LCD_CMD8_WRITE(Cmd);
-  while(Size--)
-  {
-    LCD_DATA16_WRITE(*pData);
-    pData ++;
-  }
-  LCD_CS_OFF;
+    *(volatile uint8_t *)LCD_ADDR_BASE = Cmd;
+
+    while(Size--)
+    {
+        *(volatile uint16_t *)LCD_ADDR_DATA = RD(*pData);
+        pData++;
+    }
+
+//  LCD_CS_ON;
+//  LCD_CMD8_WRITE(Cmd);
+//  while(Size--)
+//  {
+//    LCD_DATA16_WRITE(*pData);
+//    pData ++;
+//  }
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteCmd16DataFill16(uint16_t Cmd, uint16_t Data, uint32_t Size)
 {
-  LCD_CS_ON;
-  LCD_CMD16_WRITE(Cmd);
-  while(Size--)
-  {
-    LCD_DATA16_WRITE(Data);
-  }
-  LCD_CS_OFF;
+    *(volatile uint16_t *)LCD_ADDR_BASE = RD(Cmd);
+    uint16_t d = RD(Data);
+
+    while(Size--)
+    *(volatile uint16_t *)LCD_ADDR_DATA = d;
+//  LCD_CS_ON;
+//  LCD_CMD16_WRITE(Cmd);
+//  while(Size--)
+//  {
+//    LCD_DATA16_WRITE(Data);
+//  }
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
-void LCD_IO_WriteCmd16MultipleData8(uint16_t Cmd, uint8_t *pData, uint32_t Size)
-{
-  LCD_CS_ON;
-  LCD_CMD16_WRITE(Cmd);
-  while(Size--)
-  {
-    LCD_DATA8_WRITE(*pData);
-    pData ++;
-  }
-  LCD_CS_OFF;
+void LCD_IO_WriteCmd16MultipleData8(uint16_t Cmd, uint8_t *pData, uint32_t Size) {
+    *(volatile uint16_t *) LCD_ADDR_BASE = RD(Cmd);
+
+    while (Size--) {
+        *(volatile uint8_t *) LCD_ADDR_DATA = *pData;
+        pData++;
+    }
+//  LCD_CS_ON;
+//  LCD_CMD16_WRITE(Cmd);
+//  while(Size--)
+//  {
+//    LCD_DATA8_WRITE(*pData);
+//    pData ++;
+//  }
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_WriteCmd16MultipleData16(uint16_t Cmd, uint16_t *pData, uint32_t Size)
 {
-  LCD_CS_ON;
-  LCD_CMD16_WRITE(Cmd);
-  while(Size--)
-  {
-    LCD_DATA16_WRITE(*pData);
-    pData ++;
-  }
-  LCD_CS_OFF;
+    *(volatile uint16_t *)LCD_ADDR_BASE = RD(Cmd);
+
+    while(Size--)
+    {
+        *(volatile uint16_t *)LCD_ADDR_DATA = RD(*pData);
+        pData++;
+    }
+
+//  LCD_CS_ON;
+//  LCD_CMD16_WRITE(Cmd);
+//  while(Size--)
+//  {
+//    LCD_DATA16_WRITE(*pData);
+//    pData ++;
+//  }
+//  LCD_CS_OFF;
 }
 
 //-----------------------------------------------------------------------------
 #if GPIOX_PORTNUM(LCD_RD) >=  GPIOX_PORTNUM_A
 void LCD_IO_ReadCmd8MultipleData8(uint8_t Cmd, uint8_t *pData, uint32_t Size, uint32_t DummySize)
 {
-  uint8_t  d;
-  LCD_CS_ON;
-  LCD_CMD8_WRITE(Cmd);
-  LCD_DIRREAD;
-  while(DummySize--)
-    LCD_DUMMY_READ;
-  while(Size--)
+#ifdef  __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+    uint8_t DummyData;
+#pragma GCC diagnostic pop
+#elif   defined(__CC_ARM)
+    uint8_t DummyData;
+#endif
+
+    *(volatile uint8_t *)LCD_ADDR_BASE = Cmd;
+
+    while(DummySize--)
+        DummyData = *(volatile uint8_t *)LCD_ADDR_DATA;
+
+    while(Size--)
   {
-    LCD_DATA8_READ(d);
-    *pData = d;
+    *pData = *(volatile uint8_t *)LCD_ADDR_DATA;
     pData++;
   }
-  LCD_CS_OFF;
-  LCD_DIRWRITE;
+
+//  uint8_t  d;
+//  LCD_CS_ON;
+//  LCD_CMD8_WRITE(Cmd);
+//  LCD_DIRREAD;
+//  while(DummySize--)
+//    LCD_DUMMY_READ;
+//  while(Size--)
+//  {
+//    LCD_DATA8_READ(d);
+//    *pData = d;
+//    pData++;
+//  }
+//  LCD_CS_OFF;
+//  LCD_DIRWRITE;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_ReadCmd8MultipleData16(uint8_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize)
 {
-  uint8_t  dl, dh;
-  LCD_CS_ON;
-  LCD_CMD8_WRITE(Cmd);
-  LCD_DIRREAD;
-  while(DummySize--)
-    LCD_DUMMY_READ;
+#ifdef  __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+    uint8_t DummyData;
+#pragma GCC diagnostic pop
+#elif   defined(__CC_ARM)
+    uint8_t DummyData;
+#endif
 
-  while(Size--)
-  {
-    LCD_DATA16_READ(dh, dl);
-    *pData = (dh << 8) | dl;
-    pData++;
-  }
-  LCD_CS_OFF;
-  LCD_DIRWRITE;
+    *(volatile uint8_t *)LCD_ADDR_BASE = Cmd;
+
+    while(DummySize)
+    {
+        DummyData = *(volatile uint8_t *)LCD_ADDR_DATA;
+        DummySize--;
+    }
+
+    while(Size--)
+    {
+        *pData = RD(*(volatile uint16_t *)LCD_ADDR_DATA);
+        pData++;
+    }
+//  uint8_t  dl, dh;
+//  LCD_CS_ON;
+//  LCD_CMD8_WRITE(Cmd);
+//  LCD_DIRREAD;
+//  while(DummySize--)
+//    LCD_DUMMY_READ;
+//
+//  while(Size--)
+//  {
+//    LCD_DATA16_READ(dh, dl);
+//    *pData = (dh << 8) | dl;
+//    pData++;
+//  }
+//  LCD_CS_OFF;
+//  LCD_DIRWRITE;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_ReadCmd8MultipleData24to16(uint8_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize)
 {
-  uint8_t  rgb888[3];
-  LCD_CS_ON;
-  LCD_CMD8_WRITE(Cmd);
-  LCD_DIRREAD;
-  while(DummySize--)
-    LCD_DUMMY_READ;
-  while(Size--)
-  {
-    LCD_DATA8_READ(rgb888[0]);
-    LCD_DATA8_READ(rgb888[1]);
-    LCD_DATA8_READ(rgb888[2]);
-    #if LCD_REVERSE16 == 0
-    *pData = ((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
-    #else
-    *pData = __REVSH((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
-    #endif
-    pData++;
-  }
-  LCD_CS_OFF;
-  LCD_DIRWRITE;
+    uint8_t rgb888[3];
+
+#ifdef  __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+    uint8_t DummyData;
+#pragma GCC diagnostic pop
+#elif   defined(__CC_ARM)
+    uint8_t DummyData;
+#endif
+
+    *(volatile uint8_t *)LCD_ADDR_BASE = Cmd;
+
+    while(DummySize--)
+        DummyData = *(volatile uint8_t *)LCD_ADDR_DATA;
+
+    while(Size--)
+    {
+        rgb888[0] = *(volatile uint8_t*)LCD_ADDR_DATA;
+        rgb888[1] = *(volatile uint8_t*)LCD_ADDR_DATA;
+        rgb888[2] = *(volatile uint8_t*)LCD_ADDR_DATA;
+#if LCD_REVERSE16 == 0
+        *pData = ((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
+#else
+        *pData = __REVSH((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
+#endif
+        pData++;
+    }
+//  uint8_t  rgb888[3];
+//  LCD_CS_ON;
+//  LCD_CMD8_WRITE(Cmd);
+//  LCD_DIRREAD;
+//  while(DummySize--)
+//    LCD_DUMMY_READ;
+//  while(Size--)
+//  {
+//    LCD_DATA8_READ(rgb888[0]);
+//    LCD_DATA8_READ(rgb888[1]);
+//    LCD_DATA8_READ(rgb888[2]);
+//    #if LCD_REVERSE16 == 0
+//    *pData = ((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
+//    #else
+//    *pData = __REVSH((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
+//    #endif
+//    pData++;
+//  }
+//  LCD_CS_OFF;
+//  LCD_DIRWRITE;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_ReadCmd16MultipleData8(uint16_t Cmd, uint8_t *pData, uint32_t Size, uint32_t DummySize)
 {
-  uint8_t  d;
-  LCD_CS_ON;
-  LCD_CMD16_WRITE(Cmd);
-  LCD_DIRREAD;
-  while(DummySize--)
-    LCD_DUMMY_READ;
-  while(Size--)
+#ifdef  __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+    uint8_t DummyData;
+#pragma GCC diagnostic pop
+#elif   defined(__CC_ARM)
+    uint8_t DummyData;
+#endif
+
+    *(volatile uint16_t *)LCD_ADDR_BASE = RD(Cmd);
+
+    while(DummySize--)
+        DummyData = *(volatile uint8_t *)LCD_ADDR_DATA;
+
+    while(Size--)
   {
-    LCD_DATA8_READ(d);
-    *pData = d;
+    *pData = *(volatile uint8_t *)LCD_ADDR_DATA;
     pData++;
   }
-  LCD_CS_OFF;
-  LCD_DIRWRITE;
+
+//  uint8_t  d;
+//  LCD_CS_ON;
+//  LCD_CMD16_WRITE(Cmd);
+//  LCD_DIRREAD;
+//  while(DummySize--)
+//    LCD_DUMMY_READ;
+//  while(Size--)
+//  {
+//    LCD_DATA8_READ(d);
+//    *pData = d;
+//    pData++;
+//  }
+//  LCD_CS_OFF;
+//  LCD_DIRWRITE;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_ReadCmd16MultipleData16(uint16_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize)
 {
-  uint8_t  dl, dh;
-  LCD_CS_ON;
-  LCD_CMD16_WRITE(Cmd);
-  LCD_DIRREAD;
-  while(DummySize--)
-    LCD_DUMMY_READ;
-  while(Size--)
-  {
-    LCD_DATA16_READ(dh, dl);
-    *pData = (dh << 8) | dl;
-    pData++;
-  }
-  LCD_CS_OFF;
-  LCD_DIRWRITE;
+#ifdef  __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+    uint8_t DummyData;
+#pragma GCC diagnostic pop
+#elif   defined(__CC_ARM)
+    uint8_t DummyData;
+#endif
+
+    *(volatile uint16_t *)LCD_ADDR_BASE = RD(Cmd);
+
+    while(DummySize--)
+        DummyData = *(volatile uint8_t *)LCD_ADDR_DATA;
+
+    while(Size)
+    {
+        *pData = RD(*(volatile uint16_t *)LCD_ADDR_DATA);
+        pData++;
+        Size--;
+    }
+
+//  uint8_t  dl, dh;
+//  LCD_CS_ON;
+//  LCD_CMD16_WRITE(Cmd);
+//  LCD_DIRREAD;
+//  while(DummySize--)
+//    LCD_DUMMY_READ;
+//  while(Size--)
+//  {
+//    LCD_DATA16_READ(dh, dl);
+//    *pData = (dh << 8) | dl;
+//    pData++;
+//  }
+//  LCD_CS_OFF;
+//  LCD_DIRWRITE;
 }
 
 //-----------------------------------------------------------------------------
 void LCD_IO_ReadCmd16MultipleData24to16(uint16_t Cmd, uint16_t *pData, uint32_t Size, uint32_t DummySize)
 {
-  uint8_t  rgb888[3];
-  LCD_CS_ON;
-  LCD_CMD16_WRITE(Cmd);
-  LCD_DIRREAD;
-  while(DummySize--)
-    LCD_DUMMY_READ;
-  while(Size--)
-  {
-    LCD_DATA8_READ(rgb888[0]);
-    LCD_DATA8_READ(rgb888[1]);
-    LCD_DATA8_READ(rgb888[2]);
-    #if LCD_REVERSE16 == 0
-    *pData = ((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
-    #else
-    *pData = __REVSH((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
-    #endif
-    pData++;
-  }
-  LCD_CS_OFF;
-  LCD_DIRWRITE;
+    uint8_t rgb888[3];
+
+#ifdef  __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+    uint8_t DummyData;
+#pragma GCC diagnostic pop
+#elif   defined(__CC_ARM)
+    uint8_t DummyData;
+#endif
+
+    *(volatile uint16_t *)LCD_ADDR_BASE = RD(Cmd);
+
+    while(DummySize--)
+        DummyData = *(volatile uint8_t *)LCD_ADDR_DATA;
+
+    while(Size--)
+    {
+        rgb888[0] = *(volatile uint8_t*)LCD_ADDR_DATA;
+        rgb888[1] = *(volatile uint8_t*)LCD_ADDR_DATA;
+        rgb888[2] = *(volatile uint8_t*)LCD_ADDR_DATA;
+#if LCD_REVERSE16 == 0
+        *pData = ((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
+#else
+        *pData = __REVSH((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
+#endif
+        pData++;
+    }
+//  uint8_t  rgb888[3];
+//  LCD_CS_ON;
+//  LCD_CMD16_WRITE(Cmd);
+//  LCD_DIRREAD;
+//  while(DummySize--)
+//    LCD_DUMMY_READ;
+//  while(Size--)
+//  {
+//    LCD_DATA8_READ(rgb888[0]);
+//    LCD_DATA8_READ(rgb888[1]);
+//    LCD_DATA8_READ(rgb888[2]);
+//    #if LCD_REVERSE16 == 0
+//    *pData = ((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
+//    #else
+//    *pData = __REVSH((rgb888[0] & 0xF8) << 8 | (rgb888[1] & 0xFC) << 3 | rgb888[2] >> 3);
+//    #endif
+//    pData++;
+//  }
+//  LCD_CS_OFF;
+//  LCD_DIRWRITE;
 }
 
 #else

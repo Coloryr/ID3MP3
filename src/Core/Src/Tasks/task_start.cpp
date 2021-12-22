@@ -41,8 +41,8 @@ void LCD_LOOP(void *argument) {
 
 FRESULT res;
 
-#define DISP_HOR_RES 320
-#define DISP_VER_RES 480
+#define DISP_HOR_RES 480
+#define DISP_VER_RES 320
 
 ramfast static lv_disp_draw_buf_t draw_buf;
 ramfast static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
@@ -84,7 +84,7 @@ static void set_zoom(void * img, int32_t v)
     lv_img_set_zoom((lv_obj_t*)img, v);
 }
 
-void Lvgl_Config(){
+void Lvgl_Config() {
     lv_init();
     lv_disp_draw_buf_init(&draw_buf, buf1, NULL, DISP_HOR_RES * DISP_VER_RES / 10);  /*Initialize the display buffer.*/
 
@@ -102,54 +102,13 @@ void Lvgl_Config(){
 //    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 //    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-    if(res!= FR_OK)
-    {
-        lv_obj_t * label1 = lv_label_create(lv_scr_act());
-        lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);     /*Break the long lines*/
-        lv_label_set_recolor(label1, true);                      /*Enable re-coloring by commands in the text*/
-        lv_label_set_text(label1, "#0000ff Re-color# #ff00ff words# #ff0000 of a# label, align the lines to the center "
-                                  "and wrap long text automatically.");
-        lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
-        lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
-        lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
-
-
-        lv_obj_t * label2 = lv_label_create(lv_scr_act());
+    if (res != FR_OK) {
+        lv_obj_t *label2 = lv_label_create(lv_scr_act());
         lv_label_set_long_mode(label2, LV_LABEL_LONG_SCROLL_CIRCULAR);     /*Circular scroll*/
         lv_obj_set_width(label2, 150);
         lv_label_set_text(label2, "Fatfs Error...");
         lv_obj_align(label2, LV_ALIGN_CENTER, 0, 40);
     }
-    else
-    {
-        FIL fp;
-        res=f_open(&fp,"0:test.jpg",FA_OPEN_EXISTING);
-        if(res!= FR_OK)
-        {
-            lv_obj_t * label1 = lv_label_create(lv_scr_act());
-            lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);     /*Break the long lines*/
-            lv_label_set_recolor(label1, true);                      /*Enable re-coloring by commands in the text*/
-            lv_label_set_text(label1, "#0000ff Re-color# #ff00ff words# #ff0000 of a# label, align the lines to the center "
-                                      "and wrap long text automatically.");
-            lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
-            lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
-            lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
-
-
-            lv_obj_t * label2 = lv_label_create(lv_scr_act());
-            lv_label_set_long_mode(label2, LV_LABEL_LONG_SCROLL_CIRCULAR);     /*Circular scroll*/
-            lv_obj_set_width(label2, 150);
-            lv_label_set_text(label2, "File"
-                                      " Error...");
-            lv_obj_align(label2, LV_ALIGN_CENTER, 0, 40);
-        }
-
-        else
-        {
-            ai_load_picfile((const uint8_t*)"0:test.jpg" ,0, 0, lcd_drv->getLcdPixelWidth(),lcd_drv->getLcdPixelHeight(), 1);
-        }
-    }
-
 }
 
 void Fatfs_Config(){
@@ -159,11 +118,16 @@ void Fatfs_Config(){
 }
 
 void StartDefaultTask(void *argument) {
+    piclib_init();
     Fatfs_Config();
     Lvgl_Config();
 
     ledTask = osThreadNew(task_led, nullptr, &ledTask_attributes);
     lcdTask = osThreadNew(LCD_LOOP, nullptr, &lcdTask_attributes);
+
+    osDelay(2000);
+    ai_load_picfile((const uint8_t *) "0:test.jpg", 0, 0, lcd_drv->getLcdPixelWidth(),
+                    lcd_drv->getLcdPixelHeight());
 
     osThreadExit();
 }

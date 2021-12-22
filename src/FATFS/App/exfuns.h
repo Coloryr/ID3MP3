@@ -36,7 +36,6 @@ extern uint8_t *fatbuf;//SD卡数据缓存区
 
 #define T_AVI        0X60    //avi文件
 
-
 uint8_t exfuns_init(void);                            //申请内存
 uint8_t f_typetell(uint8_t *fname);                        //识别文件类型
 uint8_t exf_getfree(uint8_t *drv, uint32_t *total, uint32_t *free);    //得到磁盘总容量和剩余容量
@@ -48,4 +47,5 @@ exf_copy(uint8_t(*fcpymsg)(uint8_t *pname, uint8_t pct, uint8_t mode), uint8_t *
          uint32_t cpdsize, uint8_t fwmode);       //文件复制
 uint8_t exf_fdcopy(uint8_t(*fcpymsg)(uint8_t *pname, uint8_t pct, uint8_t mode), uint8_t *psrc, uint8_t *pdst,
                    uint32_t *totsize, uint32_t *cpdsize, uint8_t fwmode);//文件夹复制
+
 #endif

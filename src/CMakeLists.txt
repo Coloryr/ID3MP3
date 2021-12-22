@@ -82,9 +82,6 @@ add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DDEBUG -DSTM32H743xx)
 
 file(GLOB_RECURSE SOURCES
         "Core/*.*"
-        "Core/Init/*.*"
-        "Core/Tasks/*.*"
-        "Core/Pic/*.*"
         "Core/Startup/*.*"
         "Drivers/*.*"
         "FATFS/*.*"

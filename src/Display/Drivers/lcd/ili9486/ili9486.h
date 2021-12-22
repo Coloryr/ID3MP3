@@ -4,7 +4,7 @@
    - 2: 240x320 portrait 180'
    - 3: 320x240 landscape 270'
 */
-#define  ILI9486_ORIENTATION      0
+#define  ILI9486_ORIENTATION      1
 
 /* Color mode
    - 0: RGB565 (R:bit15..11, G:bit10..5, B:bit4..0)
