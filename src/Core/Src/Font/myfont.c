@@ -492,24 +492,20 @@ void load_font() {
         font_32_length = cov.u32;
     }
 
-    font_16.get_glyph_dsc = my_get_glyph_dsc_cb;
-    font_16.get_glyph_bitmap = my_get_glyph_bitmap_cb;
     font_16.dsc = &font_16_dsc;
     font_16_dsc.cache = &font_16_cache;
 
-    font_24.get_glyph_dsc = my_get_glyph_dsc_cb;
-    font_24.get_glyph_bitmap = my_get_glyph_bitmap_cb;
     font_24.dsc = &font_24_dsc;
     font_24_dsc.cache = &font_24_cache;
 
-    font_32.get_glyph_dsc = my_get_glyph_dsc_cb;
-    font_32.get_glyph_bitmap = my_get_glyph_bitmap_cb;
     font_32.dsc = &font_32_dsc;
     font_32_dsc.cache = &font_32_cache;
 
     font_load(&font_16, FONT_ADDR);
     font_load(&font_24, FONT_ADDR + font_16_length);
     font_load(&font_32, FONT_ADDR + font_16_length + font_24_length);
+
+    lv_label_set_text(info, "font init done");
 }
 
 static void font_load(lv_font_t * font, uint32_t local) {
@@ -526,6 +522,8 @@ static void font_load(lv_font_t * font, uint32_t local) {
 
     font->base_line = -font_header->descent;
     font->line_height = font_header->ascent - font_header->descent;
+    font->get_glyph_dsc = my_get_glyph_dsc_cb;
+    font->get_glyph_bitmap = my_get_glyph_bitmap_cb;
     font->subpx = font_header->subpixels_mode;
     font->underline_position = font_header->underline_position;
     font->underline_thickness = font_header->underline_thickness;
@@ -553,30 +551,9 @@ static void font_load(lv_font_t * font, uint32_t local) {
     uint32_t loca_count;
     W25QXX_Read_Utils(head, &loca_count, sizeof(uint32_t));
 
-//    uint32_t *glyph_offset = malloc(sizeof(uint32_t) * (loca_count + 1));
-
-//    if (font_header.index_to_loc_format == 0) {
-//        for (unsigned int i = 0; i < loca_count; ++i) {
-//            uint16_t offset;
-//            W25QXX_Read_Utils(head, &offset, sizeof(uint16_t));
-//            glyph_offset[i] = offset;
-//        }
-//    } else if (font_header.index_to_loc_format == 1) {
-//        W25QXX_Read_Utils(head, glyph_offset, loca_count * sizeof(uint32_t));
-//    } else {
-//        return;
-//    }
-
     /*glyph*/
     uint32_t glyph_start = loca_start + loca_length;
     int32_t glyph_length = font_load_glyph(head, glyph_start);
-
-//    free(glyph_offset);
-
-//    if (glyph_length < 0) {
-//        lv_label_set_text(info, "font 16 error:glyph_length is error");
-//        while (1);
-//    }
 
     if(font == &font_16) {
         font_16_header_bin = font_header;

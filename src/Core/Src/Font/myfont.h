@@ -11,6 +11,7 @@ void load_font();
 #ifdef __cplusplus
 }
 #endif
+
 extern lv_font_t font_16;
 extern lv_font_t font_24;
 extern lv_font_t font_32;
