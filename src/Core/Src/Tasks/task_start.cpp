@@ -7,6 +7,7 @@
 #include "Font/myfont.h"
 #include "Flash/w25q64.h"
 #include "Show/show.h"
+#include "Pic/png.h"
 
 /* BSP LCD driver */
 #include "stm32_adafruit_lcd.h"
@@ -135,6 +136,11 @@ void StartDefaultTask(void *argument) {
     load_font();
 
     info_close();
+
+    FIL *file = (FIL *)malloc(sizeof(FIL));
+    f_open(file, "0:/test1.png", FA_READ);
+
+    dec_png(file);
 
     lv_obj_t *label1 = lv_label_create(lv_scr_act());
     lv_obj_set_style_text_font(label1, &font_16.font, 0);
