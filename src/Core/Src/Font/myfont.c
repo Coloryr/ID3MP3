@@ -342,7 +342,7 @@ void load_font() {
     uint32_t pos = FONT_ADDR;
     FRESULT res;
 
-    lv_font_load("0:/font/sy16.font");
+    // lv_font_load("0:/font/sy16.font");
 
     // W25QXX_Erase_Chip();
 
