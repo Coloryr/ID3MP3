@@ -396,101 +396,101 @@ void load_font() {
 
     pos = FONT_ADDR + font_16_length;
 
-//    if (temp[5] != 24) {
-//        res = f_open(&font_file, "0:/font/24.font", FA_READ);
-//        if (res != FR_OK) {
-//            lv_label_set_text(info, "no file 24.font");
-//            while (1);
-//        }
-//        now = 0;
-//        for (;;) {
-//            res = f_read(&font_file, data_temp, TEMP_L, (UINT *) &len);
-//            if (res != FR_OK) {
-//                lv_label_set_text_fmt(info, "file 24.font error res:%d", res);
-//                while (1);
-//            }
-//            W25QXX_Write(data_temp, pos + now, len);
-//            if (len == 0)
-//                break;
-//            now += len;
-//            if (now == font_file.obj.objsize)
-//                break;
-//
-//            lv_label_set_text_fmt(info, "init font 24.. %d/%d", font_file.obj.objsize, now);
-//        }
-//        if (now != font_file.obj.objsize) {
-//            lv_label_set_text(info, "init font 24 error:size check fail");
-//            while (1);
-//        }
-//
-//        lv_label_set_text(info, "init font 16 done.");
-//
-//        f_close(&font_file);
-//
-//        font_24_length = cov.u32 = now + 10;
-//        write_temp[0] = 24;
-//        write_temp[1] = cov.u8[0];
-//        write_temp[2] = cov.u8[1];
-//        write_temp[3] = cov.u8[2];
-//        write_temp[4] = cov.u8[3];
-//        osDelay(10);
-//        W25QXX_Write(write_temp, SAVE_ADDR + 5, 5);
-//    } else {
-//        cov.u8[0] = temp[6];
-//        cov.u8[1] = temp[7];
-//        cov.u8[2] = temp[8];
-//        cov.u8[3] = temp[9];
-//        font_24_length = cov.u32;
-//    }
-//
-//    pos = FONT_ADDR + font_16_length + font_24_length;
-//
-//    if (temp[10] != 32) {
-//        res = f_open(&font_file, "0:/font/32.font", FA_READ);
-//        if (res != FR_OK) {
-//            lv_label_set_text(info, "no file 32.font");
-//            while (1);
-//        }
-//        now = 0;
-//        for (;;) {
-//            res = f_read(&font_file, data_temp, TEMP_L, (UINT *) &len);
-//            if (res != FR_OK) {
-//                lv_label_set_text_fmt(info, "file 32.font error res:%d", res);
-//                while (1);
-//            }
-//            W25QXX_Write(data_temp, pos + now, len);
-//            if (len == 0)
-//                break;
-//            now += len;
-//            if(now == font_file.obj.objsize)
-//                break;
-//
-//            lv_label_set_text_fmt(info, "init font 32.. %d/%d", font_file.obj.objsize, now);
-//        }
-//        if(now != font_file.obj.objsize) {
-//            lv_label_set_text(info, "init font 32 error:size check fail");
-//            while (1);
-//        }
-//
-//        lv_label_set_text(info, "init font 32 done.");
-//
-//        f_close(&font_file);
-//
-//        font_32_length = cov.u32 = now + 10;
-//        write_temp[0] = 32;
-//        write_temp[1] = cov.u8[0];
-//        write_temp[2] = cov.u8[1];
-//        write_temp[3] = cov.u8[2];
-//        write_temp[4] = cov.u8[3];
-//        osDelay(10);
-//        W25QXX_Write(write_temp, SAVE_ADDR + 10, 5);
-//    } else {
-//        cov.u8[0] = temp[11];
-//        cov.u8[1] = temp[12];
-//        cov.u8[2] = temp[13];
-//        cov.u8[3] = temp[14];
-//        font_32_length = cov.u32;
-//    }
+    if (temp[5] != 24) {
+        res = f_open(&font_file, "0:/font/24.font", FA_READ);
+        if (res != FR_OK) {
+            lv_label_set_text(info, "no file 24.font");
+            while (1);
+        }
+        now = 0;
+        for (;;) {
+            res = f_read(&font_file, data_temp, TEMP_L, (UINT *) &len);
+            if (res != FR_OK) {
+                lv_label_set_text_fmt(info, "file 24.font error res:%d", res);
+                while (1);
+            }
+            W25QXX_Write(data_temp, pos + now, len);
+            if (len == 0)
+                break;
+            now += len;
+            if (now == font_file.obj.objsize)
+                break;
+
+            lv_label_set_text_fmt(info, "init font 24.. %d/%d", font_file.obj.objsize, now);
+        }
+        if (now != font_file.obj.objsize) {
+            lv_label_set_text(info, "init font 24 error:size check fail");
+            while (1);
+        }
+
+        lv_label_set_text(info, "init font 16 done.");
+
+        f_close(&font_file);
+
+        font_24_length = cov.u32 = now + 10;
+        write_temp[0] = 24;
+        write_temp[1] = cov.u8[0];
+        write_temp[2] = cov.u8[1];
+        write_temp[3] = cov.u8[2];
+        write_temp[4] = cov.u8[3];
+        osDelay(10);
+        W25QXX_Write(write_temp, SAVE_ADDR + 5, 5);
+    } else {
+        cov.u8[0] = temp[6];
+        cov.u8[1] = temp[7];
+        cov.u8[2] = temp[8];
+        cov.u8[3] = temp[9];
+        font_24_length = cov.u32;
+    }
+
+    pos = FONT_ADDR + font_16_length + font_24_length;
+
+    if (temp[10] != 32) {
+        res = f_open(&font_file, "0:/font/32.font", FA_READ);
+        if (res != FR_OK) {
+            lv_label_set_text(info, "no file 32.font");
+            while (1);
+        }
+        now = 0;
+        for (;;) {
+            res = f_read(&font_file, data_temp, TEMP_L, (UINT *) &len);
+            if (res != FR_OK) {
+                lv_label_set_text_fmt(info, "file 32.font error res:%d", res);
+                while (1);
+            }
+            W25QXX_Write(data_temp, pos + now, len);
+            if (len == 0)
+                break;
+            now += len;
+            if(now == font_file.obj.objsize)
+                break;
+
+            lv_label_set_text_fmt(info, "init font 32.. %d/%d", font_file.obj.objsize, now);
+        }
+        if(now != font_file.obj.objsize) {
+            lv_label_set_text(info, "init font 32 error:size check fail");
+            while (1);
+        }
+
+        lv_label_set_text(info, "init font 32 done.");
+
+        f_close(&font_file);
+
+        font_32_length = cov.u32 = now + 10;
+        write_temp[0] = 32;
+        write_temp[1] = cov.u8[0];
+        write_temp[2] = cov.u8[1];
+        write_temp[3] = cov.u8[2];
+        write_temp[4] = cov.u8[3];
+        osDelay(10);
+        W25QXX_Write(write_temp, SAVE_ADDR + 10, 5);
+    } else {
+        cov.u8[0] = temp[11];
+        cov.u8[1] = temp[12];
+        cov.u8[2] = temp[13];
+        cov.u8[3] = temp[14];
+        font_32_length = cov.u32;
+    }
 
     font_16.get_glyph_dsc = my_get_glyph_dsc_cb;
     font_16.get_glyph_bitmap = my_get_glyph_bitmap_cb;
@@ -508,8 +508,8 @@ void load_font() {
     font_32_dsc.cache = &font_32_cache;
 
     font_load(&font_16, FONT_ADDR);
-//    font_load(&font_24, FONT_ADDR + font_16_length);
-//    font_load(&font_32, FONT_ADDR + font_24_length);
+    font_load(&font_24, FONT_ADDR + font_16_length);
+    font_load(&font_32, FONT_ADDR + font_16_length + font_24_length);
 }
 
 static void font_load(lv_font_t * font, uint32_t local) {
