@@ -4,6 +4,7 @@
 #include "fatfs.h"
 #include "Flash/qspi.h"
 #include "Flash/w25q64.h"
+#include "crc.h"
 
 /* BSP LCD driver */
 #include "stm32_adafruit_lcd.h"
@@ -13,6 +14,7 @@
 QSPI_HandleTypeDef hqspi;
 SD_HandleTypeDef hsd1;
 SRAM_HandleTypeDef hsram1;
+CRC_HandleTypeDef hcrc;
 
 void MPU_Config() {
 
@@ -43,6 +45,41 @@ void MPU_Config() {
     MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
+}
+
+/**
+  * @brief CRC Initialization Function
+  * @param None
+  * @retval None
+  */
+void MX_CRC_Init()
+{
+
+    /* USER CODE BEGIN CRC_Init 0 */
+
+    /* USER CODE END CRC_Init 0 */
+
+    /* USER CODE BEGIN CRC_Init 1 */
+
+    /* USER CODE END CRC_Init 1 */
+    __HAL_RCC_CRC_CLK_ENABLE();
+    hcrc.Instance = CRC;
+    hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE;
+    hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_DISABLE;
+    hcrc.Init.CRCLength = CRC_POLYLENGTH_32B;
+    hcrc.Init.InitValue = 0xFFFFFFFF;
+    hcrc.Init.GeneratingPolynomial = 0x04C11DB7;
+    hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_BYTE;
+    hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_ENABLE;
+    hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
+    if (HAL_CRC_Init(&hcrc) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN CRC_Init 2 */
+
+    /* USER CODE END CRC_Init 2 */
+
 }
 
 /**
@@ -138,7 +175,7 @@ void MX_QUADSPI_Init() {
     hqspi.Init.ClockPrescaler = 1;
     hqspi.Init.FifoThreshold = 8;
     hqspi.Init.SampleShifting = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
-    hqspi.Init.FlashSize = POSITION_VAL(0X1000000)-1;
+    hqspi.Init.FlashSize = POSITION_VAL(0X1000000) - 1;
     hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_5_CYCLE;
     hqspi.Init.ClockMode = QSPI_CLOCK_MODE_0;
     hqspi.Init.FlashID = QSPI_FLASH_ID_1;
@@ -406,7 +443,7 @@ void MX_GPIO_Init() {
     LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
-void init(){
+void init() {
     MPU_Config();
     SCB_EnableICache();
     SCB_EnableDCache();
@@ -420,7 +457,6 @@ void init(){
     MX_SPI1_Init();
     MX_USART1_Init();
     MX_FATFS_Init();
-
+    MX_CRC_Init();
     BSP_LCD_Init();
-    //    BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
 }

@@ -36,22 +36,22 @@ const osThreadAttr_t defaultTask_attributes = {
 };
 
 void LCD_LOOP(void *argument) {
-    for(;;){
+    for (;;) {
         lv_tick_inc(1);
         lv_task_handler();
         osDelay(1);
     }
 }
 
-FRESULT res;
-
 #define DISP_HOR_RES 480
 #define DISP_VER_RES 320
 
-ramfast static lv_disp_draw_buf_t draw_buf;
-ram2 static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 2];                        /*Declare a buffer for 1/10 screen size*/
+#define DISP_BUFF_SIZE DISP_HOR_RES * DISP_VER_RES / 2
 
-void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * color_p) {
+ramfast static lv_disp_draw_buf_t draw_buf;
+ram2 static lv_color_t buf1[DISP_BUFF_SIZE];
+
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
     uint16_t Xpos, Ypos, Xsize, Ysize, count;
     Xpos = area->x1;
     Ypos = area->y1;
@@ -79,19 +79,17 @@ void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * co
 //
 //}
 
-static void set_angle(void * img, int32_t v)
-{
-    lv_img_set_angle((lv_obj_t*)img, v);
+static void set_angle(void *img, int32_t v) {
+    lv_img_set_angle((lv_obj_t *) img, v);
 }
 
-static void set_zoom(void * img, int32_t v)
-{
-    lv_img_set_zoom((lv_obj_t*)img, v);
+static void set_zoom(void *img, int32_t v) {
+    lv_img_set_zoom((lv_obj_t *) img, v);
 }
 
 void Lvgl_Config() {
     lv_init();
-    lv_disp_draw_buf_init(&draw_buf, buf1, NULL, DISP_HOR_RES * DISP_VER_RES / 10);  /*Initialize the display buffer.*/
+    lv_disp_draw_buf_init(&draw_buf, buf1, NULL, DISP_BUFF_SIZE);  /*Initialize the display buffer.*/
 
     static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
     lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
@@ -109,17 +107,23 @@ void Lvgl_Config() {
 }
 
 void Fatfs_Config() {
-    res = f_mount(&SDFatFS, SDPath, 1);
+    FRESULT res = f_mount(&SDFatFS, SDPath, 1);
+    if (res != FR_OK) {
+        lv_label_set_text_fmt(info, "fatfs error:%d", res);
+        while (1);
+    }
 }
 
 void flash_config() {
     uint8_t datatemp[32];
     W25QXX_Write((uint8_t *) "test", 0x0, 4);
 
-    W25QXX_Read(datatemp,  0x0, 4);
+    W25QXX_Read(datatemp, 0x0, 4);
 }
 
 void StartDefaultTask(void *argument) {
+    FIL *file;
+    FRESULT res;
     ledTask = osThreadNew(task_led, nullptr, &ledTask_attributes);
     lcdTask = osThreadNew(LCD_LOOP, nullptr, &lcdTask_attributes);
 
@@ -137,9 +141,12 @@ void StartDefaultTask(void *argument) {
 
     info_close();
 
-    FIL *file = (FIL *)malloc(sizeof(FIL));
-    f_open(file, "0:/test1.png", FA_READ);
-
+    file = (FIL *) malloc(sizeof(FIL));
+    res = f_open(file, "0:test1.png", FA_READ);
+    if(res!=FR_OK) {
+        lv_label_set_text(info, "file open fail");
+        while (1);
+    }
     dec_png(file);
 
     lv_obj_t *label1 = lv_label_create(lv_scr_act());

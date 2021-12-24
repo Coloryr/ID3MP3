@@ -199,8 +199,9 @@ int gif_getnextcode(FIL *gfile, gif89a *gif) {
     i = gif->lzw->CurBit >> 3;
     if (i == j)Result = (long) gif->lzw->aBuffer[i];
     else if (i + 1 == j)Result = (long) gif->lzw->aBuffer[i] | ((long) gif->lzw->aBuffer[i + 1] << 8);
-    else Result = (long) gif->lzw->aBuffer[i] | ((long) gif->lzw->aBuffer[i + 1] << 8) |
-                  ((long) gif->lzw->aBuffer[i + 2] << 16);
+    else
+        Result = (long) gif->lzw->aBuffer[i] | ((long) gif->lzw->aBuffer[i + 1] << 8) |
+                 ((long) gif->lzw->aBuffer[i + 2] << 16);
     Result = (Result >> (gif->lzw->CurBit & 0x7)) & _aMaskTbl[gif->lzw->CodeSize];
     gif->lzw->CurBit += gif->lzw->CodeSize;
     return (int) Result;

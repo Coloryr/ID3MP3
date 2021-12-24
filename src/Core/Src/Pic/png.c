@@ -16,7 +16,7 @@ void dec_png(FIL *file) {
         res = upng_header(upng);
         width = upng_get_width(upng);
         height = upng_get_height(upng);
-        uint16_t *out = malloc(sizeof(uint16_t) * width * height);
+        uint16_t *out = malloc(sizeof(uint16_t) * 4096);
 
         upng_decode(upng, out);
         if (upng_get_error(upng) != UPNG_EOK) {

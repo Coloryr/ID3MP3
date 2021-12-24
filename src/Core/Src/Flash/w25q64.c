@@ -143,7 +143,7 @@ uint16_t W25QXX_ReadID() {
 }
 
 void W25QXX_Read(uint8_t *pBuffer, uint32_t ReadAddr, uint16_t NumByteToRead) {
-    if(ReadAddr > MAX_LENGTH) {
+    if (ReadAddr > MAX_LENGTH) {
         info_show();
         lv_label_set_text_fmt(info, "W25Qxx read error:out of size %d,max:%d", ReadAddr, MAX_LENGTH);
         return;
@@ -199,7 +199,7 @@ void W25QXX_Write(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
     uint16_t i;
     uint8_t *W25QXX_BUF;
 
-    if(WriteAddr > MAX_LENGTH) {
+    if (WriteAddr > MAX_LENGTH) {
         info_show();
         lv_label_set_text_fmt(info, "W25Qxx read error:out of size %d,max:%d", WriteAddr, MAX_LENGTH);
         return;

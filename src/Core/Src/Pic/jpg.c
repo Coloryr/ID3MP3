@@ -45,18 +45,19 @@ UINT jpeg_in_func(JDEC *jd, uint8_t *buf, UINT num) {
 //rect:等待输出的矩形图像的参数
 //返回值:1,输出成功;
 int jpeg_out_func_fill(JDEC *jd, void *rgbbuf, JRECT *rect) {
-    uint8_t *s = (uint8_t*)rgbbuf;
-    uint16_t w, *d = (uint16_t*)s;
+    uint8_t *s = (uint8_t *) rgbbuf;
+    uint16_t w, *d = (uint16_t *) s;
     uint16_t width = rect->right - rect->left + 1;        //填充的宽度
     uint16_t height = rect->bottom - rect->top + 1;    //填充的高度
     unsigned int n = width * height;
     do {
-        w = (*s++ & 0xF8) << 8;		/* RRRRR----------- */
-        w |= (*s++ & 0xFC) << 3;	/* -----GGGGGG----- */
-        w |= *s++ >> 3;				/* -----------BBBBB */
+        w = (*s++ & 0xF8) << 8;        /* RRRRR----------- */
+        w |= (*s++ & 0xFC) << 3;    /* -----GGGGGG----- */
+        w |= *s++ >> 3;                /* -----------BBBBB */
         *d++ = w;
     } while (--n);
-    pic_phy.fillcolor(rect->left + picinfo.S_XOFF, rect->top + picinfo.S_YOFF, width, height, (uint16_t*)rgbbuf);//颜色填充
+    pic_phy.fillcolor(rect->left + picinfo.S_XOFF, rect->top + picinfo.S_YOFF, width, height,
+                      (uint16_t *) rgbbuf);//颜色填充
     return 1;    //返回1,使得解码工作继续执行
 }
 
@@ -71,16 +72,16 @@ int jpeg_out_func_point(JDEC *jd, void *rgbbuf, JRECT *rect) {
     uint16_t width = rect->right - rect->left + 1;        //图片的宽度
     uint16_t height = rect->bottom - rect->top + 1;    //图片的高度
 
-    uint8_t *s = (uint8_t*)rgbbuf;
-    uint16_t w, *d = (uint16_t*)s;
+    uint8_t *s = (uint8_t *) rgbbuf;
+    uint16_t w, *d = (uint16_t *) s;
     unsigned int n = width * height;
     do {
-        w = (*s++ & 0xF8) << 8;		/* RRRRR----------- */
-        w |= (*s++ & 0xFC) << 3;	/* -----GGGGGG----- */
-        w |= *s++ >> 3;				/* -----------BBBBB */
+        w = (*s++ & 0xF8) << 8;        /* RRRRR----------- */
+        w |= (*s++ & 0xFC) << 3;    /* -----GGGGGG----- */
+        w |= *s++ >> 3;                /* -----------BBBBB */
         *d++ = w;
     } while (--n);
-    uint16_t* color =(uint16_t*) rgbbuf;
+    uint16_t *color = (uint16_t *) rgbbuf;
     for (i = 0; i < height; i++)//y坐标
     {
         realy = (picinfo.Div_Fac * (rect->top + i)) >> 13;//实际Y坐标
@@ -119,7 +120,7 @@ uint8_t jpg_get_size(const uint8_t *filename, uint32_t *width, uint32_t *height)
         if (res == FR_OK)//打开文件成功
         {
             res = jd_prepare(jpeg_dev, jpeg_in_func, jpg_buffer, JPEG_WBUF_SIZE,
-                              f_jpeg);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
+                             f_jpeg);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
             if (res == JDR_OK)//准备解码成功,即获取到了图片的宽度和高度.返回正确的宽度和高度
             {
                 *width = jpeg_dev->width;
@@ -147,8 +148,8 @@ uint8_t jpg_decode(const uint8_t *filename) {
         if (res == FR_OK)//打开文件成功
         {
             res = jd_prepare(jpeg_dev, jpeg_in_func, jpg_buffer, JPEG_WBUF_SIZE,
-                              f_jpeg);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
-            outfun=jpeg_out_func_point;//默认采用画点的方式显示
+                             f_jpeg);//执行解码的准备工作，调用TjpgDec模块的jd_prepare函数
+            outfun = jpeg_out_func_point;//默认采用画点的方式显示
             if (res == JDR_OK)//准备解码成功
             {
                 for (scale = 0; scale < 4; scale++)//确定输出图像的比例因子
@@ -159,7 +160,7 @@ uint8_t jpg_decode(const uint8_t *filename) {
                         if (((jpeg_dev->width >> scale) != picinfo.S_Width) &&
                             ((jpeg_dev->height >> scale) != picinfo.S_Height && scale))
                             scale = 0;//不能贴边,则不缩放
-                        else outfun=jpeg_out_func_fill;	//在显示尺寸以内,可以采用填充的方式显示
+                        else outfun = jpeg_out_func_fill;    //在显示尺寸以内,可以采用填充的方式显示
                         break;
                     }
                 }

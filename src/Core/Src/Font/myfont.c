@@ -16,10 +16,10 @@
 
 #define SAVE_BIT 67
 
-union font_len_cov {
+typedef union {
     uint32_t u32;
     uint8_t u8[4];
-};
+}font_len_cov;
 
 typedef struct cmap_table_bin {
     uint32_t data_offset;
@@ -32,37 +32,51 @@ typedef struct cmap_table_bin {
 } cmap_table_bin_t;
 
 typedef struct {
-    w25qxx_utils * fp;
+    w25qxx_utils *fp;
     int8_t bit_pos;
     uint8_t byte_value;
 } bit_iterator_t;
 
-static int32_t font_read_label(w25qxx_utils *head, uint32_t start, const char * label);
+static int32_t font_read_label(w25qxx_utils *head, uint32_t start, const char *label);
+
 static void font_load(my_font_data *font, uint32_t local);
-static int32_t font_load_cmaps(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_dsc, uint32_t cmaps_start);
-static bool font_load_cmaps_tables(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_dsc,
-                                   uint32_t cmaps_start, cmap_table_bin_t * cmap_table);
-static int32_t font_load_kern(w25qxx_utils * head, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start);
-static int32_t font_load_glyph(w25qxx_utils * head, uint32_t start);
-static bit_iterator_t font_init_bit_iterator(w25qxx_utils * fp);
-static unsigned int font_read_bits(bit_iterator_t * it, int n_bits);
-static int font_read_bits_signed(bit_iterator_t * it, int n_bits);
-static uint32_t font_get_glyph_dsc_id(const lv_font_t * font, uint32_t letter);
-static int32_t font_unicode_list_compare(const void * ref, const void * element);
-static int32_t font_kern_pair_16_compare(const void * ref, const void * element);
-static int32_t font_kern_pair_8_compare(const void * ref, const void * element);
-static int8_t font_get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right);
+
+static int32_t font_load_cmaps(w25qxx_utils *head, lv_font_fmt_txt_dsc_t *font_dsc, uint32_t cmaps_start);
+
+static bool font_load_cmaps_tables(w25qxx_utils *head, lv_font_fmt_txt_dsc_t *font_dsc,
+                                   uint32_t cmaps_start, cmap_table_bin_t *cmap_table);
+
+static int32_t font_load_kern(w25qxx_utils *head, lv_font_fmt_txt_dsc_t *font_dsc, uint8_t format, uint32_t start);
+
+static int32_t font_load_glyph(w25qxx_utils *head, uint32_t start);
+
+static bit_iterator_t font_init_bit_iterator(w25qxx_utils *fp);
+
+static unsigned int font_read_bits(bit_iterator_t *it, int n_bits);
+
+static int font_read_bits_signed(bit_iterator_t *it, int n_bits);
+
+static uint32_t font_get_glyph_dsc_id(const lv_font_t *font, uint32_t letter);
+
+static int32_t font_unicode_list_compare(const void *ref, const void *element);
+
+static int32_t font_kern_pair_16_compare(const void *ref, const void *element);
+
+static int32_t font_kern_pair_8_compare(const void *ref, const void *element);
+
+static int8_t font_get_kern_value(const lv_font_t *font, uint32_t gid_left, uint32_t gid_right);
 
 ramfast FIL font_file;
-ramfast uint8_t data_temp[TEMP_L];
 
 ramfast my_font_data font_16;
 ramfast my_font_data font_24;
 ramfast my_font_data font_32;
 
-ramfast union font_len_cov cov;
+ramfast font_len_cov cov;
 
-void font_get_glyph_dsc(const lv_font_t * font, uint32_t gid, lv_font_fmt_txt_glyph_dsc_t* gdsc){
+uint8_t data_temp[TEMP_L];
+
+void font_get_glyph_dsc(const lv_font_t *font, uint32_t gid, lv_font_fmt_txt_glyph_dsc_t *gdsc) {
     w25qxx_utils *head = malloc(sizeof(w25qxx_utils));
     my_font_data *font_data;
 
@@ -107,22 +121,23 @@ void font_get_glyph_dsc(const lv_font_t * font, uint32_t gid, lv_font_fmt_txt_gl
     free(head);
 }
 
-bool my_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter, uint32_t unicode_letter_next) {
+bool my_get_glyph_dsc_cb(const lv_font_t *font, lv_font_glyph_dsc_t *dsc_out, uint32_t unicode_letter,
+                         uint32_t unicode_letter_next) {
     bool is_tab = false;
-    if(unicode_letter == '\t') {
+    if (unicode_letter == '\t') {
         unicode_letter = ' ';
         is_tab = true;
     }
 
     uint32_t gid = font_get_glyph_dsc_id(font, unicode_letter);
-    if(!gid) return NULL;
+    if (!gid) return NULL;
 
-    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    lv_font_fmt_txt_dsc_t *fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
 
     int8_t kvalue = 0;
-    if(fdsc->kern_dsc) {
+    if (fdsc->kern_dsc) {
         uint32_t gid_next = font_get_glyph_dsc_id(font, unicode_letter_next);
-        if(gid_next) {
+        if (gid_next) {
             kvalue = font_get_kern_value(font, gid, gid_next);
         }
     }
@@ -130,29 +145,29 @@ bool my_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, 
     lv_font_fmt_txt_glyph_dsc_t *gdsc = malloc(sizeof(lv_font_fmt_txt_glyph_dsc_t));
     font_get_glyph_dsc(font, gid, gdsc);
 
-    int32_t kv = ((int32_t)((int32_t)kvalue * fdsc->kern_scale) >> 4);
+    int32_t kv = ((int32_t) ((int32_t) kvalue * fdsc->kern_scale) >> 4);
 
     uint32_t adv_w = gdsc->adv_w;
-    if(is_tab) adv_w *= 2;
+    if (is_tab) adv_w *= 2;
 
     adv_w += kv;
-    adv_w  = (adv_w + (1 << 3)) >> 4;
+    adv_w = (adv_w + (1 << 3)) >> 4;
 
     dsc_out->adv_w = adv_w;
     dsc_out->box_h = gdsc->box_h;
     dsc_out->box_w = gdsc->box_w;
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
-    dsc_out->bpp   = (uint8_t)fdsc->bpp;
+    dsc_out->bpp = (uint8_t) fdsc->bpp;
 
-    if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
+    if (is_tab) dsc_out->box_w = dsc_out->box_w * 2;
 
     free(gdsc);
 
     return true;
 }
 
-const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter) {
+const uint8_t *my_get_glyph_bitmap_cb(const lv_font_t *font, uint32_t unicode_letter) {
     w25qxx_utils *head = malloc(sizeof(w25qxx_utils));
     uint32_t next;
     uint32_t now;
@@ -161,7 +176,7 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
     int nbits;
     uint32_t next_offset;
     uint32_t bmp_size;
-    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    lv_font_fmt_txt_dsc_t *fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
     my_font_data *font_data;
 
     if (font == &font_16.font) {
@@ -175,10 +190,10 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
         head->local = FONT_ADDR + font_16.length + font_24.length;
     }
 
-    if(unicode_letter == '\t') unicode_letter = ' ';
+    if (unicode_letter == '\t') unicode_letter = ' ';
 
     gid = font_get_glyph_dsc_id(font, unicode_letter);
-    if(!gid) return NULL;
+    if (!gid) return NULL;
 
     if (font_data->header_bin.index_to_loc_format == 0) {
         head->pos = font_data->loca_start + gid * sizeof(uint16_t);
@@ -194,15 +209,15 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
 
     bit_it = font_init_bit_iterator(head);
 
-    nbits = font_data->header_bin.advance_width_bits + 2 * font_data->header_bin.xy_bits + 2 * font_data->header_bin.wh_bits;
+    nbits = font_data->header_bin.advance_width_bits + 2 * font_data->header_bin.xy_bits +
+            2 * font_data->header_bin.wh_bits;
 
     font_read_bits(&bit_it, nbits);
 
-    if(gid < font_data->loca_count){
+    if (gid < font_data->loca_count) {
         next = font_data->glyph_start + next;
         next_offset = next;
-    }
-    else {
+    } else {
         next_offset = font_data->glyph_length;
     }
 
@@ -220,7 +235,7 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
         font_data->glyph_bmp[bmp_size - 1] = font_data->glyph_bmp[bmp_size - 1] << (nbits % 8);
     }
 
-    if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+    if (fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
         return font_data->glyph_bmp;
     }
 
@@ -229,7 +244,7 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
     return NULL;
 }
 
-uint32_t write_font(uint32_t pos, uint32_t addr, const char * path){
+uint32_t write_font(uint32_t pos, uint32_t addr, const char *path) {
     FRESULT res;
     uint16_t len;
     uint32_t now;
@@ -394,12 +409,11 @@ static void font_load(my_font_data *font, uint32_t local) {
     }
 }
 
-static int32_t font_load_glyph(w25qxx_utils * head, uint32_t start)
-{
+static int32_t font_load_glyph(w25qxx_utils *head, uint32_t start) {
     return font_read_label(head, start, "glyf");
 }
 
-static int32_t font_read_label(w25qxx_utils *head, uint32_t start, const char * label) {
+static int32_t font_read_label(w25qxx_utils *head, uint32_t start, const char *label) {
     uint32_t length;
     uint8_t buf[8];
     uint8_t i;
@@ -421,8 +435,8 @@ static int32_t font_read_label(w25qxx_utils *head, uint32_t start, const char * 
     return length;
 }
 
-static bool font_load_cmaps_tables(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_dsc,
-                            uint32_t cmaps_start, cmap_table_bin_t * cmap_table) {
+static bool font_load_cmaps_tables(w25qxx_utils *head, lv_font_fmt_txt_dsc_t *font_dsc,
+                                   uint32_t cmaps_start, cmap_table_bin_t *cmap_table) {
     W25QXX_Read_Utils(head, cmap_table, font_dsc->cmap_num * sizeof(cmap_table_bin_t));
     for (unsigned int i = 0; i < font_dsc->cmap_num; ++i) {
         head->pos = cmaps_start + cmap_table[i].data_offset;
@@ -474,7 +488,7 @@ static bool font_load_cmaps_tables(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * f
     return true;
 }
 
-static int32_t font_load_cmaps(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_dsc, uint32_t cmaps_start) {
+static int32_t font_load_cmaps(w25qxx_utils *head, lv_font_fmt_txt_dsc_t *font_dsc, uint32_t cmaps_start) {
     int32_t cmaps_length = font_read_label(head, cmaps_start, "cmap");
     if (cmaps_length < 0) {
         return -1;
@@ -500,7 +514,7 @@ static int32_t font_load_cmaps(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_
     return success ? cmaps_length : -1;
 }
 
-static int32_t font_load_kern(w25qxx_utils * head, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start) {
+static int32_t font_load_kern(w25qxx_utils *head, lv_font_fmt_txt_dsc_t *font_dsc, uint8_t format, uint32_t start) {
     int32_t kern_length = font_read_label(head, start, "kern");
     if (kern_length < 0) {
         return -1;
@@ -579,8 +593,7 @@ static int32_t font_load_kern(w25qxx_utils * head, lv_font_fmt_txt_dsc_t * font_
     return kern_length;
 }
 
-static bit_iterator_t font_init_bit_iterator(w25qxx_utils * fp)
-{
+static bit_iterator_t font_init_bit_iterator(w25qxx_utils *fp) {
     bit_iterator_t it;
     it.fp = fp;
     it.bit_pos = -1;
@@ -588,7 +601,7 @@ static bit_iterator_t font_init_bit_iterator(w25qxx_utils * fp)
     return it;
 }
 
-static unsigned int font_read_bits(bit_iterator_t * it, int n_bits) {
+static unsigned int font_read_bits(bit_iterator_t *it, int n_bits) {
     unsigned int value = 0;
     while (n_bits--) {
         it->byte_value = it->byte_value << 1;
@@ -596,7 +609,7 @@ static unsigned int font_read_bits(bit_iterator_t * it, int n_bits) {
 
         if (it->bit_pos < 0) {
             it->bit_pos = 7;
-            W25QXX_Read_Utils(it->fp,  &(it->byte_value), 1);
+            W25QXX_Read_Utils(it->fp, &(it->byte_value), 1);
         }
         int8_t bit = (it->byte_value & 0x80) ? 1 : 0;
 
@@ -605,7 +618,7 @@ static unsigned int font_read_bits(bit_iterator_t * it, int n_bits) {
     return value;
 }
 
-static int font_read_bits_signed(bit_iterator_t * it, int n_bits) {
+static int font_read_bits_signed(bit_iterator_t *it, int n_bits) {
     unsigned int value = font_read_bits(it, n_bits);
     if (value & (1 << (n_bits - 1))) {
         value |= ~0u << n_bits;
@@ -613,60 +626,56 @@ static int font_read_bits_signed(bit_iterator_t * it, int n_bits) {
     return value;
 }
 
-static uint32_t font_get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
-{
-    if(letter == '\0') return 0;
+static uint32_t font_get_glyph_dsc_id(const lv_font_t *font, uint32_t letter) {
+    if (letter == '\0') return 0;
 
-    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    lv_font_fmt_txt_dsc_t *fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
 
     /*Check the cache first*/
-    if(fdsc->cache && letter == fdsc->cache->last_letter) return fdsc->cache->last_glyph_id;
+    if (fdsc->cache && letter == fdsc->cache->last_letter) return fdsc->cache->last_glyph_id;
 
     uint16_t i;
-    for(i = 0; i < fdsc->cmap_num; i++) {
+    for (i = 0; i < fdsc->cmap_num; i++) {
 
         /*Relative code point*/
         uint32_t rcp = letter - fdsc->cmaps[i].range_start;
-        if(rcp > fdsc->cmaps[i].range_length) continue;
+        if (rcp > fdsc->cmaps[i].range_length) continue;
         uint32_t glyph_id = 0;
-        if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY) {
+        if (fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY) {
             glyph_id = fdsc->cmaps[i].glyph_id_start + rcp;
-        }
-        else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL) {
-            const uint8_t * gid_ofs_8 = fdsc->cmaps[i].glyph_id_ofs_list;
+        } else if (fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL) {
+            const uint8_t *gid_ofs_8 = fdsc->cmaps[i].glyph_id_ofs_list;
             glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_8[rcp];
-        }
-        else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
+        } else if (fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
             uint16_t key = rcp;
-            uint16_t * p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
-                                             sizeof(fdsc->cmaps[i].unicode_list[0]), font_unicode_list_compare);
+            uint16_t *p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+                                            sizeof(fdsc->cmaps[i].unicode_list[0]), font_unicode_list_compare);
 
-            if(p) {
+            if (p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
                 glyph_id = fdsc->cmaps[i].glyph_id_start + ofs;
             }
-        }
-        else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
+        } else if (fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
             uint16_t key = rcp;
-            uint16_t * p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
-                                             sizeof(fdsc->cmaps[i].unicode_list[0]), font_unicode_list_compare);
+            uint16_t *p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+                                            sizeof(fdsc->cmaps[i].unicode_list[0]), font_unicode_list_compare);
 
-            if(p) {
+            if (p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
-                const uint16_t * gid_ofs_16 = fdsc->cmaps[i].glyph_id_ofs_list;
+                const uint16_t *gid_ofs_16 = fdsc->cmaps[i].glyph_id_ofs_list;
                 glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_16[ofs];
             }
         }
 
         /*Update the cache*/
-        if(fdsc->cache) {
+        if (fdsc->cache) {
             fdsc->cache->last_letter = letter;
             fdsc->cache->last_glyph_id = glyph_id;
         }
         return glyph_id;
     }
 
-    if(fdsc->cache) {
+    if (fdsc->cache) {
         fdsc->cache->last_letter = letter;
         fdsc->cache->last_glyph_id = 0;
     }
@@ -674,60 +683,55 @@ static uint32_t font_get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
 }
 
-static int32_t font_unicode_list_compare(const void * ref, const void * element)
-{
-    return ((int32_t)(*(uint16_t *)ref)) - ((int32_t)(*(uint16_t *)element));
+static int32_t font_unicode_list_compare(const void *ref, const void *element) {
+    return ((int32_t) (*(uint16_t *) ref)) - ((int32_t) (*(uint16_t *) element));
 }
 
-static int8_t font_get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right)
-{
-    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+static int8_t font_get_kern_value(const lv_font_t *font, uint32_t gid_left, uint32_t gid_right) {
+    lv_font_fmt_txt_dsc_t *fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
 
     int8_t value = 0;
 
-    if(fdsc->kern_classes == 0) {
+    if (fdsc->kern_classes == 0) {
         /*Kern pairs*/
-        const lv_font_fmt_txt_kern_pair_t * kdsc = fdsc->kern_dsc;
-        if(kdsc->glyph_ids_size == 0) {
+        const lv_font_fmt_txt_kern_pair_t *kdsc = fdsc->kern_dsc;
+        if (kdsc->glyph_ids_size == 0) {
             /*Use binary search to find the kern value.
              *The pairs are ordered left_id first, then right_id secondly.*/
-            const uint16_t * g_ids = kdsc->glyph_ids;
+            const uint16_t *g_ids = kdsc->glyph_ids;
             uint16_t g_id_both = (gid_right << 8) + gid_left; /*Create one number from the ids*/
-            uint16_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, font_kern_pair_8_compare);
+            uint16_t *kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, font_kern_pair_8_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
-            if(kid_p) {
+            if (kid_p) {
                 lv_uintptr_t ofs = kid_p - g_ids;
                 value = kdsc->values[ofs];
             }
-        }
-        else if(kdsc->glyph_ids_size == 1) {
+        } else if (kdsc->glyph_ids_size == 1) {
             /*Use binary search to find the kern value.
              *The pairs are ordered left_id first, then right_id secondly.*/
-            const uint32_t * g_ids = kdsc->glyph_ids;
+            const uint32_t *g_ids = kdsc->glyph_ids;
             uint32_t g_id_both = (gid_right << 16) + gid_left; /*Create one number from the ids*/
-            uint32_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, font_kern_pair_16_compare);
+            uint32_t *kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, font_kern_pair_16_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
-            if(kid_p) {
+            if (kid_p) {
                 lv_uintptr_t ofs = kid_p - g_ids;
                 value = kdsc->values[ofs];
             }
 
-        }
-        else {
+        } else {
             /*Invalid value*/
         }
-    }
-    else {
+    } else {
         /*Kern classes*/
-        const lv_font_fmt_txt_kern_classes_t * kdsc = fdsc->kern_dsc;
+        const lv_font_fmt_txt_kern_classes_t *kdsc = fdsc->kern_dsc;
         uint8_t left_class = kdsc->left_class_mapping[gid_left];
         uint8_t right_class = kdsc->right_class_mapping[gid_right];
 
         /*If class = 0, kerning not exist for that glyph
          *else got the value form `class_pair_values` 2D array*/
-        if(left_class > 0 && right_class > 0) {
+        if (left_class > 0 && right_class > 0) {
             value = kdsc->class_pair_values[(left_class - 1) * kdsc->right_class_cnt + (right_class - 1)];
         }
 
@@ -735,23 +739,21 @@ static int8_t font_get_kern_value(const lv_font_t * font, uint32_t gid_left, uin
     return value;
 }
 
-static int32_t font_kern_pair_8_compare(const void * ref, const void * element)
-{
-    const uint8_t * ref8_p = ref;
-    const uint8_t * element8_p = element;
+static int32_t font_kern_pair_8_compare(const void *ref, const void *element) {
+    const uint8_t *ref8_p = ref;
+    const uint8_t *element8_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref8_p[0] != element8_p[0]) return (int32_t)ref8_p[0] - element8_p[0];
+    if (ref8_p[0] != element8_p[0]) return (int32_t) ref8_p[0] - element8_p[0];
     else return (int32_t) ref8_p[1] - element8_p[1];
 
 }
 
-static int32_t font_kern_pair_16_compare(const void * ref, const void * element)
-{
-    const uint16_t * ref16_p = ref;
-    const uint16_t * element16_p = element;
+static int32_t font_kern_pair_16_compare(const void *ref, const void *element) {
+    const uint16_t *ref16_p = ref;
+    const uint16_t *element16_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref16_p[0] != element16_p[0]) return (int32_t)ref16_p[0] - element16_p[0];
+    if (ref16_p[0] != element16_p[0]) return (int32_t) ref16_p[0] - element16_p[0];
     else return (int32_t) ref16_p[1] - element16_p[1];
 }

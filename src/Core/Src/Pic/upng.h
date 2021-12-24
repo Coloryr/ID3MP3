@@ -30,23 +30,24 @@ freely, subject to the following restrictions:
 #include "fatfs.h"
 
 typedef enum upng_error {
-    UPNG_EOK			= 0, /* success (no error) */
-    UPNG_ENOMEM			= 1, /* memory allocation failed */
-    UPNG_ENOTFOUND		= 2, /* resource not found (file missing) */
-    UPNG_ENOTPNG		= 3, /* image data does not have a PNG header */
-    UPNG_EMALFORMED		= 4, /* image data is not a valid PNG image */
-    UPNG_EUNSUPPORTED	= 5, /* critical PNG chunk type is not supported */
-    UPNG_EUNINTERLACED	= 6, /* image interlacing is not supported */
-    UPNG_EUNFORMAT		= 7, /* image color format is not supported */
-    UPNG_EPARAM			= 8, /* invalid parameter to method call */
+    UPNG_EOK = 0, /* success (no error) */
+    UPNG_ENOMEM = 1, /* memory allocation failed */
+    UPNG_ENOTFOUND = 2, /* resource not found (file missing) */
+    UPNG_ENOTPNG = 3, /* image data does not have a PNG header */
+    UPNG_EMALFORMED = 4, /* image data is not a valid PNG image */
+    UPNG_EUNSUPPORTED = 5, /* critical PNG chunk type is not supported */
+    UPNG_EUNINTERLACED = 6, /* image interlacing is not supported */
+    UPNG_EUNFORMAT = 7, /* image color format is not supported */
+    UPNG_EPARAM = 8, /* invalid parameter to method call */
+    UPNG_READ_ERROR = 9,
 } upng_error;
 
 typedef enum upng_state {
-    UPNG_ERROR		= -1,
-    UPNG_DECODED	= 0,
-    UPNG_DECODING	= 1,
-    UPNG_HEADER		= 2,
-    UPNG_NEW		= 3
+    UPNG_ERROR = -1,
+    UPNG_DECODED = 0,
+    UPNG_DECODING = 1,
+    UPNG_HEADER = 2,
+    UPNG_NEW = 3
 } upng_state;
 
 typedef enum upng_format {
@@ -67,67 +68,78 @@ typedef enum upng_format {
 
 
 typedef enum {
-    UPNG_LUM		= 0,
-    UPNG_RGB		= 2,
-    UPNG_LUMA		= 4,
-    UPNG_RGBA		= 6
+    UPNG_LUM = 0,
+    UPNG_RGB = 2,
+    UPNG_LUMA = 4,
+    UPNG_RGBA = 6
 } upng_color;
 
 typedef struct {
-    const unsigned char*	buffer;
-    unsigned long			size;
-    char					owning;
+    uint8_t *buffer;
+    unsigned long size;
+    char owning;
 } upng_source;
 
 typedef struct {
-    FIL * file;
+    FIL *file;
 
-    unsigned		width;
-    unsigned		height;
+    unsigned width;
+    unsigned height;
 
-    upng_color		color_type;
-    unsigned		color_depth;
-    upng_format		format;
+    upng_color color_type;
+    unsigned color_depth;
+    upng_format format;
 
-    unsigned char*	buffer;
-    unsigned long	size;
+    unsigned char *buffer;
+    unsigned long size;
 
-    upng_error		error;
-    unsigned		error_line;
+    upng_error error;
+    unsigned error_line;
 
-    upng_state		state;
-    upng_source		source;
+    upng_state state;
+    upng_source source;
 
-    char 			output_owning; //cyang add. Is output to a preallocated buffer
+    char output_owning; //cyang add. Is output to a preallocated buffer
 } upng_t;
 
 typedef struct huffman_tree {
-    unsigned* tree2d;
-    unsigned maxbitlen;	/*maximum number of bits a single code can get */
-    unsigned numcodes;	/*number of symbols in the alphabet = number of codes */
+    unsigned *tree2d;
+    unsigned maxbitlen;    /*maximum number of bits a single code can get */
+    unsigned numcodes;    /*number of symbols in the alphabet = number of codes */
 } huffman_tree;
 
-upng_t*		upng_new_from_bytes	(const unsigned char* buffer, unsigned long size);
-upng_t*		upng_new_from_file	(FIL* path);
-void		upng_free			(upng_t* upng);
+upng_t *upng_new_from_bytes(uint8_t *buffer, unsigned long size);
 
-upng_error	upng_header			(upng_t* upng);
-upng_error	upng_decode			(upng_t* upng, uint16_t * out);
+upng_t *upng_new_from_file(FIL *path);
 
-upng_state	upng_get_state		(const upng_t* upng);
+void upng_free(upng_t *upng);
 
-upng_error	upng_get_error		(const upng_t* upng);
-unsigned	upng_get_error_line	(const upng_t* upng);
+upng_error upng_header(upng_t *upng);
 
-unsigned	upng_get_width		(const upng_t* upng);
-unsigned	upng_get_height		(const upng_t* upng);
-unsigned	upng_get_bpp		(const upng_t* upng);
-unsigned	upng_get_bitdepth	(const upng_t* upng);
-unsigned	upng_get_components	(const upng_t* upng);
-unsigned	upng_get_pixelsize	(const upng_t* upng);
-upng_format	upng_get_format		(const upng_t* upng);
+upng_error upng_decode(upng_t *upng, uint16_t *out);
 
-const unsigned char*	upng_get_buffer		(const upng_t* upng);
-unsigned				upng_get_size		(const upng_t* upng);
+upng_state upng_get_state(const upng_t *upng);
+
+upng_error upng_get_error(const upng_t *upng);
+
+unsigned upng_get_error_line(const upng_t *upng);
+
+unsigned upng_get_width(const upng_t *upng);
+
+unsigned upng_get_height(const upng_t *upng);
+
+unsigned upng_get_bpp(const upng_t *upng);
+
+unsigned upng_get_bitdepth(const upng_t *upng);
+
+unsigned upng_get_components(const upng_t *upng);
+
+unsigned upng_get_pixelsize(const upng_t *upng);
+
+upng_format upng_get_format(const upng_t *upng);
+
+const unsigned char *upng_get_buffer(const upng_t *upng);
+
+unsigned upng_get_size(const upng_t *upng);
 
 #endif /*defined(UPNG_H)*/
