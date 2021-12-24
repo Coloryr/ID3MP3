@@ -38,7 +38,7 @@ typedef struct {
 } bit_iterator_t;
 
 static int32_t font_read_label(w25qxx_utils *head, uint32_t start, const char * label);
-static void font_load(my_font_data font, uint32_t local);
+static void font_load(my_font_data *font, uint32_t local);
 static int32_t font_load_cmaps(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_dsc, uint32_t cmaps_start);
 static bool font_load_cmaps_tables(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_dsc,
                                    uint32_t cmaps_start, cmap_table_bin_t * cmap_table);
@@ -180,7 +180,7 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
     gid = font_get_glyph_dsc_id(font, unicode_letter);
     if(!gid) return NULL;
 
-    if (font_data->header_bin.index_to_loc_format) {
+    if (font_data->header_bin.index_to_loc_format == 0) {
         head->pos = font_data->loca_start + gid * sizeof(uint16_t);
         W25QXX_Read_Utils(head, &now, sizeof(uint16_t));
         W25QXX_Read_Utils(head, &next, sizeof(uint16_t));
@@ -319,14 +319,14 @@ void load_font() {
     font_24.glyph_bmp = malloc(sizeof(uint8_t) * 3 * 24 * 3);
     font_32.glyph_bmp = malloc(sizeof(uint8_t) * 4 * 32 * 3);
 
-    font_load(font_16, FONT_ADDR);
-    font_load(font_24, FONT_ADDR + font_16.length);
-    font_load(font_32, FONT_ADDR + font_16.length + font_24.length);
+    font_load(&font_16, FONT_ADDR);
+    font_load(&font_24, FONT_ADDR + font_16.length);
+    font_load(&font_32, FONT_ADDR + font_16.length + font_24.length);
 
     lv_label_set_text(info, "font init done");
 }
 
-static void font_load(my_font_data font, uint32_t local) {
+static void font_load(my_font_data *font, uint32_t local) {
     w25qxx_utils *head = malloc(sizeof(w25qxx_utils));
     head->local = local;
     int32_t header_length = font_read_label(head, 0, "head");
@@ -335,23 +335,23 @@ static void font_load(my_font_data font, uint32_t local) {
         while (1);
     }
 
-    W25QXX_Read_Utils(head, &font.header_bin, sizeof(font_header_bin_t));
+    W25QXX_Read_Utils(head, &font->header_bin, sizeof(font_header_bin_t));
 
-    font.font.base_line = -font.header_bin.descent;
-    font.font.line_height = font.header_bin.ascent - font.header_bin.descent;
-    font.font.get_glyph_dsc = my_get_glyph_dsc_cb;
-    font.font.get_glyph_bitmap = my_get_glyph_bitmap_cb;
-    font.font.subpx = font.header_bin.subpixels_mode;
-    font.font.underline_position = font.header_bin.underline_position;
-    font.font.underline_thickness = font.header_bin.underline_thickness;
+    font->font.base_line = -font->header_bin.descent;
+    font->font.line_height = font->header_bin.ascent - font->header_bin.descent;
+    font->font.get_glyph_dsc = my_get_glyph_dsc_cb;
+    font->font.get_glyph_bitmap = my_get_glyph_bitmap_cb;
+    font->font.subpx = font->header_bin.subpixels_mode;
+    font->font.underline_position = font->header_bin.underline_position;
+    font->font.underline_thickness = font->header_bin.underline_thickness;
 
-    font.font.dsc = &font.dsc;
-    lv_font_fmt_txt_dsc_t *font_dsc = (lv_font_fmt_txt_dsc_t *) font.font.dsc;
-    font_dsc->cache = &font.cache;
+    font->font.dsc = &font->dsc;
+    lv_font_fmt_txt_dsc_t *font_dsc = (lv_font_fmt_txt_dsc_t *) font->font.dsc;
+    font_dsc->cache = &font->cache;
 
-    font_dsc->bpp = font.header_bin.bits_per_pixel;
-    font_dsc->kern_scale = font.header_bin.kerning_scale;
-    font_dsc->bitmap_format = font.header_bin.compression_id;
+    font_dsc->bpp = font->header_bin.bits_per_pixel;
+    font_dsc->kern_scale = font->header_bin.kerning_scale;
+    font_dsc->bitmap_format = font->header_bin.compression_id;
 
     uint32_t cmaps_start = header_length;
     int32_t cmaps_length = font_load_cmaps(head, font_dsc, cmaps_start);
@@ -374,12 +374,12 @@ static void font_load(my_font_data font, uint32_t local) {
     uint32_t glyph_start = loca_start + loca_length;
     int32_t glyph_length = font_load_glyph(head, glyph_start);
 
-    font.glyph_start = glyph_start;
-    font.loca_count = loca_count;
-    font.glyph_length = glyph_length;
-    font.loca_start = loca_start + 12;
+    font->glyph_start = glyph_start;
+    font->loca_count = loca_count;
+    font->glyph_length = glyph_length;
+    font->loca_start = loca_start + 12;
 
-    if (font.header_bin.tables_count < 4) {
+    if (font->header_bin.tables_count < 4) {
         font_dsc->kern_dsc = NULL;
         font_dsc->kern_classes = 0;
         font_dsc->kern_scale = 0;
@@ -387,7 +387,7 @@ static void font_load(my_font_data font, uint32_t local) {
     }
 
     uint32_t kern_start = glyph_start + glyph_length;
-    int32_t kern_length = font_load_kern(head, font_dsc, font.header_bin.glyph_id_format, kern_start);
+    int32_t kern_length = font_load_kern(head, font_dsc, font->header_bin.glyph_id_format, kern_start);
     if (kern_length < 0) {
         lv_label_set_text(info, "font 16 error:kern_length is error");
         while (1);
