@@ -19,20 +19,7 @@ uint8_t BSP_LCD_Init(void) {
     uint8_t ret = LCD_ERROR;
 
     /* LCD Init */
-    lcd_drv->Init();
+    ili9486_Init();
     ret = LCD_OK;
     return ret;
-}
-
-/**
-  * @brief  Draws a pixel on LCD.
-  * @param  Xpos: X position 
-  * @param  Ypos: Y position
-  * @param  RGB_Code: Pixel color in RGB mode (5-6-5)  
-  * @retval None
-  */
-void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code) {
-    if (lcd_drv->WritePixel != NULL) {
-        lcd_drv->WritePixel(Xpos, Ypos, RGB_Code);
-    }
 }

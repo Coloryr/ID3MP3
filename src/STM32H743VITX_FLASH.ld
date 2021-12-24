@@ -168,6 +168,15 @@ SECTIONS
       . = ALIGN(4);
     } >DTCMRAM
 
+  ._ram_2 :
+    {
+      . = ALIGN(4);
+    } >RAM_D2
+   ._ram_3 :
+   {
+     . = ALIGN(4);
+   } >RAM_D3
+
   /* Remove information from the standard libraries */
   /DISCARD/ :
   {

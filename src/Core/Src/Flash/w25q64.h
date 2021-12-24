@@ -17,6 +17,8 @@
 #define W25Q128    0XEF17
 #define W25Q256 0XEF18
 
+#define MAX_LENGTH 0x1000000
+
 extern uint16_t W25QXX_TYPE;                    //定义W25QXX芯片型号
 
 #define W25X_WriteEnable        0x06
@@ -47,6 +49,11 @@ extern uint16_t W25QXX_TYPE;                    //定义W25QXX芯片型号
 #define W25X_EnterQPIMode       0x38
 #define W25X_ExitQPIMode        0xFF
 
+typedef struct {
+    uint32_t local;
+    uint32_t pos;
+} w25qxx_utils;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -66,6 +73,7 @@ void W25QXX_Write(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
 void W25QXX_Erase_Chip();            //整片擦除
 void W25QXX_Erase_Sector(uint32_t Dst_Addr);    //扇区擦除
 void W25QXX_Wait_Busy();            //等待空闲
+void W25QXX_Read_Utils(w25qxx_utils *head, void *pBuffer, uint16_t NumByteToRead);
 
 #ifdef __cplusplus
 }

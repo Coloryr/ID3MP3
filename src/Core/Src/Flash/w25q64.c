@@ -1,9 +1,11 @@
 #include "w25q64.h"
 #include "main.h"
 #include "qspi.h"
+#include "lvgl.h"
+#include "Show/show.h"
 
-uint16_t W25QXX_TYPE = W25Q64;    //默认是W25Q64
-uint8_t W25QXX_QPI_MODE = 0;        //QSPI模式标志:0,SPI模式;1,QSPI模式.
+ramfast uint16_t W25QXX_TYPE = W25Q64;    //默认是W25Q64
+ramfast uint8_t W25QXX_QPI_MODE = 0;        //QSPI模式标志:0,SPI模式;1,QSPI模式.
 
 void W25QXX_Init() {
     uint8_t temp;
@@ -141,9 +143,19 @@ uint16_t W25QXX_ReadID() {
 }
 
 void W25QXX_Read(uint8_t *pBuffer, uint32_t ReadAddr, uint16_t NumByteToRead) {
+    if(ReadAddr > MAX_LENGTH) {
+        info_show();
+        lv_label_set_text_fmt(info, "W25Qxx read error:out of size %d,max:%d", ReadAddr, MAX_LENGTH);
+        return;
+    }
     QSPI_Send_CMD(W25X_FastReadData, ReadAddr, 8, QSPI_INSTRUCTION_4_LINES, QSPI_ADDRESS_4_LINES, QSPI_ADDRESS_24_BITS,
                   QSPI_DATA_4_LINES);    //QPI,快速读数据,地址为ReadAddr,4线传输数据_24位地址_4线传输地址_4线传输指令,8空周期,NumByteToRead个数据
     QSPI_Receive(pBuffer, NumByteToRead);
+}
+
+void W25QXX_Read_Utils(w25qxx_utils *head, void *pBuffer, uint16_t NumByteToRead) {
+    W25QXX_Read(pBuffer, head->local + head->pos, NumByteToRead);
+    head->pos += NumByteToRead;
 }
 
 void W25QXX_Write_Page(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite) {
@@ -178,7 +190,7 @@ void W25QXX_Write_NoCheck(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByte
     }
 }
 
-uint8_t W25QXX_BUFFER[4096];
+ramfast uint8_t W25QXX_BUFFER[4096];
 
 void W25QXX_Write(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite) {
     uint32_t secpos;
@@ -187,12 +199,18 @@ void W25QXX_Write(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
     uint16_t i;
     uint8_t *W25QXX_BUF;
 
+    if(WriteAddr > MAX_LENGTH) {
+        info_show();
+        lv_label_set_text_fmt(info, "W25Qxx read error:out of size %d,max:%d", WriteAddr, MAX_LENGTH);
+        return;
+    }
+
+    W25QXX_Wait_Busy();
+
     W25QXX_BUF = W25QXX_BUFFER;
     secpos = WriteAddr / 4096;//扇区地址
     secoff = WriteAddr % 4096;//在扇区内的偏移
     secremain = 4096 - secoff;//扇区剩余空间大小
-
-    //printf("ad:%X,nb:%X\r\n",WriteAddr,NumByteToWrite);//测试用
 
     if (NumByteToWrite <= secremain)secremain = NumByteToWrite;//不大于4096个字节
 
@@ -226,7 +244,7 @@ void W25QXX_Write(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
             if (NumByteToWrite > 4096)secremain = 4096;    //下一个扇区还是写不完
             else secremain = NumByteToWrite;            //下一个扇区可以写完了
         }
-    };
+    }
 }
 
 void W25QXX_Erase_Chip() {
@@ -239,7 +257,6 @@ void W25QXX_Erase_Chip() {
 
 void W25QXX_Erase_Sector(uint32_t Dst_Addr) {
 
-    //printf("fe:%x\r\n",Dst_Addr);			//监视falsh擦除情况,测试用
     Dst_Addr *= 4096;
     W25QXX_Write_Enable();                  //SET WEL
     W25QXX_Wait_Busy();
@@ -249,5 +266,5 @@ void W25QXX_Erase_Sector(uint32_t Dst_Addr) {
 }
 
 void W25QXX_Wait_Busy() {
-    while ((W25QXX_ReadSR(1) & 0x01) == 0x01);   // 等待BUSY位清空
+    while ((W25QXX_ReadSR(1) & 0x01) == 0x01);// 等待BUSY位清空
 }

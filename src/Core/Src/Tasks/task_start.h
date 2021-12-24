@@ -7,6 +7,4 @@
 
 void task_init();
 
-extern ramfast lv_obj_t *info;
-
 #endif //ID3MP3_TASK_START_H

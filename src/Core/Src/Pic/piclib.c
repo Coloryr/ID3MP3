@@ -11,22 +11,22 @@ ramfast _pic_phy pic_phy;        //图片显示物理接口
 //////////////////////////////////////////////////////////////////////////
 //lcd.h没有提供划横线函数,需要自己实现
 void piclib_draw_hline(uint16_t x0, uint16_t y0, uint16_t len, uint16_t color) {
-    if ((len == 0) || (x0 > lcd_drv->getLcdPixelWidth()) || (y0 > lcd_drv->getLcdPixelHeight()))return;
-    lcd_drv->FillRect(x0, y0, x0 + len - 1, y0, color);
+    if ((len == 0) || (x0 > ili9486_GetLcdPixelWidth()) || (y0 > ili9486_GetLcdPixelHeight()))return;
+    ili9486_FillRect(x0, y0, x0 + len - 1, y0, color);
 }
 
 //////////////////////////////////////////////////////////////////////////
 //画图初始化,在画图之前,必须先调用此函数
 //指定画点/读点
 void piclib_init() {
-    pic_phy.read_point = lcd_drv->readPixel;        //读点函数实现,仅BMP需要
-    pic_phy.draw_point = lcd_drv->WritePixel;    //画点函数实现
-    pic_phy.fill = lcd_drv->FillRect;                    //填充函数实现,仅GIF需要
+    pic_phy.read_point = ili9486_ReadPixel;        //读点函数实现,仅BMP需要
+    pic_phy.draw_point = ili9486_WritePixel;    //画点函数实现
+    pic_phy.fill = ili9486_FillRect;                    //填充函数实现,仅GIF需要
     pic_phy.draw_hline = piclib_draw_hline;    //画线函数实现,仅GIF需要
-    pic_phy.fillcolor = lcd_drv->DrawRGBImage;    //颜色填充函数实现,仅TJPGD需要
+    pic_phy.fillcolor = ili9486_DrawRGBImage;    //颜色填充函数实现,仅TJPGD需要
 
-    picinfo.lcdwidth = lcd_drv->getLcdPixelWidth();    //得到LCD的宽度像素
-    picinfo.lcdheight = lcd_drv->getLcdPixelHeight();//得到LCD的高度像素
+    picinfo.lcdwidth = ili9486_GetLcdPixelWidth();    //得到LCD的宽度像素
+    picinfo.lcdheight = ili9486_GetLcdPixelHeight();//得到LCD的高度像素
 
     picinfo.ImgWidth = 0;    //初始化宽度为0
     picinfo.ImgHeight = 0;//初始化高度为0
@@ -105,8 +105,8 @@ uint8_t ai_load_picfile(const uint8_t *filename, uint16_t x, uint16_t y, uint16_
     picinfo.S_Width = width;
     //显示区域无效
     if (picinfo.S_Height == 0 || picinfo.S_Width == 0) {
-        picinfo.S_Height = lcd_drv->getLcdPixelHeight();
-        picinfo.S_Width = lcd_drv->getLcdPixelWidth();
+        picinfo.S_Height = ili9486_GetLcdPixelHeight();
+        picinfo.S_Width = ili9486_GetLcdPixelWidth();
         return FALSE;
     }
     //显示的开始坐标点

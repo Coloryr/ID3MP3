@@ -9,6 +9,8 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "lcd.h"
 
+#include "ili9486.h"
+
 /** 
   * @brief  Point structures definition
   */
@@ -39,10 +41,6 @@ typedef struct {
   * @{
   */
 uint8_t BSP_LCD_Init(void);
-
-void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code);
-
-extern LCD_DrvTypeDef *lcd_drv;
 
 #ifdef __cplusplus
 }

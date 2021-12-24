@@ -10,10 +10,9 @@
 /* BSP TS driver */
 #include "stm32_adafruit_ts.h"
 
- JPEG_HandleTypeDef hjpeg;
- QSPI_HandleTypeDef hqspi;
- SD_HandleTypeDef hsd1;
- SRAM_HandleTypeDef hsram1;
+QSPI_HandleTypeDef hqspi;
+SD_HandleTypeDef hsd1;
+SRAM_HandleTypeDef hsram1;
 
 void MPU_Config() {
 
@@ -117,30 +116,6 @@ void PeriphCommonClock_Config() {
     /* Wait till PLL is ready */
     while (LL_RCC_PLL2_IsReady() != 1) {
     }
-
-}
-
-/**
-  * @brief JPEG Initialization Function
-  * @param None
-  * @retval None
-  */
-void MX_JPEG_Init() {
-
-    /* USER CODE BEGIN JPEG_Init 0 */
-
-    /* USER CODE END JPEG_Init 0 */
-
-    /* USER CODE BEGIN JPEG_Init 1 */
-
-    /* USER CODE END JPEG_Init 1 */
-    hjpeg.Instance = JPEG;
-    if (HAL_JPEG_Init(&hjpeg) != HAL_OK) {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN JPEG_Init 2 */
-
-    /* USER CODE END JPEG_Init 2 */
 
 }
 
@@ -440,7 +415,6 @@ void init(){
     PeriphCommonClock_Config();
     MX_GPIO_Init();
     MX_FMC_Init();
-    MX_JPEG_Init();
     MX_QUADSPI_Init();
     MX_SDMMC1_SD_Init();
     MX_SPI1_Init();

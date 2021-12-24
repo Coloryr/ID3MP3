@@ -13,8 +13,6 @@ void MX_GPIO_Init();
 
 void MX_FMC_Init();
 
-void MX_JPEG_Init();
-
 void MX_QUADSPI_Init();
 
 void MX_SDMMC1_SD_Init();

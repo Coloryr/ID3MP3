@@ -6,29 +6,28 @@
 #include "Pic/piclib.h"
 #include "Font/myfont.h"
 #include "Flash/w25q64.h"
+#include "Show/show.h"
 
 /* BSP LCD driver */
 #include "stm32_adafruit_lcd.h"
 /* BSP TS driver */
 #include "stm32_adafruit_ts.h"
 
-#include "Font/myfont.h"
-
- osThreadId_t ledTask;
+ramfast osThreadId_t ledTask;
 const osThreadAttr_t ledTask_attributes = {
         .name = "ledTask",
         .stack_size = 512,
         .priority = (osPriority_t) osPriorityNormal,
 };
 
- osThreadId_t lcdTask;
+ramfast osThreadId_t lcdTask;
 const osThreadAttr_t lcdTask_attributes = {
         .name = "lcdTask",
         .stack_size = 2048,
         .priority = (osPriority_t) osPriorityNormal,
 };
 
- osThreadId_t defaultTaskHandle;
+ramfast osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
         .name = "defaultTask",
         .stack_size = 512 * 4,
@@ -49,20 +48,21 @@ FRESULT res;
 #define DISP_VER_RES 320
 
 ramfast static lv_disp_draw_buf_t draw_buf;
-ramfast static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
+ram2 static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 2];                        /*Declare a buffer for 1/10 screen size*/
 
-void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * color_p)
-{
-    int32_t x, y;
-    /*It's a very slow but simple implementation.
-     *`set_pixel` needs to be written by you to a set pixel on the screen*/
-    for(y = area->y1; y <= area->y2; y++) {
-        for(x = area->x1; x <= area->x2; x++) {
-            BSP_LCD_DrawPixel(x, y, color_p->full);
-            color_p++;
-        }
+void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * color_p) {
+    uint16_t Xpos, Ypos, Xsize, Ysize, count;
+    Xpos = area->x1;
+    Ypos = area->y1;
+    Xsize = area->x2 - area->x1 + 1;
+    Ysize = area->y2 - area->y1 + 1;
+    count = Xsize * Ysize;
+    ili9486_SetDisplayWindow(Xpos, Ypos, Xsize, Ysize);
+    LCD_IO_WriteCmd8(ILI9486_RAMWR);
+    while (count--) {
+        LCD_IO_WriteData16(color_p->full);
+        color_p++;
     }
-
     lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
 }
 
@@ -88,8 +88,6 @@ static void set_zoom(void * img, int32_t v)
     lv_img_set_zoom((lv_obj_t*)img, v);
 }
 
-ramfast lv_obj_t *info;
-
 void Lvgl_Config() {
     lv_init();
     lv_disp_draw_buf_init(&draw_buf, buf1, NULL, DISP_HOR_RES * DISP_VER_RES / 10);  /*Initialize the display buffer.*/
@@ -107,10 +105,6 @@ void Lvgl_Config() {
 //    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
 //    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 //    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
-
-    info = lv_label_create(lv_scr_act());
-    lv_label_set_text(info, "init...");
-    lv_obj_align(info, LV_ALIGN_CENTER, 0, 0);
 }
 
 void Fatfs_Config() {
@@ -129,6 +123,8 @@ void StartDefaultTask(void *argument) {
     lcdTask = osThreadNew(LCD_LOOP, nullptr, &lcdTask_attributes);
 
     Lvgl_Config();
+    info_init();
+
     lv_label_set_text(info, "init piclib");
     piclib_init();
     lv_label_set_text(info, "init fatfs");
@@ -138,23 +134,25 @@ void StartDefaultTask(void *argument) {
     lv_label_set_text(info, "init font");
     load_font();
 
+    info_close();
+
     lv_obj_t *label1 = lv_label_create(lv_scr_act());
-    lv_label_set_text(label1, "ノンフィクション!!\n测试\nabc");
-    lv_obj_set_style_text_font(label1, sy16, 0);
+    lv_obj_set_style_text_font(label1, &font_16, 0);
+    lv_label_set_text(label1, "ノンフィクション!!");
     lv_obj_set_width(label1, 310);
-    lv_obj_align(label1, LV_ALIGN_TOP_LEFT, 5, 0);
+    lv_obj_align(label1, LV_ALIGN_TOP_LEFT, 0, 0);
 
-    lv_obj_t *label2 = lv_label_create(lv_scr_act());
-    lv_label_set_text(label2, "ノンフィクション!!\n测试\nabc");
-    lv_obj_set_style_text_font(label2, sy24, 0);
-    lv_obj_set_width(label2, 310);
-    lv_obj_align(label2, LV_ALIGN_LEFT_MID, 5, 0);
-
-    lv_obj_t *label3 = lv_label_create(lv_scr_act());
-    lv_label_set_text(label3, "ノンフィクション!!\n测试\nabc");
-    lv_obj_set_style_text_font(label3, sy32, 0);
-    lv_obj_set_width(label3, 310);
-    lv_obj_align(label3, LV_ALIGN_BOTTOM_LEFT, 5, 0);
+//    lv_obj_t *label2 = lv_label_create(lv_scr_act());
+//    lv_label_set_text(label2, "ノンフィクション!!\n测试\nabc");
+//    lv_obj_set_style_text_font(label2, &font_24, 0);
+//    lv_obj_set_width(label2, 310);
+//    lv_obj_align(label2, LV_ALIGN_LEFT_MID, 5, 0);
+//
+//    lv_obj_t *label3 = lv_label_create(lv_scr_act());
+//    lv_label_set_text(label3, "ノンフィクション!!\n测试\nabc");
+//    lv_obj_set_style_text_font(label3, &font_32, 0);
+//    lv_obj_set_width(label3, 310);
+//    lv_obj_align(label3, LV_ALIGN_BOTTOM_LEFT, 5, 0);
 
     osDelay(2000);
 //    ai_load_picfile((const uint8_t *) "0:test.jpg", 0, 0, lcd_drv->getLcdPixelWidth(),

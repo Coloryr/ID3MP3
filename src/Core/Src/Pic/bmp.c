@@ -361,8 +361,8 @@ uint8_t bmp_encode(uint8_t *filename, uint16_t x, uint16_t y, uint16_t width, ui
     uint16_t pixcnt;                    //像素计数器
     uint16_t bi4width;                //水平像素字节数
     if (width == 0 || height == 0)return PIC_WINDOW_ERR;    //区域错误
-    if ((x + width - 1) > lcd_drv->getLcdPixelWidth())return PIC_WINDOW_ERR;        //区域错误
-    if ((y + height - 1) > lcd_drv->getLcdPixelWidth())return PIC_WINDOW_ERR;    //区域错误
+    if ((x + width - 1) > ili9486_GetLcdPixelWidth())return PIC_WINDOW_ERR;        //区域错误
+    if ((y + height - 1) > ili9486_GetLcdPixelHeight())return PIC_WINDOW_ERR;    //区域错误
 
 #if BMP_USE_MALLOC == 1    //使用malloc
     databuf = (uint16_t *) pic_memalloc(2048);        //开辟至少bi4width大小的字节的内存区域 ,对240宽的屏,480个字节就够了.最大支持1024宽度的bmp编码
@@ -409,7 +409,7 @@ uint8_t bmp_encode(uint8_t *filename, uint16_t x, uint16_t y, uint16_t width, ui
         for (ty = y + height - 1; hbmp.bmiHeader.biHeight; ty--) {
             pixcnt = 0;
             for (tx = x; pixcnt != (bi4width / 2);) {
-                if (pixcnt < hbmp.bmiHeader.biWidth)databuf[pixcnt] = lcd_drv->readPixel(tx, ty);//读取坐标点的值
+                if (pixcnt < hbmp.bmiHeader.biWidth)databuf[pixcnt] = ili9486_ReadPixel(tx, ty);//读取坐标点的值
                 else databuf[pixcnt] = 0Xffff;//补充白色的像素.
                 pixcnt++;
                 tx++;
