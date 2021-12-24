@@ -14,37 +14,12 @@
 #define SAVE_ADDR 0x100
 #define TEMP_L 0x8000
 
+#define SAVE_BIT 67
+
 union font_len_cov {
     uint32_t u32;
     uint8_t u8[4];
 };
-
-typedef struct font_header_bin {
-    uint32_t version;
-    uint16_t tables_count;
-    uint16_t font_size;
-    uint16_t ascent;
-    int16_t descent;
-    uint16_t typo_ascent;
-    int16_t typo_descent;
-    uint16_t typo_line_gap;
-    int16_t min_y;
-    int16_t max_y;
-    uint16_t default_advance_width;
-    uint16_t kerning_scale;
-    uint8_t index_to_loc_format;
-    uint8_t glyph_id_format;
-    uint8_t advance_width_format;
-    uint8_t bits_per_pixel;
-    uint8_t xy_bits;
-    uint8_t wh_bits;
-    uint8_t advance_width_bits;
-    uint8_t compression_id;
-    uint8_t subpixels_mode;
-    uint8_t padding;
-    int16_t underline_position;
-    uint16_t underline_thickness;
-} font_header_bin_t;
 
 typedef struct cmap_table_bin {
     uint32_t data_offset;
@@ -63,7 +38,7 @@ typedef struct {
 } bit_iterator_t;
 
 static int32_t font_read_label(w25qxx_utils *head, uint32_t start, const char * label);
-static void font_load(lv_font_t * font, uint32_t local);
+static void font_load(my_font_data font, uint32_t local);
 static int32_t font_load_cmaps(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_dsc, uint32_t cmaps_start);
 static bool font_load_cmaps_tables(w25qxx_utils *head, lv_font_fmt_txt_dsc_t * font_dsc,
                                    uint32_t cmaps_start, cmap_table_bin_t * cmap_table);
@@ -81,105 +56,53 @@ static int8_t font_get_kern_value(const lv_font_t * font, uint32_t gid_left, uin
 ramfast FIL font_file;
 ramfast uint8_t data_temp[TEMP_L];
 
-ramfast uint32_t font_16_length;
-ramfast uint32_t font_24_length;
-ramfast uint32_t font_32_length;
-
-ramfast lv_font_t font_16;
-ramfast lv_font_t font_24;
-ramfast lv_font_t font_32;
-
-ramfast lv_font_fmt_txt_glyph_cache_t font_16_cache;
-ramfast lv_font_fmt_txt_glyph_cache_t font_24_cache;
-ramfast lv_font_fmt_txt_glyph_cache_t font_32_cache;
-
-ramfast lv_font_fmt_txt_dsc_t font_16_dsc;
-ramfast lv_font_fmt_txt_dsc_t font_24_dsc;
-ramfast lv_font_fmt_txt_dsc_t font_32_dsc;
-
-ramfast uint32_t font_16_glyph_start;
-ramfast uint32_t font_24_glyph_start;
-ramfast uint32_t font_32_glyph_start;
-
-ramfast font_header_bin_t *font_16_header_bin;
-ramfast font_header_bin_t *font_24_header_bin;
-ramfast font_header_bin_t *font_32_header_bin;
-
-ramfast uint32_t font_16_loca_count;
-ramfast uint32_t font_24_loca_count;
-ramfast uint32_t font_32_loca_count;
-
-ramfast uint32_t font_16_loca_start;
-ramfast uint32_t font_24_loca_start;
-ramfast uint32_t font_32_loca_start;
-
-ramfast uint32_t font_16_glyph_length;
-ramfast uint32_t font_24_glyph_length;
-ramfast uint32_t font_32_glyph_length;
-
-ramfast uint8_t font_16_glyph_bmp[2 * 16 * 3];
-ramfast uint8_t font_24_glyph_bmp[3 * 24 * 3];
-ramfast uint8_t font_32_glyph_bmp[4 * 32 * 3];
+ramfast my_font_data font_16;
+ramfast my_font_data font_24;
+ramfast my_font_data font_32;
 
 ramfast union font_len_cov cov;
 
-/* Get info about glyph of `unicode_letter` in `font` font.
- * Store the result in `dsc_out`.
- * The next letter (`unicode_letter_next`) might be used to calculate the width required by this glyph (kerning)
- */
 void font_get_glyph_dsc(const lv_font_t * font, uint32_t gid, lv_font_fmt_txt_glyph_dsc_t* gdsc){
     w25qxx_utils *head = malloc(sizeof(w25qxx_utils));
-    uint8_t index_to_loc_format;
-    font_header_bin_t *header;
-    uint32_t glyph_start;
-    uint32_t loca_start;
+    my_font_data *font_data;
 
-    if (font == &font_16) {
-        index_to_loc_format = font_16_header_bin->index_to_loc_format;
-        header = font_16_header_bin;
+    if (font == &font_16.font) {
+        font_data = &font_16;
         head->local = FONT_ADDR;
-        glyph_start = font_16_glyph_start;
-        loca_start = font_16_loca_start;
-    } else if (font == &font_24) {
-        index_to_loc_format = font_24_header_bin->index_to_loc_format;
-        header = font_24_header_bin;
-        head->local = FONT_ADDR + font_24_length;
-        glyph_start = font_24_glyph_start;
-        loca_start = font_24_loca_start;
+    } else if (font == &font_24.font) {
+        font_data = &font_24;
+        head->local = FONT_ADDR + font_16.length;
     } else {
-        index_to_loc_format = font_32_header_bin->index_to_loc_format;
-        header = font_32_header_bin;
-        head->local = FONT_ADDR + font_32_length + font_24_length;
-        glyph_start = font_32_glyph_start;
-        loca_start = font_32_loca_start;
+        font_data = &font_32;
+        head->local = FONT_ADDR + font_16.length + font_24.length;
     }
 
     uint32_t now;
-    if (index_to_loc_format == 0) {
-        head->pos = loca_start + gid * sizeof(uint16_t);
+    if (font_data->header_bin.index_to_loc_format == 0) {
+        head->pos = font_data->loca_start + gid * sizeof(uint16_t);
         W25QXX_Read_Utils(head, &now, sizeof(uint16_t));
     } else {
-        head->pos = loca_start + gid * sizeof(uint32_t);
+        head->pos = font_data->loca_start + gid * sizeof(uint32_t);
         W25QXX_Read_Utils(head, &now, sizeof(uint32_t));
     }
-    head->pos = glyph_start + now;
+    head->pos = font_data->glyph_start + now;
 
     bit_iterator_t bit_it = font_init_bit_iterator(head);
 
-    if (header->advance_width_bits == 0) {
-        gdsc->adv_w = header->default_advance_width;
+    if (font_data->header_bin.advance_width_bits == 0) {
+        gdsc->adv_w = font_data->header_bin.default_advance_width;
     } else {
-        gdsc->adv_w = font_read_bits(&bit_it, header->advance_width_bits);
+        gdsc->adv_w = font_read_bits(&bit_it, font_data->header_bin.advance_width_bits);
     }
 
-    if (header->advance_width_format == 0) {
+    if (font_data->header_bin.advance_width_format == 0) {
         gdsc->adv_w *= 16;
     }
 
-    gdsc->ofs_x = font_read_bits_signed(&bit_it, header->xy_bits);
-    gdsc->ofs_y = font_read_bits_signed(&bit_it, header->xy_bits);
-    gdsc->box_w = font_read_bits(&bit_it, header->wh_bits);
-    gdsc->box_h = font_read_bits(&bit_it, header->wh_bits);
+    gdsc->ofs_x = font_read_bits_signed(&bit_it, font_data->header_bin.xy_bits);
+    gdsc->ofs_y = font_read_bits_signed(&bit_it, font_data->header_bin.xy_bits);
+    gdsc->box_w = font_read_bits(&bit_it, font_data->header_bin.wh_bits);
+    gdsc->box_h = font_read_bits(&bit_it, font_data->header_bin.wh_bits);
 
     free(head);
 }
@@ -226,20 +149,11 @@ bool my_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, 
 
     free(gdsc);
 
-    return true;                /*true: glyph found; false: glyph was not found*/
+    return true;
 }
 
-
-/* Get the bitmap of `unicode_letter` from `font`. */
 const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter) {
     w25qxx_utils *head = malloc(sizeof(w25qxx_utils));
-    uint8_t index_to_loc_format;
-    font_header_bin_t *header;
-    uint32_t glyph_start;
-    uint32_t loca_count;
-    uint32_t glyph_length;
-    uint32_t loca_start;
-    uint8_t *glyph_bmp;
     uint32_t next;
     uint32_t now;
     uint32_t gid;
@@ -248,34 +162,17 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
     uint32_t next_offset;
     uint32_t bmp_size;
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    my_font_data *font_data;
 
-    if (font == &font_16) {
-        index_to_loc_format = font_16_header_bin->index_to_loc_format;
-        header = font_16_header_bin;
+    if (font == &font_16.font) {
+        font_data = &font_16;
         head->local = FONT_ADDR;
-        glyph_start = font_16_glyph_start;
-        loca_count = font_16_loca_count;
-        glyph_length = font_16_glyph_length;
-        glyph_bmp = font_16_glyph_bmp;
-        loca_start = font_16_loca_start;
-    } else if (font == &font_24) {
-        index_to_loc_format = font_24_header_bin->index_to_loc_format;
-        header = font_24_header_bin;
-        head->local = FONT_ADDR + font_24_length;
-        glyph_start = font_24_glyph_start;
-        loca_count = font_24_loca_count;
-        glyph_length = font_24_glyph_length;
-        glyph_bmp = font_24_glyph_bmp;
-        loca_start = font_24_loca_start;
+    } else if (font == &font_24.font) {
+        font_data = &font_24;
+        head->local = FONT_ADDR + font_16.length;
     } else {
-        index_to_loc_format = font_32_header_bin->index_to_loc_format;
-        header = font_32_header_bin;
-        head->local = FONT_ADDR + font_32_length + font_24_length;
-        glyph_start = font_32_glyph_start;
-        loca_count = font_32_loca_count;
-        glyph_length = font_32_glyph_length;
-        glyph_bmp = font_32_glyph_bmp;
-        loca_start = font_32_loca_start;
+        font_data = &font_32;
+        head->local = FONT_ADDR + font_16.length + font_24.length;
     }
 
     if(unicode_letter == '\t') unicode_letter = ' ';
@@ -283,232 +180,153 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
     gid = font_get_glyph_dsc_id(font, unicode_letter);
     if(!gid) return NULL;
 
-    //lv_font_fmt_txt_glyph_dsc_t * gdsc = font_get_glyph_dsc(font, gid);
-
-    if (index_to_loc_format == 0) {
-        head->pos = loca_start + gid * sizeof(uint16_t);
+    if (font_data->header_bin.index_to_loc_format) {
+        head->pos = font_data->loca_start + gid * sizeof(uint16_t);
         W25QXX_Read_Utils(head, &now, sizeof(uint16_t));
         W25QXX_Read_Utils(head, &next, sizeof(uint16_t));
     } else {
-        head->pos = loca_start + gid * sizeof(uint32_t);
+        head->pos = font_data->loca_start + gid * sizeof(uint32_t);
         W25QXX_Read_Utils(head, &now, sizeof(uint32_t));
         W25QXX_Read_Utils(head, &next, sizeof(uint32_t));
     }
-    now = glyph_start + now;
+    now = font_data->glyph_start + now;
     head->pos = now;
 
     bit_it = font_init_bit_iterator(head);
 
-    nbits = header->advance_width_bits + 2 * header->xy_bits + 2 * header->wh_bits;
+    nbits = font_data->header_bin.advance_width_bits + 2 * font_data->header_bin.xy_bits + 2 * font_data->header_bin.wh_bits;
 
     font_read_bits(&bit_it, nbits);
 
-    if(gid < loca_count){
-        next = glyph_start + next;
+    if(gid < font_data->loca_count){
+        next = font_data->glyph_start + next;
         next_offset = next;
     }
     else {
-        next_offset = glyph_length;
+        next_offset = font_data->glyph_length;
     }
 
     bmp_size = next_offset - now - nbits / 8;
 
     if (nbits % 8 == 0) {  /*Fast path*/
-        W25QXX_Read_Utils(head, glyph_bmp, bmp_size);
+        W25QXX_Read_Utils(head, font_data->glyph_bmp, bmp_size);
     } else {
         for (int k = 0; k < bmp_size - 1; ++k) {
-            glyph_bmp[k] = font_read_bits(&bit_it, 8);
+            font_data->glyph_bmp[k] = font_read_bits(&bit_it, 8);
         }
-        glyph_bmp[bmp_size - 1] = font_read_bits(&bit_it, 8 - nbits % 8);
+        font_data->glyph_bmp[bmp_size - 1] = font_read_bits(&bit_it, 8 - nbits % 8);
 
         /*The last fragment should be on the MSB but read_bits() will place it to the LSB*/
-        glyph_bmp[bmp_size - 1] = glyph_bmp[bmp_size - 1] << (nbits % 8);
+        font_data->glyph_bmp[bmp_size - 1] = font_data->glyph_bmp[bmp_size - 1] << (nbits % 8);
     }
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-        return glyph_bmp;
+        return font_data->glyph_bmp;
     }
 
     free(head);
 
-    return NULL;    /*Or NULL if not found*/
+    return NULL;
+}
+
+uint32_t write_font(uint32_t pos, uint32_t addr, const char * path){
+    FRESULT res;
+    uint16_t len;
+    uint32_t now;
+    uint8_t write_temp[5];
+    res = f_open(&font_file, path, FA_READ);
+    if (res != FR_OK) {
+        lv_label_set_text_fmt(info, "no file %s", path);
+        while (1);
+    }
+    now = 0;
+    for (;;) {
+        res = f_read(&font_file, data_temp, TEMP_L, (UINT *) &len);
+        if (res != FR_OK) {
+            lv_label_set_text_fmt(info, "file %s error res:%d", path, res);
+            while (1);
+        }
+        W25QXX_Write(data_temp, pos + now, len);
+        if (len == 0)
+            break;
+        now += len;
+        if (now == font_file.obj.objsize)
+            break;
+
+        lv_label_set_text_fmt(info, "init font %s %d/%d", path, font_file.obj.objsize, now);
+    }
+    if (now != font_file.obj.objsize) {
+        lv_label_set_text_fmt(info, "init font %s error:size check fail", path);
+        while (1);
+    }
+
+    lv_label_set_text_fmt(info, "init font %s done.", path);
+
+    f_close(&font_file);
+
+    cov.u32 = now + 10;
+    write_temp[0] = SAVE_BIT;
+    write_temp[1] = cov.u8[0];
+    write_temp[2] = cov.u8[1];
+    write_temp[3] = cov.u8[2];
+    write_temp[4] = cov.u8[3];
+    osDelay(10);
+    W25QXX_Write(write_temp, addr, 5);
+
+    return cov.u32;
 }
 
 void load_font() {
     uint8_t temp[20];
-    uint8_t write_temp[5];
-    uint16_t len;
-    uint32_t now = 0;
     uint32_t pos = FONT_ADDR;
-    FRESULT res;
-
-    // lv_font_load("0:/font/sy16.font");
-
-    // W25QXX_Erase_Chip();
 
     W25QXX_Read(temp, SAVE_ADDR, 20);
-    if (temp[0] != 17) {
-        res = f_open(&font_file, "0:/font/16.font", FA_READ);
-        if (res != FR_OK) {
-            lv_label_set_text(info, "no file 16.font");
-            while (1);
-        }
-        now = 0;
-        for (;;) {
-            res = f_read(&font_file, data_temp, TEMP_L, (UINT *) &len);
-            if (res != FR_OK) {
-                lv_label_set_text_fmt(info, "file 16.font error res:%d", res);
-                while (1);
-            }
-            W25QXX_Write(data_temp, pos + now, len);
-            if (len == 0)
-                break;
-            now += len;
-            if (now == font_file.obj.objsize)
-                break;
-
-            lv_label_set_text_fmt(info, "init font 16.. %d/%d", font_file.obj.objsize, now);
-        }
-        if (now != font_file.obj.objsize) {
-            lv_label_set_text(info, "init font 16 error:size check fail");
-            while (1);
-        }
-
-        lv_label_set_text(info, "init font 16 done.");
-
-        f_close(&font_file);
-
-        font_16_length = cov.u32 = now + 10;
-        write_temp[0] = 17;
-        write_temp[1] = cov.u8[0];
-        write_temp[2] = cov.u8[1];
-        write_temp[3] = cov.u8[2];
-        write_temp[4] = cov.u8[3];
-        osDelay(10);
-        W25QXX_Write(write_temp, SAVE_ADDR, 5);
+    if (temp[0] != SAVE_BIT) {
+        font_16.length = write_font(pos, SAVE_ADDR, "0:/font/16.font");
     } else {
         cov.u8[0] = temp[1];
         cov.u8[1] = temp[2];
         cov.u8[2] = temp[3];
         cov.u8[3] = temp[4];
-        font_16_length = cov.u32;
+        font_16.length = cov.u32;
     }
 
-    pos = FONT_ADDR + font_16_length;
+    pos = FONT_ADDR + font_16.length;
 
-    if (temp[5] != 24) {
-        res = f_open(&font_file, "0:/font/24.font", FA_READ);
-        if (res != FR_OK) {
-            lv_label_set_text(info, "no file 24.font");
-            while (1);
-        }
-        now = 0;
-        for (;;) {
-            res = f_read(&font_file, data_temp, TEMP_L, (UINT *) &len);
-            if (res != FR_OK) {
-                lv_label_set_text_fmt(info, "file 24.font error res:%d", res);
-                while (1);
-            }
-            W25QXX_Write(data_temp, pos + now, len);
-            if (len == 0)
-                break;
-            now += len;
-            if (now == font_file.obj.objsize)
-                break;
-
-            lv_label_set_text_fmt(info, "init font 24.. %d/%d", font_file.obj.objsize, now);
-        }
-        if (now != font_file.obj.objsize) {
-            lv_label_set_text(info, "init font 24 error:size check fail");
-            while (1);
-        }
-
-        lv_label_set_text(info, "init font 16 done.");
-
-        f_close(&font_file);
-
-        font_24_length = cov.u32 = now + 10;
-        write_temp[0] = 24;
-        write_temp[1] = cov.u8[0];
-        write_temp[2] = cov.u8[1];
-        write_temp[3] = cov.u8[2];
-        write_temp[4] = cov.u8[3];
-        osDelay(10);
-        W25QXX_Write(write_temp, SAVE_ADDR + 5, 5);
+    if (temp[5] != SAVE_BIT) {
+        font_24.length = write_font(pos, SAVE_ADDR + 5, "0:/font/24.font");
     } else {
         cov.u8[0] = temp[6];
         cov.u8[1] = temp[7];
         cov.u8[2] = temp[8];
         cov.u8[3] = temp[9];
-        font_24_length = cov.u32;
+        font_24.length = cov.u32;
     }
 
-    pos = FONT_ADDR + font_16_length + font_24_length;
+    pos = FONT_ADDR + font_16.length + font_24.length;
 
-    if (temp[10] != 32) {
-        res = f_open(&font_file, "0:/font/32.font", FA_READ);
-        if (res != FR_OK) {
-            lv_label_set_text(info, "no file 32.font");
-            while (1);
-        }
-        now = 0;
-        for (;;) {
-            res = f_read(&font_file, data_temp, TEMP_L, (UINT *) &len);
-            if (res != FR_OK) {
-                lv_label_set_text_fmt(info, "file 32.font error res:%d", res);
-                while (1);
-            }
-            W25QXX_Write(data_temp, pos + now, len);
-            if (len == 0)
-                break;
-            now += len;
-            if(now == font_file.obj.objsize)
-                break;
-
-            lv_label_set_text_fmt(info, "init font 32.. %d/%d", font_file.obj.objsize, now);
-        }
-        if(now != font_file.obj.objsize) {
-            lv_label_set_text(info, "init font 32 error:size check fail");
-            while (1);
-        }
-
-        lv_label_set_text(info, "init font 32 done.");
-
-        f_close(&font_file);
-
-        font_32_length = cov.u32 = now + 10;
-        write_temp[0] = 32;
-        write_temp[1] = cov.u8[0];
-        write_temp[2] = cov.u8[1];
-        write_temp[3] = cov.u8[2];
-        write_temp[4] = cov.u8[3];
-        osDelay(10);
-        W25QXX_Write(write_temp, SAVE_ADDR + 10, 5);
+    if (temp[10] != SAVE_BIT) {
+        font_32.length = write_font(pos, SAVE_ADDR + 10, "0:/font/32.font");
     } else {
         cov.u8[0] = temp[11];
         cov.u8[1] = temp[12];
         cov.u8[2] = temp[13];
         cov.u8[3] = temp[14];
-        font_32_length = cov.u32;
+        font_32.length = cov.u32;
     }
 
-    font_16.dsc = &font_16_dsc;
-    font_16_dsc.cache = &font_16_cache;
+    font_16.glyph_bmp = malloc(sizeof(uint8_t) * 2 * 16 * 3);
+    font_24.glyph_bmp = malloc(sizeof(uint8_t) * 3 * 24 * 3);
+    font_32.glyph_bmp = malloc(sizeof(uint8_t) * 4 * 32 * 3);
 
-    font_24.dsc = &font_24_dsc;
-    font_24_dsc.cache = &font_24_cache;
-
-    font_32.dsc = &font_32_dsc;
-    font_32_dsc.cache = &font_32_cache;
-
-    font_load(&font_16, FONT_ADDR);
-    font_load(&font_24, FONT_ADDR + font_16_length);
-    font_load(&font_32, FONT_ADDR + font_16_length + font_24_length);
+    font_load(font_16, FONT_ADDR);
+    font_load(font_24, FONT_ADDR + font_16.length);
+    font_load(font_32, FONT_ADDR + font_16.length + font_24.length);
 
     lv_label_set_text(info, "font init done");
 }
 
-static void font_load(lv_font_t * font, uint32_t local) {
+static void font_load(my_font_data font, uint32_t local) {
     w25qxx_utils *head = malloc(sizeof(w25qxx_utils));
     head->local = local;
     int32_t header_length = font_read_label(head, 0, "head");
@@ -517,22 +335,23 @@ static void font_load(lv_font_t * font, uint32_t local) {
         while (1);
     }
 
-    font_header_bin_t *font_header = malloc(sizeof(font_header_bin_t));
-    W25QXX_Read_Utils(head, font_header, sizeof(font_header_bin_t));
+    W25QXX_Read_Utils(head, &font.header_bin, sizeof(font_header_bin_t));
 
-    font->base_line = -font_header->descent;
-    font->line_height = font_header->ascent - font_header->descent;
-    font->get_glyph_dsc = my_get_glyph_dsc_cb;
-    font->get_glyph_bitmap = my_get_glyph_bitmap_cb;
-    font->subpx = font_header->subpixels_mode;
-    font->underline_position = font_header->underline_position;
-    font->underline_thickness = font_header->underline_thickness;
+    font.font.base_line = -font.header_bin.descent;
+    font.font.line_height = font.header_bin.ascent - font.header_bin.descent;
+    font.font.get_glyph_dsc = my_get_glyph_dsc_cb;
+    font.font.get_glyph_bitmap = my_get_glyph_bitmap_cb;
+    font.font.subpx = font.header_bin.subpixels_mode;
+    font.font.underline_position = font.header_bin.underline_position;
+    font.font.underline_thickness = font.header_bin.underline_thickness;
 
-    lv_font_fmt_txt_dsc_t *font_dsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
+    font.font.dsc = &font.dsc;
+    lv_font_fmt_txt_dsc_t *font_dsc = (lv_font_fmt_txt_dsc_t *) font.font.dsc;
+    font_dsc->cache = &font.cache;
 
-    font_dsc->bpp = font_header->bits_per_pixel;
-    font_dsc->kern_scale = font_header->kerning_scale;
-    font_dsc->bitmap_format = font_header->compression_id;
+    font_dsc->bpp = font.header_bin.bits_per_pixel;
+    font_dsc->kern_scale = font.header_bin.kerning_scale;
+    font_dsc->bitmap_format = font.header_bin.compression_id;
 
     uint32_t cmaps_start = header_length;
     int32_t cmaps_length = font_load_cmaps(head, font_dsc, cmaps_start);
@@ -555,27 +374,12 @@ static void font_load(lv_font_t * font, uint32_t local) {
     uint32_t glyph_start = loca_start + loca_length;
     int32_t glyph_length = font_load_glyph(head, glyph_start);
 
-    if(font == &font_16) {
-        font_16_header_bin = font_header;
-        font_16_glyph_start = glyph_start;
-        font_16_loca_count = loca_count;
-        font_16_glyph_length = glyph_length;
-        font_16_loca_start = loca_start + 12;
-    } else if(font == &font_24) {
-        font_24_header_bin = font_header;
-        font_24_glyph_start = glyph_start;
-        font_24_loca_count = loca_count;
-        font_24_glyph_length = glyph_length;
-        font_24_loca_start = loca_start + 12;
-    } else if(font == &font_32) {
-        font_32_header_bin = font_header;
-        font_32_glyph_start = glyph_start;
-        font_32_loca_count = loca_count;
-        font_32_glyph_length = glyph_length;
-        font_32_loca_start = loca_start + 12;
-    }
+    font.glyph_start = glyph_start;
+    font.loca_count = loca_count;
+    font.glyph_length = glyph_length;
+    font.loca_start = loca_start + 12;
 
-    if (font_header->tables_count < 4) {
+    if (font.header_bin.tables_count < 4) {
         font_dsc->kern_dsc = NULL;
         font_dsc->kern_classes = 0;
         font_dsc->kern_scale = 0;
@@ -583,7 +387,7 @@ static void font_load(lv_font_t * font, uint32_t local) {
     }
 
     uint32_t kern_start = glyph_start + glyph_length;
-    int32_t kern_length = font_load_kern(head, font_dsc, font_header->glyph_id_format, kern_start);
+    int32_t kern_length = font_load_kern(head, font_dsc, font.header_bin.glyph_id_format, kern_start);
     if (kern_length < 0) {
         lv_label_set_text(info, "font 16 error:kern_length is error");
         while (1);

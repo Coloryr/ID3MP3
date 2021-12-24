@@ -137,20 +137,20 @@ void StartDefaultTask(void *argument) {
     info_close();
 
     lv_obj_t *label1 = lv_label_create(lv_scr_act());
-    lv_obj_set_style_text_font(label1, &font_16, 0);
+    lv_obj_set_style_text_font(label1, &font_16.font, 0);
     lv_label_set_text(label1, "ノンフィクション!!\n测试\nabc");
     lv_obj_set_width(label1, 310);
     lv_obj_align(label1, LV_ALIGN_TOP_LEFT, 5, 0);
 
     lv_obj_t *label2 = lv_label_create(lv_scr_act());
     lv_label_set_text(label2, "ノンフィクション!!\n测试\nabc");
-    lv_obj_set_style_text_font(label2, &font_24, 0);
+    lv_obj_set_style_text_font(label2, &font_24.font, 0);
     lv_obj_set_width(label2, 310);
     lv_obj_align(label2, LV_ALIGN_LEFT_MID, 5, 0);
 
     lv_obj_t *label3 = lv_label_create(lv_scr_act());
     lv_label_set_text(label3, "ノンフィクション!!\n测试\nabc");
-    lv_obj_set_style_text_font(label3, &font_32, 0);
+    lv_obj_set_style_text_font(label3, &font_32.font, 0);
     lv_obj_set_width(label3, 310);
     lv_obj_align(label3, LV_ALIGN_BOTTOM_LEFT, 5, 0);
 
