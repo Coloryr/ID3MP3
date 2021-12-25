@@ -1,14 +1,15 @@
 #include "mp3id3.h"
 #include "fatfs.h"
 #include "malloc.h"
-#include "../mp3player/mp3player.h"
-#include "../lcd/lcd.h"
-#include "../show/show.h"
-#include "../font/font.h"
-#include "../flash/flash.h"
+#include "mp3player/mp3player.h"
+#include "lcd/lcd.h"
+#include "show/show.h"
+#include "font/font.h"
+#include "flash/flash.h"
 #include "cmsis_os.h"
+#include "font/text.h"
 
-UINT br;	   //读写变量
+UINT br1;	   //读写变量
 
 uint16_t UNICODEtoGBK(uint16_t unicode) //???????
 {
@@ -166,14 +167,14 @@ void mp3id3(void)
 			LCD_Fill(30, 20, 160, 16, BLACK); //清除显示
 			osDelay(200 / portTICK_RATE_MS);
 		}
-	res = f_read(info.fmp3, databuf, 10, (UINT *)&br); //读出mp3id3头
+	res = f_read(info.fmp3, databuf, 10, (UINT *)&br1); //读出mp3id3头
 	if (res != FR_OK)
 		return;
 	if (databuf[0] == 0x49 && databuf[1] == 0x44 && databuf[2] == 0x33)
 	{
 		//计算大小
 		info.size = databuf[6] << 21 | databuf[7] << 14 | databuf[8] << 7 | databuf[9];
-		res = f_read(info.fmp3, databuf, READ_buff_size, (UINT *)&br);
+		res = f_read(info.fmp3, databuf, READ_buff_size, (UINT *)&br1);
 		if (res != FR_OK)
 			return;
 		i = 0;

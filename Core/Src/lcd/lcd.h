@@ -2,7 +2,7 @@
 #define __LCD_H__
 #include "main.h"
 #include "stdlib.h"
-#include "../bit.h"
+#include "bit.h"
 
 //LCD重要参数集
 typedef struct

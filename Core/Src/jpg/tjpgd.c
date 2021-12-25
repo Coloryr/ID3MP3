@@ -21,8 +21,8 @@
 #include "main.h"
 #include "tjpgd.h"
 #include "fatfs.h"
-#include "../lcd/lcd.h"
-#include "../gui/guix.h"
+#include "lcd/lcd.h"
+#include "gui/guix.h"
 #include "piclib.h"
 
 uint8_t write_bit;

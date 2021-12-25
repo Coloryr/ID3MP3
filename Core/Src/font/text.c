@@ -1,8 +1,8 @@
 #include "main.h"
 #include "text.h"
-#include "../flash/flash.h"
+#include "flash/flash.h"
 #include "font.h"
-#include "../lcd/lcd.h"
+#include "lcd/lcd.h"
 #include "string.h"
 
 //code 字符指针开始

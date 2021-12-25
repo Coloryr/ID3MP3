@@ -1,13 +1,13 @@
 #include "show.h"
-#include "../lcd/lcd.h"
+#include "lcd/lcd.h"
 #include "fatfs.h"
-#include "../mp3player/mp3player.h"
-#include "../font/text.h"
-#include "../vs10xx/vs10XX.h"
+#include "mp3player/mp3player.h"
+#include "font/text.h"
+#include "vs10xx/vs10XX.h"
 #include "string.h"
-#include "../gui/guix.h"
-#include "../jpg/tjpgd.h"
-#include "../jpg/piclib.h"
+#include "gui/guix.h"
+#include "jpg/tjpgd.h"
+#include "jpg/piclib.h"
 
 uint8_t lcd_bit = 0;
 FIL *fmp3_pic = 0;

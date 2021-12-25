@@ -2,8 +2,8 @@
 #include "fatfs.h"
 #include "string.h"
 #include "malloc.h"
-#include "../lcd/lcd.h"
-#include "../flash/flash.h"
+#include "lcd/lcd.h"
+#include "flash/flash.h"
 
 #define FONTINFOADDR (1024 * 25) * 1024 //默认是24M的地址
 //字库信息结构体.

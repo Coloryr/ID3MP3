@@ -1,7 +1,7 @@
 #include "guix.h"
-#include "../font/text.h"
-#include "../lcd/lcd.h"
-#include "../touch/touch.h"
+#include "font/text.h"
+#include "lcd/lcd.h"
+#include "touch/touch.h"
 
 //此处必须在外部申明asc2_1206和asc2_1608;
 extern const unsigned char asc2_1206[95][12];
@@ -1090,18 +1090,4 @@ void gui_memin_free(void *ptr)
 {
 	if (ptr)
 		free(ptr);
-}
-//copy ptr的前size个字节到新地址,并返回新地址值
-//ptr:要copy的源地址
-//size:新地址内存的大小
-//返回值:目的地址
-void *gui_memin_realloc(void *ptr, uint32_t size)
-{
-	uint32_t offset;
-	offset = malloc(size);
-	if (offset == 0XFFFFFFFF)
-		return NULL;
-	memcpy(offset, ptr, size);
-	free(ptr);
-	return offset;
 }

@@ -66,3 +66,4 @@ dkms.conf
 
 OBJ
 .vscode
+cmake-build-debug

@@ -1,7 +1,7 @@
 #ifndef __TOUCH_H__
 #define __TOUCH_H__
 #include "main.h"
-#include "../bit.h"
+#include "bit.h"
 
 #define TP_PRES_DOWN 0x80 //触屏被按下
 #define TP_CATH_PRES 0x40 //有按键按下了

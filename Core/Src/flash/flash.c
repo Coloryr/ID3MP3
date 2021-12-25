@@ -1,7 +1,7 @@
 #include "flash.h"
 #include "cmsis_os.h"
 #include "malloc.h"
-#include "../spi/spi.h"
+#include "spi/spi.h"
 
 uint16_t SPI_FLASH_TYPE = W25Q128; //默认就是25Q64
 

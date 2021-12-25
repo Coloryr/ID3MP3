@@ -1,8 +1,8 @@
 #include "touch.h"
 #include "stdlib.h"
 #include "math.h"
-#include "../lcd/lcd.h"
-#include "../data/data.h"
+#include "lcd/lcd.h"
+#include "data/data.h"
 #include "cmsis_os.h"
 
 _m_tp_dev tp_dev =

@@ -1,8 +1,8 @@
 #ifndef VS1053_H
 #define VS1053_H
 #include "main.h"
-#include "../bit.h"
-#include "../spi/spi.h"
+#include "bit.h"
+#include "spi/spi.h"
 
 //移植时候的接口
 //data:要写入的数据

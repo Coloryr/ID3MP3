@@ -1,8 +1,8 @@
 #include "main.h"
-#include "../mp3player/mp3player.h"
-#include "../vs10xx/vs10XX.h"
-#include "../flash/flash.h"
-#include "../touch/touch.h"
+#include "mp3player/mp3player.h"
+#include "vs10xx/vs10XX.h"
+#include "flash/flash.h"
+#include "touch/touch.h"
 
 uint8_t data_save_bit = 0;
 
