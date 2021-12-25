@@ -45,7 +45,7 @@ void LCD_LOOP(void *argument) {
 #define DISP_HOR_RES 480
 #define DISP_VER_RES 320
 
-#define DISP_BUFF_SIZE DISP_HOR_RES * DISP_VER_RES / 2
+#define DISP_BUFF_SIZE DISP_HOR_RES * DISP_VER_RES / 5
 
 ramfast static lv_disp_draw_buf_t draw_buf;
 ram2 static lv_color_t buf1[DISP_BUFF_SIZE];
