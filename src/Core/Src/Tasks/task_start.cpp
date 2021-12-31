@@ -5,8 +5,9 @@
 #include "fatfs.h"
 #include "Pic/piclib.h"
 #include "Font/myfont.h"
-#include "Flash/w25q64.h"
+#include "qspi/w25q64.h"
 #include "Show/show.h"
+#include "qspi/psram.h"
 
 /* BSP LCD driver */
 #include "stm32_adafruit_lcd.h"
@@ -118,6 +119,23 @@ void flash_config() {
     W25QXX_Write((uint8_t *) "test", 0x0, 4);
 
     W25QXX_Read(datatemp, 0x0, 4);
+
+    for (uint8_t i = 0; i < 4; i++) {
+        datatemp[i] = datatemp[i];
+    }
+}
+
+void psram_config() {
+    uint8_t datatemp[32];
+    while (1) {
+        QSPI_PSRAM_Write((uint8_t *) "test", 0xA5, 4);
+
+        QSPI_PSRAM_Read(datatemp, 0xA5, 4);
+    }
+
+    for (uint8_t i = 0; i < 4; i++) {
+        datatemp[i] = datatemp[i];
+    }
 }
 
 void StartDefaultTask(void *argument) {
@@ -133,8 +151,10 @@ void StartDefaultTask(void *argument) {
     piclib_init();
     lv_label_set_text(info, "init fatfs");
     Fatfs_Config();
-    lv_label_set_text(info, "init flash");
-    flash_config();
+//    lv_label_set_text(info, "config flash");
+//    flash_config();
+    lv_label_set_text(info, "config psram");
+    psram_config();
     lv_label_set_text(info, "init font");
     load_font();
 

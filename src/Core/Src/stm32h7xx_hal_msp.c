@@ -139,8 +139,8 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef *hqspi) {
         __HAL_RCC_GPIOD_CLK_ENABLE();
         /**QUADSPI GPIO Configuration
         PE2     ------> QUADSPI_BK1_IO2
-        PB6     ------> QUADSPI_CLK
-        PB10     ------> QUADSPI_BK1_NCS
+        PB2     ------> QUADSPI_CLK
+        PB6     ------> QUADSPI_BK1_NCS
         PD11     ------> QUADSPI_BK1_IO0
         PD12     ------> QUADSPI_BK1_IO1
         PD13     ------> QUADSPI_BK1_IO3

@@ -2,14 +2,15 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "fatfs.h"
-#include "Flash/qspi.h"
-#include "Flash/w25q64.h"
+#include "qspi/qspi.h"
+#include "qspi/w25q64.h"
 #include "crc.h"
 
 /* BSP LCD driver */
 #include "stm32_adafruit_lcd.h"
 /* BSP TS driver */
 #include "stm32_adafruit_ts.h"
+#include "qspi/psram.h"
 
 QSPI_HandleTypeDef hqspi;
 SD_HandleTypeDef hsd1;
@@ -172,11 +173,11 @@ void MX_QUADSPI_Init() {
     /* USER CODE END QUADSPI_Init 1 */
     /* QUADSPI parameter configuration*/
     hqspi.Instance = QUADSPI;
-    hqspi.Init.ClockPrescaler = 1;
+    hqspi.Init.ClockPrescaler = 2;
     hqspi.Init.FifoThreshold = 8;
     hqspi.Init.SampleShifting = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
     hqspi.Init.FlashSize = POSITION_VAL(0X1000000) - 1;
-    hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_5_CYCLE;
+    hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_2_CYCLE;
     hqspi.Init.ClockMode = QSPI_CLOCK_MODE_0;
     hqspi.Init.FlashID = QSPI_FLASH_ID_1;
     hqspi.Init.DualFlash = QSPI_DUALFLASH_DISABLE;
@@ -184,7 +185,8 @@ void MX_QUADSPI_Init() {
         Error_Handler();
     }
     /* USER CODE BEGIN QUADSPI_Init 2 */
-    W25QXX_Init();
+//    W25QXX_Init();
+    QSPI_PSRAM_Init();
     /* USER CODE END QUADSPI_Init 2 */
 
 }
@@ -434,13 +436,19 @@ void MX_GPIO_Init() {
     /**/
     GPIO_InitStruct.Pin = LL_GPIO_PIN_1;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = LL_GPIO_PIN_6;
     LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = LL_GPIO_PIN_4 | LL_GPIO_PIN_7;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_4 | LL_GPIO_PIN_7);
 }
 
 void init() {

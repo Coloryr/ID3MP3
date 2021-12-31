@@ -1,6 +1,6 @@
 #include "lvgl.h"
 #include "main.h"
-#include "Flash/w25q64.h"
+#include "qspi/w25q64.h"
 #include "fatfs.h"
 #include "malloc.h"
 #include "Tasks/task_start.h"
