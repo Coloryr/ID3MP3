@@ -16,27 +16,29 @@
 
 ramfast osThreadId_t ledTask;
 const osThreadAttr_t ledTask_attributes = {
-        .name = "ledTask",
-        .stack_size = 512,
-        .priority = (osPriority_t) osPriorityNormal,
+    .name = "ledTask",
+    .stack_size = 512,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 
 ramfast osThreadId_t lcdTask;
 const osThreadAttr_t lcdTask_attributes = {
-        .name = "lcdTask",
-        .stack_size = 2048,
-        .priority = (osPriority_t) osPriorityNormal,
+    .name = "lcdTask",
+    .stack_size = 2048,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 
 ramfast osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-        .name = "defaultTask",
-        .stack_size = 512 * 4,
-        .priority = (osPriority_t) osPriorityNormal,
+    .name = "defaultTask",
+    .stack_size = 512 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 
-void LCD_LOOP(void *argument) {
-    for (;;) {
+void LCD_LOOP(void *argument)
+{
+    for (;;)
+    {
         lv_tick_inc(1);
         lv_task_handler();
         osDelay(1);
@@ -46,12 +48,13 @@ void LCD_LOOP(void *argument) {
 #define DISP_HOR_RES 480
 #define DISP_VER_RES 320
 
-#define DISP_BUFF_SIZE DISP_HOR_RES * DISP_VER_RES / 5
+#define DISP_BUFF_SIZE (DISP_HOR_RES * DISP_VER_RES / 5)
 
 ramfast static lv_disp_draw_buf_t draw_buf;
 ram2 static lv_color_t buf1[DISP_BUFF_SIZE];
 
-void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
+{
     uint16_t Xpos, Ypos, Xsize, Ysize, count;
     Xpos = area->x1;
     Ypos = area->y1;
@@ -60,85 +63,98 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
     count = Xsize * Ysize;
     ili9486_SetDisplayWindow(Xpos, Ypos, Xsize, Ysize);
     LCD_IO_WriteCmd8(ILI9486_RAMWR);
-    while (count--) {
+    while (count--)
+    {
         LCD_IO_WriteData16(color_p->full);
         color_p++;
     }
-    lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
+    lv_disp_flush_ready(disp); /* Indicate you are ready with the flushing*/
 }
 
-//void my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
+// void my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
 //{
-//    /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
-//    if(touchpad_is_pressed()) {
-//        data->state = LV_INDEV_STATE_PRESSED;
-//        touchpad_get_xy(&data->point.x, &data->point.y);
-//    } else {
-//        data->state = LV_INDEV_STATE_RELEASED;
-//    }
+//     /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
+//     if(touchpad_is_pressed()) {
+//         data->state = LV_INDEV_STATE_PRESSED;
+//         touchpad_get_xy(&data->point.x, &data->point.y);
+//     } else {
+//         data->state = LV_INDEV_STATE_RELEASED;
+//     }
 //
-//}
+// }
 
-static void set_angle(void *img, int32_t v) {
-    lv_img_set_angle((lv_obj_t *) img, v);
+static void set_angle(void *img, int32_t v)
+{
+    lv_img_set_angle((lv_obj_t *)img, v);
 }
 
-static void set_zoom(void *img, int32_t v) {
-    lv_img_set_zoom((lv_obj_t *) img, v);
+static void set_zoom(void *img, int32_t v)
+{
+    lv_img_set_zoom((lv_obj_t *)img, v);
 }
 
-void Lvgl_Config() {
+void Lvgl_Config()
+{
     lv_init();
-    lv_disp_draw_buf_init(&draw_buf, buf1, NULL, DISP_BUFF_SIZE);  /*Initialize the display buffer.*/
+    lv_disp_draw_buf_init(&draw_buf, buf1, nullptr, DISP_BUFF_SIZE); /*Initialize the display buffer.*/
 
-    static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
-    lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
-    disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
-    disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
+    static lv_disp_drv_t disp_drv;     /*Descriptor of a display driver*/
+    lv_disp_drv_init(&disp_drv);       /*Basic initialization*/
+    disp_drv.flush_cb = my_disp_flush; /*Set your driver function*/
+    disp_drv.draw_buf = &draw_buf;     /*Assign the buffer to the display*/
     disp_drv.hor_res = DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
     disp_drv.ver_res = DISP_VER_RES;   /*Set the vertical resolution of the display*/
-    lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+    lv_disp_drv_register(&disp_drv);   /*Finally register the driver*/
 
-//    static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
-//    lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
-//    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
-//    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
-//    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
+    //    static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
+    //    lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
+    //    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
+    //    indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
+    //    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 }
 
-void Fatfs_Config() {
+void Fatfs_Config()
+{
     FRESULT res = f_mount(&SDFatFS, SDPath, 1);
-    if (res != FR_OK) {
+    if (res != FR_OK)
+    {
         lv_label_set_text_fmt(info, "fatfs error:%d", res);
-        while (1);
+        while (1)
+            ;
     }
 }
 
-void flash_config() {
+void flash_config()
+{
     uint8_t datatemp[32];
-    W25QXX_Write((uint8_t *) "test", 0x0, 4);
+    W25QXX_Write((uint8_t *)"test", 0x0, 4);
 
     W25QXX_Read(datatemp, 0x0, 4);
 
-    for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < 4; i++)
+    {
         datatemp[i] = datatemp[i];
     }
 }
 
-void psram_config() {
+void psram_config()
+{
     uint8_t datatemp[32];
-    while (1) {
-        QSPI_PSRAM_Write((uint8_t *) "test", 0xA5, 4);
+    while (1)
+    {
+        QSPI_PSRAM_Write((uint8_t *)"test", 0xA5, 4);
 
         QSPI_PSRAM_Read(datatemp, 0xA5, 4);
     }
 
-    for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < 4; i++)
+    {
         datatemp[i] = datatemp[i];
     }
 }
 
-void StartDefaultTask(void *argument) {
+void StartDefaultTask(void *argument)
+{
     FIL *file;
     FRESULT res;
     ledTask = osThreadNew(task_led, nullptr, &ledTask_attributes);
@@ -151,8 +167,8 @@ void StartDefaultTask(void *argument) {
     piclib_init();
     lv_label_set_text(info, "init fatfs");
     Fatfs_Config();
-//    lv_label_set_text(info, "config flash");
-//    flash_config();
+    //    lv_label_set_text(info, "config flash");
+    //    flash_config();
     lv_label_set_text(info, "config psram");
     psram_config();
     lv_label_set_text(info, "init font");
@@ -179,13 +195,13 @@ void StartDefaultTask(void *argument) {
     lv_obj_align(label3, LV_ALIGN_BOTTOM_LEFT, 5, 0);
 
     osDelay(2000);
-//    ai_load_picfile((const uint8_t *) "0:test.jpg", 0, 0, lcd_drv->getLcdPixelWidth(),
-//                    lcd_drv->getLcdPixelHeight());
+    //    ai_load_picfile((const uint8_t *) "0:test.jpg", 0, 0, lcd_drv->getLcdPixelWidth(),
+    //                    lcd_drv->getLcdPixelHeight());
 
     osThreadExit();
 }
 
-void task_init() {
+void task_init()
+{
     defaultTaskHandle = osThreadNew(StartDefaultTask, nullptr, &defaultTask_attributes);
-
 }

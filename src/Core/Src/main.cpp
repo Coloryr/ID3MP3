@@ -1,7 +1,7 @@
 #include "main.h"
 #include "cmsis_os.h"
-#include "init/init.h"
-#include "tasks/task_start.h"
+#include "Init/init.h"
+#include "Tasks/task_start.h"
 
 int main() {
     __HAL_RCC_D2SRAM1_CLK_ENABLE();
